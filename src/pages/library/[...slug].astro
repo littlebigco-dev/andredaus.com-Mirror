@@ -1,0 +1,344 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('library');
+  return entries
+    .filter(e => e.id.startsWith('en/'))
+    .map(entry => ({
+      params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+
+// Resolve related entries
+const relatedConcepts = await Promise.all(
+  entry.data.related_concepts.map(ref => getEntry(ref))
+);
+const relatedEntries = await Promise.all(
+  entry.data.related_entries.map(ref => getEntry(ref))
+);
+const relatedUseCases = await Promise.all(
+  entry.data.related_use_cases.map(ref => getEntry(ref))
+);
+
+const categoryLabels: Record<string, { en: string; de: string }> = {
+  bias: { en: 'Cognitive Bias', de: 'Kognitive Verzerrung' },
+  'liberating-structure': { en: 'Liberating Structure', de: 'Liberating Structure' },
+  'mental-model': { en: 'Mental Model', de: 'Mentales Modell' },
+};
+
+function formatDate(d: Date) {
+  return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+---
+
+<Base
+  title={`${entry.data.title} — André Daus Library`}
+  description={entry.data.summary}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="lib-entry-hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href={`${prefix}/library`}>{isDE ? 'Bibliothek' : 'Library'}</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">
+          {isDE ? categoryLabels[entry.data.category]?.de : categoryLabels[entry.data.category]?.en}
+        </span>
+      </nav>
+
+      <div class="lib-entry-hero__meta">
+        <span class="entry-cat">
+          {isDE ? categoryLabels[entry.data.category]?.de : categoryLabels[entry.data.category]?.en}
+        </span>
+        <span class="entry-updated">
+          {isDE ? 'Zuletzt aktualisiert' : 'Last updated'}:
+          <time datetime={entry.data.last_updated.toISOString()}>
+            {formatDate(entry.data.last_updated)}
+          </time>
+        </span>
+      </div>
+
+      <h1 class="lib-entry-hero__title">{entry.data.title}</h1>
+
+      {entry.data.summary && (
+        <p class="lib-entry-hero__summary">{entry.data.summary}</p>
+      )}
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div class="article-layout container">
+    <article class="article-body prose">
+      <Content />
+    </article>
+
+    <aside class="article-aside">
+      <!-- Related concepts (cross-category) -->
+      {relatedConcepts.filter(Boolean).length > 0 && (
+        <div class="aside-card">
+          <p class="label" style="margin-bottom:1rem">
+            {isDE ? 'Verwandte Konzepte' : 'Related Concepts'}
+          </p>
+          <ul class="aside-related">
+            {relatedConcepts.filter(Boolean).map(rel => {
+              if (!rel) return null;
+              const relSlug = rel.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+              return (
+                <li>
+                  <a href={`${prefix}/library/${relSlug}`} class="aside-rel-link">
+                    <span class="aside-rel-cat">
+                      {isDE ? categoryLabels[rel.data.category]?.de : categoryLabels[rel.data.category]?.en}
+                    </span>
+                    {rel.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <!-- Related entries (same category) -->
+      {relatedEntries.filter(Boolean).length > 0 && (
+        <div class="aside-card" style="margin-top:1.5rem">
+          <p class="label" style="margin-bottom:1rem">
+            {isDE ? 'Weitere Einträge' : 'More Entries'}
+          </p>
+          <ul class="aside-related">
+            {relatedEntries.filter(Boolean).map(rel => {
+              if (!rel) return null;
+              const relSlug = rel.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+              return (
+                <li>
+                  <a href={`${prefix}/library/${relSlug}`} class="aside-rel-link">
+                    {rel.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <!-- Related use cases -->
+      {relatedUseCases.filter(Boolean).length > 0 && (
+        <div class="aside-card" style="margin-top:1.5rem">
+          <p class="label" style="margin-bottom:1rem">
+            {isDE ? 'In der Praxis' : 'In Practice'}
+          </p>
+          <ul class="aside-related">
+            {relatedUseCases.filter(Boolean).map(uc => {
+              if (!uc) return null;
+              const ucSlug = uc.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+              return (
+                <li>
+                  <a href={`${prefix}/use-cases/${ucSlug}`} class="aside-rel-link">
+                    <span class="aside-rel-cat">{isDE ? 'Praxisbeispiel' : 'Use Case'}</span>
+                    {uc.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <!-- CTA -->
+      <div class="aside-card aside-card--cta" style="margin-top:1.5rem">
+        <p class="label" style="margin-bottom:1rem">{isDE ? 'In Ihrer Praxis' : 'In Your Practice'}</p>
+        <p class="aside-card__text">
+          {isDE
+            ? 'Dieses Konzept erscheint in realen Entscheidungsprozessen. Ein Discovery Call zeigt, wie es in Ihrer Situation relevant ist.'
+            : 'This concept appears in real decision processes. A discovery call shows how it\'s relevant in your situation.'}
+        </p>
+        <a href={`${prefix}/contact`} class="btn btn--outline" style="margin-top:1.25rem;width:100%;justify-content:center">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+      </div>
+
+      <div class="aside-card" style="margin-top:1.5rem">
+        <a href={`${prefix}/library`} class="back-link">
+          {isDE ? '← Bibliothek' : '← Library'}
+        </a>
+      </div>
+    </aside>
+  </div>
+
+</Base>
+
+<style>
+  .lib-entry-hero {
+    position: relative;
+    padding: calc(68px + 4rem) 0 4rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+  .breadcrumb a { color: var(--gold); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .lib-entry-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .entry-cat {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .entry-updated {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .lib-entry-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+  }
+  .lib-entry-hero__summary {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 55ch;
+    line-height: 1.6;
+  }
+
+  .article-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 5rem;
+    padding-top: 4rem;
+    padding-bottom: 6rem;
+    align-items: start;
+  }
+
+  .article-body :global(h2) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+  }
+  .article-body :global(h3) {
+    font-family: var(--sans);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .article-body :global(p) {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+  .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
+  .article-body :global(em) { font-style: italic; color: var(--text-primary); }
+  .article-body :global(ul), .article-body :global(ol) {
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
+  .article-body :global(ol li) { list-style: decimal; }
+  .article-body :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 3rem 0;
+  }
+  .article-body :global(a) { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+
+  .article-aside { position: sticky; top: calc(68px + 2rem); }
+  .aside-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+  }
+  .aside-card--cta { border-color: var(--border); }
+  .aside-card__text { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.7; }
+
+  .aside-related {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+  .aside-rel-link {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .aside-rel-link:hover { color: var(--gold); }
+  .aside-rel-cat {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .back-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+  }
+
+  @media (max-width: 900px) {
+    .article-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .article-aside { position: static; }
+  }
+</style>

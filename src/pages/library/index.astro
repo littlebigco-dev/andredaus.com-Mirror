@@ -1,0 +1,474 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+
+const allEntries = await getCollection('library');
+const entries = allEntries
+  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/'))
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, isDE ? 'de' : 'en'));
+
+// All entries serialised for client-side filtering
+const entriesJSON = JSON.stringify(entries.map(e => ({
+  id: e.id,
+  title: e.data.title,
+  category: e.data.category,
+  summary: e.data.summary ?? '',
+  slug: e.id.replace(/^(en|de)\//, '').replace(/\.md$/, ''),
+  letter: e.data.title[0].toUpperCase(),
+})));
+
+// All letters present in the full set
+const allLetters = Array.from(new Set(entries.map(e => e.data.title[0].toUpperCase()))).sort();
+
+const categoryLabels: Record<string, { en: string; de: string }> = {
+  bias: { en: 'Cognitive Bias', de: 'Kognitive Verzerrung' },
+  'liberating-structure': { en: 'Liberating Structure', de: 'Liberating Structure' },
+  'mental-model': { en: 'Mental Model', de: 'Mentales Modell' },
+};
+---
+
+<Base
+  title={isDE ? 'Bibliothek — André Daus' : 'Library — André Daus'}
+  description={isDE
+    ? 'Kognitive Verzerrungen, Liberating Structures und mentale Modelle — Referenzeinträge für strategisches Denken.'
+    : 'Cognitive biases, liberating structures, and mental models — reference entries for strategic thinking.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="coll-hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="container">
+      <p class="label">{isDE ? 'Bibliothek' : 'Library'}</p>
+      <h1 class="coll-hero__heading">
+        {isDE
+          ? <Fragment>Das Vokabular des <em>strategischen Denkens.</em></Fragment>
+          : <Fragment>The vocabulary of <em>strategic thinking.</em></Fragment>}
+      </h1>
+      <p class="coll-hero__sub">
+        {isDE
+          ? 'Kognitive Verzerrungen, Liberating Structures und mentale Modelle — immergrüne Referenzeinträge für Führungskräfte, die besser denken wollen.'
+          : 'Cognitive biases, liberating structures, and mental models — evergreen reference entries for leaders who want to think more clearly.'}
+      </p>
+    </div>
+  </header>
+
+  <!-- CONTROLS -->
+  <div class="library-controls" id="library-controls">
+    <div class="container">
+      <div class="controls-inner">
+
+        <!-- Category tabs -->
+        <div class="cat-tabs" role="group" aria-label={isDE ? 'Nach Kategorie filtern' : 'Filter by category'}>
+          <button class="cat-tab is-active" data-cat="all" aria-pressed="true">
+            {isDE ? 'Alle' : 'All'}
+          </button>
+          {(['bias', 'liberating-structure', 'mental-model'] as const).map(cat => (
+            <button class="cat-tab" data-cat={cat} aria-pressed="false">
+              {isDE ? categoryLabels[cat].de : categoryLabels[cat].en}
+            </button>
+          ))}
+        </div>
+
+        <!-- Search (scaffolded for Pagefind in Phase 5) -->
+        <div class="library-search" role="search">
+          <label for="library-search-input" class="sr-only">
+            {isDE ? 'Bibliothek durchsuchen' : 'Search library'}
+          </label>
+          <input
+            type="search"
+            id="library-search-input"
+            class="search-input"
+            placeholder={isDE ? 'Suchen…' : 'Search…'}
+            autocomplete="off"
+          />
+          <span class="search-icon" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ALPHA INDEX + GRID -->
+  <section class="section library-section" aria-label={isDE ? 'Bibliothekseinträge' : 'Library entries'}>
+    <div class="container library-layout">
+
+      <!-- Alphabetical sidebar index -->
+      <nav class="alpha-index" aria-label={isDE ? 'Alphabetischer Index' : 'Alphabetical index'} id="alpha-nav">
+        {allLetters.map(letter => (
+          <a href={`#letter-${letter}`} class="alpha-link" data-letter={letter}>
+            {letter}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Entry list -->
+      <div class="library-list" id="library-list" aria-live="polite">
+        {allLetters.map(letter => (
+          <div class="alpha-group" data-letter={letter} id={`letter-${letter}`}>
+            <h2 class="alpha-group__heading" aria-label={`${isDE ? 'Einträge unter' : 'Entries under'} ${letter}`}>
+              {letter}
+            </h2>
+            <ul class="alpha-group__list">
+              {entries
+                .filter(e => e.data.title[0].toUpperCase() === letter)
+                .map(entry => {
+                  const slug = entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+                  return (
+                    <li class="lib-entry" data-category={entry.data.category} data-title={entry.data.title.toLowerCase()}>
+                      <a href={`${prefix}/library/${slug}`} class="lib-entry__link">
+                        <div class="lib-entry__inner">
+                          <div class="lib-entry__text">
+                            <h3 class="lib-entry__title">{entry.data.title}</h3>
+                            {entry.data.summary && (
+                              <p class="lib-entry__summary">{entry.data.summary}</p>
+                            )}
+                          </div>
+                          <span class="lib-entry__cat">
+                            {isDE ? categoryLabels[entry.data.category]?.de : categoryLabels[entry.data.category]?.en}
+                          </span>
+                        </div>
+                      </a>
+                    </li>
+                  );
+                })
+              }
+            </ul>
+          </div>
+        ))}
+
+        <p class="no-results" id="no-results" hidden>
+          {isDE ? 'Keine Einträge gefunden.' : 'No entries found.'}
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</Base>
+
+<script define:vars={{ entriesJSON, prefix }}>
+  const entries = JSON.parse(entriesJSON);
+  const catTabs = document.querySelectorAll('.cat-tab');
+  const searchInput = document.getElementById('library-search-input');
+  const alphaLinks = document.querySelectorAll('.alpha-link');
+  const noResults = document.getElementById('no-results');
+
+  let activeCat = 'all';
+  let searchTerm = '';
+
+  // Sync URL param on category change
+  function pushCategoryParam(cat) {
+    const url = new URL(window.location.href);
+    if (cat === 'all') {
+      url.searchParams.delete('category');
+    } else {
+      url.searchParams.set('category', cat);
+    }
+    history.replaceState(null, '', url.toString());
+  }
+
+  function applyFilters() {
+    const filtered = entries.filter(e => {
+      const catMatch = activeCat === 'all' || e.category === activeCat;
+      const searchMatch = !searchTerm || e.title.toLowerCase().includes(searchTerm) || e.summary.toLowerCase().includes(searchTerm);
+      return catMatch && searchMatch;
+    });
+
+    const filteredSlugs = new Set(filtered.map(e => e.slug));
+    const filteredLetters = new Set(filtered.map(e => e.letter));
+
+    // Show/hide entries
+    document.querySelectorAll('.lib-entry').forEach(el => {
+      const link = el.querySelector('a');
+      const href = link?.getAttribute('href') || '';
+      const slug = href.split('/').pop();
+      el.hidden = !filteredSlugs.has(slug);
+    });
+
+    // Show/hide alpha groups; update alpha nav
+    document.querySelectorAll('.alpha-group').forEach(group => {
+      const letter = group.dataset.letter;
+      group.hidden = !filteredLetters.has(letter);
+    });
+
+    alphaLinks.forEach(link => {
+      const letter = link.dataset.letter;
+      link.classList.toggle('is-dimmed', !filteredLetters.has(letter));
+    });
+
+    // No results
+    noResults.hidden = filtered.length > 0;
+  }
+
+  // Category tabs
+  catTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      activeCat = tab.dataset.cat;
+      catTabs.forEach(t => {
+        t.classList.toggle('is-active', t === tab);
+        t.setAttribute('aria-pressed', t === tab ? 'true' : 'false');
+      });
+      pushCategoryParam(activeCat);
+      applyFilters();
+    });
+  });
+
+  // Search (client-side title/summary match; Pagefind wired in Phase 5)
+  searchInput?.addEventListener('input', () => {
+    searchTerm = searchInput.value.toLowerCase().trim();
+    applyFilters();
+  });
+
+  // Initialise from URL param
+  const initCat = new URLSearchParams(window.location.search).get('category') || 'all';
+  if (initCat !== 'all') {
+    const matchTab = document.querySelector(`.cat-tab[data-cat="${initCat}"]`);
+    if (matchTab) {
+      activeCat = initCat;
+      catTabs.forEach(t => {
+        t.classList.toggle('is-active', t === matchTab);
+        t.setAttribute('aria-pressed', t === matchTab ? 'true' : 'false');
+      });
+      applyFilters();
+    }
+  }
+</script>
+
+<style>
+  /* Hero */
+  .coll-hero {
+    position: relative;
+    padding: calc(68px + var(--section)) 0 var(--section);
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .coll-hero .label { margin-bottom: 1.25rem; }
+  .coll-hero__heading {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+  .coll-hero__heading em { font-style: italic; color: var(--gold); }
+  .coll-hero__sub {
+    max-width: 52ch;
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+  }
+
+  /* Controls bar */
+  .library-controls {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+    padding: 1rem 0;
+    position: sticky;
+    top: 68px;
+    z-index: 10;
+  }
+  .controls-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  /* Category tabs */
+  .cat-tabs {
+    display: flex;
+    gap: 0.375rem;
+    flex-wrap: wrap;
+  }
+  .cat-tab {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: transparent;
+    color: var(--text-subtle);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+  }
+  .cat-tab:hover,
+  .cat-tab.is-active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-trans);
+  }
+
+  /* Search */
+  .library-search {
+    position: relative;
+    margin-left: auto;
+  }
+  .search-input {
+    font-family: var(--sans);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 7px 12px 7px 36px;
+    width: 220px;
+    transition: border-color var(--transition-fast);
+  }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-input:focus { outline: none; border-color: var(--gold); }
+  .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    display: flex;
+  }
+
+  /* Library layout */
+  .library-section { padding-top: 3rem; }
+  .library-layout {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  /* Alpha index */
+  .alpha-index {
+    position: sticky;
+    top: calc(68px + 60px + 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .alpha-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-subtle);
+    text-align: center;
+    padding: 4px;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: color var(--transition-fast);
+  }
+  .alpha-link:hover { color: var(--gold); }
+  .alpha-link.is-dimmed { color: var(--text-muted); opacity: 0.4; pointer-events: none; }
+
+  /* Alpha groups */
+  .alpha-group { margin-bottom: 3rem; }
+  .alpha-group__heading {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .alpha-group__list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  /* Library entries */
+  .lib-entry {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    transition: border-color var(--transition-fast);
+    margin-bottom: 2px;
+  }
+  .lib-entry:hover { border-color: var(--border); }
+
+  .lib-entry__link {
+    display: block;
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .lib-entry__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    justify-content: space-between;
+  }
+  .lib-entry__text { flex: 1; min-width: 0; }
+
+  .lib-entry__title {
+    font-family: var(--sans);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+  .lib-entry__summary {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .lib-entry__cat {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 3px 8px;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+  }
+
+  .no-results {
+    color: var(--text-subtle);
+    font-style: italic;
+    padding: 3rem 0;
+  }
+
+  @media (max-width: 700px) {
+    .library-layout { grid-template-columns: 1fr; }
+    .alpha-index {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .library-search { margin-left: 0; width: 100%; }
+    .search-input { width: 100%; }
+    .lib-entry__inner { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+  }
+</style>
