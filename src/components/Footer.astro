@@ -1,0 +1,209 @@
+---
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__main">
+
+      <!-- Brand + social -->
+      <div class="footer__brand">
+        <p class="footer__brand-name">André Daus</p>
+        <p class="footer__brand-sub">Strategic Opposition</p>
+        <p class="footer__tagline">Your thinking creates your limits.</p>
+        <nav class="footer__social" aria-label="Social media links">
+          <a
+            href="https://twitter.com/andredaus"
+            class="footer__social-link"
+            aria-label="André Daus on X (Twitter)"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true">
+              <path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/>
+            </svg>
+          </a>
+          <a
+            href="https://linkedin.com/in/andredaus"
+            class="footer__social-link"
+            aria-label="André Daus on LinkedIn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true">
+              <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/>
+            </svg>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Nav columns -->
+      <nav class="footer__nav" aria-label="Site navigation">
+        <div>
+          <h3 class="footer__nav-heading">{isDE ? 'Leistungen' : 'Services'}</h3>
+          <ul class="footer__nav-list">
+            <li><a href={`${prefix}/services/assumption-hunting`} class="footer__nav-link">Assumption Hunting</a></li>
+            <li><a href={`${prefix}/services/1-on-1-coaching`}    class="footer__nav-link">1:1 Coaching</a></li>
+            <li><a href={`${prefix}/services/burn-the-box`}       class="footer__nav-link">Burn the Box</a></li>
+            <li><a href={`${prefix}/services/workshop`}           class="footer__nav-link">Strategic Opposition Workshop</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="footer__nav-heading">{isDE ? 'Entdecken' : 'Explore'}</h3>
+          <ul class="footer__nav-list">
+            <li><a href={`${prefix}/use-cases`}  class="footer__nav-link">{isDE ? 'Fallstudien' : 'Use Cases'}</a></li>
+            <li><a href={`${prefix}/about`}       class="footer__nav-link">{isDE ? 'Die Methode' : 'The Opposition Method'}</a></li>
+            <li><a href={`${prefix}/insights`}    class="footer__nav-link">{isDE ? 'Einblicke' : 'Insights'}</a></li>
+            <li><a href={`${prefix}/podcast`}     class="footer__nav-link">Iconoclast Insights</a></li>
+            <li><a href={`${prefix}/faq`}         class="footer__nav-link">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="footer__nav-heading">{isDE ? 'Auch von André' : 'Also by André'}</h3>
+          <ul class="footer__nav-list">
+            <li>
+              <a href="https://littlebig.co" class="footer__nav-link" target="_blank" rel="noopener noreferrer">
+                LittleBig.Co
+                <span style="color:#7ab648;margin-left:4px" aria-hidden="true">↗</span>
+                <span class="sr-only">(opens in new tab)</span>
+              </a>
+            </li>
+            <li><a href={`${prefix}/about`}   class="footer__nav-link">{isDE ? 'Über André' : 'About André'}</a></li>
+            <li><a href={`${prefix}/contact`} class="footer__nav-link">{isDE ? 'Kontakt' : 'Contact'}</a></li>
+          </ul>
+        </div>
+      </nav>
+
+    </div><!-- /.footer__main -->
+
+    <div class="footer__legal">
+      <p class="footer__copyright">Copyright {year} © André Daus</p>
+      <nav class="footer__legal-links" aria-label="Legal pages">
+        <a href={`${prefix}/policy/privacy`}      class="footer__legal-link">{isDE ? 'Datenschutz' : 'Privacy Policy'}</a>
+        <a href={`${prefix}/policy/legal-notice`} class="footer__legal-link">{isDE ? 'Impressum' : 'Legal Notice'}</a>
+        <a href={`${prefix}/policy/terms`}        class="footer__legal-link">{isDE ? 'AGB' : 'Terms'}</a>
+        <a href={`${prefix}/policy/ai-use`}       class="footer__legal-link">{isDE ? 'KI-Richtlinie' : 'AI Policy'}</a>
+      </nav>
+    </div>
+
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--bg-surface);
+    padding-block: 4rem 2.5rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .footer__main {
+    display: grid;
+    grid-template-columns: 1.2fr 2fr;
+    gap: 4rem;
+    margin-bottom: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .footer__brand-name {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .footer__brand-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+  .footer__tagline {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 28ch;
+    margin-bottom: 1.5rem;
+  }
+
+  .footer__social { display: flex; gap: 1rem; }
+  .footer__social-link {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .footer__social-link:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .footer__nav-heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .footer__nav-list { display: flex; flex-direction: column; gap: 0.375rem; }
+  .footer__nav-link {
+    font-size: 13px;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+    padding-block: 4px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  .footer__nav-link:hover { color: var(--text-primary); }
+
+  .footer__legal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .footer__copyright {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+  }
+  .footer__legal-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .footer__legal-link {
+    font-size: 12px;
+    color: var(--text-subtle);
+    transition: color 0.2s ease;
+    text-decoration: none;
+    padding-block: 4px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+  }
+  .footer__legal-link:hover { color: var(--text-secondary); }
+
+  @media (max-width: 760px) {
+    .footer__main { grid-template-columns: 1fr; gap: 2.5rem; }
+    .footer__nav  { grid-template-columns: 1fr 1fr; }
+  }
+</style>

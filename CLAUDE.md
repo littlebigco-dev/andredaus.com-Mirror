@@ -200,7 +200,8 @@ src/
     podcast/
       en/
       de/
-public/             # Static assets (images, fonts, etc.)
+public/
+  fonts/            # Self-hosted .woff2 font files (Instrument Serif, Work Sans, DM Mono)
 ```
 
 ---
@@ -224,6 +225,16 @@ The Library archive is the most complex page on the site. It requires:
 - Categories defined as `string` initially — tighten to enum once content stabilises
 - `reference()` for all cross-collection relationships — never manual slug strings
 
+### Global utility classes (defined in global.css — usable everywhere)
+- `.container` — max-width wrapper with gutter padding
+- `.section` — vertical section padding
+- `.label` — gold mono label with decorative line prefix
+- `.btn`, `.btn--primary`, `.btn--outline`, `.btn-arrow` — button variants
+- `.skip-link` — WCAG 2.4.1 skip-to-content link
+- `.sr-only` — screen-reader-only visually hidden text
+- `.img-ph`, `.img-ph__icon`, `.img-ph__label`, `.img-ph__desc` — image placeholder
+- `.prose` — max-width constraint for body text
+
 ---
 
 ## Technical Decisions (recorded during build)
@@ -243,7 +254,23 @@ The Library archive is the most complex page on the site. It requires:
 - Set key in `.env` locally (see `.env.example`); add to Cloudflare Pages env vars for production
 
 ### Fonts
-- Instrument Serif, Work Sans, DM Mono — to be added as self-hosted files in `public/fonts/` with `@font-face` in `global.css` during Phase 2
+- Self-hosted in `public/fonts/` as `.woff2` files, declared via `@font-face` in `global.css`
+- Work Sans: weights 300/400/500/600/700 (+ italics); Instrument Serif: 400 regular + italic; DM Mono: 300/400/500 (+ italics)
+- Google Fonts links removed — no external font requests
+
+### Design token naming
+- CSS variable names follow the reference HTML convention: `--bg-base`, `--bg-surface`, `--bg-elevated`, `--bg-card`, `--gold`, `--gold-light`, `--gold-dim`, `--gold-glow`, `--gold-trans`, `--text-primary`, `--text-secondary`, `--text-subtle`, `--text-muted`, `--border`, `--border-light`, `--serif`, `--sans`, `--mono`
+- Layout shorthand tokens: `--max-w: 1160px`, `--gutter: clamp(1.25rem,4vw,2.5rem)`, `--section: clamp(5rem,10vw,9rem)`
+- Old Phase 1 names (`--color-bg`, `--color-accent`, `--font-heading`, etc.) have been replaced — do not use them
+
+### Component architecture
+- `Header.astro` — thin wrapper: skip link + `<Nav />`
+- `Nav.astro` — full navigation bar + mobile drawer + JS; self-contained
+- `Footer.astro` — footer with brand, nav columns, social links, legal bar
+- `Base.astro` — imports Header and Footer, wraps `<slot />` in `<main id="main-content">`
+- Nav path prefix is derived from `Astro.url.pathname`; isDE = pathname starts with `/de`
+- Nav route paths: `/services`, `/use-cases`, `/insights`, `/podcast`, `/about`, `/contact`
+- The reference HTML uses `/opposition` for the methodology page — Phase 3 should decide whether this becomes `/about` (combined About + Methodology) or two separate pages (`/about` and `/opposition`), then update the nav links accordingly
 
 ### Content collection IDs
 - Because `glob` loader is used with `base: ./src/content/<collection>`, the `id` of each entry will be `en/slug.md` or `de/slug.md`
@@ -255,7 +282,7 @@ The Library archive is the most complex page on the site. It requires:
 Work through these in order, one Claude Code session per phase:
 
 1. ~~**Foundation**~~ ✅ — Astro scaffold, Cloudflare adapter, i18n config, collection schemas, design system CSS, base layout with PostHog
-2. **Components** — Header, footer, nav, reusable UI components from existing HTML in `_reference/pages/`
+2. ~~**Components**~~ ✅ — Fonts self-hosted, global.css design tokens expanded, Header/Nav/Footer components built, Base.astro wired up
 3. **Static pages** — Home, About, Contact, 404, Policies
 4. **Collection templates** — Single page templates per collection, archive/listing pages, Library archive with filters
 5. **Integrations** — Contact form Worker, OG image hook, Cal.com booking, Pagefind

@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title: string;
@@ -47,9 +49,6 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
     {description && <meta name="twitter:description" content={description} />}
     {ogImage && <meta name="twitter:image" content={ogImage} />}
 
-    <!-- Fonts — loaded from public/fonts via @font-face in global.css -->
-    <!-- Instrument Serif, Work Sans, DM Mono are added in Phase 2 -->
-
     <!-- PostHog Analytics -->
     {posthogKey && (
       <script is:inline define:vars={{ posthogKey }}>
@@ -62,6 +61,10 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
     )}
   </head>
   <body>
-    <slot />
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>
