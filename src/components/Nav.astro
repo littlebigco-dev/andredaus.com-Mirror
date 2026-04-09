@@ -8,11 +8,12 @@ const pathWithoutLang = isDE ? (currentPath.slice(3) || '/') : currentPath;
 const altLangHref = isDE ? pathWithoutLang : `/de${currentPath}`;
 
 const navLinks = [
-  { href: `${prefix}/services`,  label: isDE ? 'Leistungen' : 'Services' },
-  { href: `${prefix}/use-cases`, label: isDE ? 'Fallstudien' : 'Use Cases' },
-  { href: `${prefix}/insights`,  label: isDE ? 'Einblicke'  : 'Insights' },
-  { href: `${prefix}/podcast`,   label: 'Podcast' },
-  { href: `${prefix}/about`,     label: isDE ? 'Über André' : 'About' },
+  { href: `${prefix}/services`,    label: isDE ? 'Leistungen'   : 'Services' },
+  { href: `${prefix}/use-cases`,   label: isDE ? 'Fallstudien'  : 'Use Cases' },
+  { href: `${prefix}/insights`,    label: isDE ? 'Einblicke'    : 'Insights' },
+  { href: `${prefix}/podcast`,     label: 'Podcast' },
+  { href: `${prefix}/opposition`,  label: isDE ? 'Methodik'     : 'Opposition' },
+  { href: `${prefix}/about`,       label: isDE ? 'Über André'   : 'About' },
 ];
 
 function isActive(href: string) {

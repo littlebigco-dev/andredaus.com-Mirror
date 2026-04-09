@@ -1,0 +1,953 @@
+---
+import Base from '../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+---
+
+<Base
+  title={isDE ? 'Kontakt — André Daus' : 'Contact — André Daus'}
+  description={isDE
+    ? 'Buchen Sie ein 30-minütiges Entdeckungsgespräch. Kein Pitch, keine Agenda. Ich stelle die Fragen, die wahrscheinlich noch niemand gestellt hat.'
+    : 'Book a 30-minute discovery call. No pitch deck, no agenda. I ask questions you probably haven\'t been asked, and we find out whether what I do is what you need.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="contact-hero" aria-labelledby="contact-heading">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="container">
+      <div class="contact-hero__inner">
+        <div>
+          <p class="label">{isDE ? 'Kontakt aufnehmen' : 'Get in touch'}</p>
+          <h1 class="contact-hero__heading" id="contact-heading">
+            {isDE
+              ? <Fragment>Finden wir heraus,<br />was Sie noch nicht<br /><em>sehen.</em></Fragment>
+              : <Fragment>Let's find out<br />what you're not<br /><em>seeing yet.</em></Fragment>
+            }
+          </h1>
+          <p class="contact-hero__sub">
+            {isDE
+              ? 'Ein 30-minütiges Entdeckungsgespräch. Kein Pitch, keine Agenda. Ich stelle Fragen, die wahrscheinlich noch niemand gestellt hat — und wir finden heraus, ob das, was ich tue, das ist, was Sie brauchen.'
+              : 'A 30-minute discovery call. No pitch deck, no agenda. I ask questions you probably haven\'t been asked, and we find out whether what I do is what you need.'
+            }
+          </p>
+        </div>
+
+        <div class="reach-aside" aria-label={isDE ? 'Schnelle Kontaktoptionen' : 'Quick contact options'}>
+          <a href="mailto:hello@andredaus.com" class="reach-card">
+            <span class="reach-card__icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="m2 7 10 7 10-7"/>
+              </svg>
+            </span>
+            <div>
+              <p class="reach-card__label">Email</p>
+              <p class="reach-card__value">hello@andredaus.com</p>
+            </div>
+          </a>
+          <a href="https://linkedin.com/in/andredaus" class="reach-card" target="_blank" rel="noopener noreferrer">
+            <span class="reach-card__icon" aria-hidden="true">
+              <svg width="15" height="15" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true">
+                <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/>
+              </svg>
+            </span>
+            <div>
+              <p class="reach-card__label">LinkedIn</p>
+              <p class="reach-card__value">{isDE ? 'Direkt verbinden' : 'Connect directly'} <span class="sr-only">{isDE ? '(öffnet neues Tab)' : '(opens in new tab)'}</span></p>
+            </div>
+          </a>
+          <a href={`${prefix}/podcast`} class="reach-card">
+            <span class="reach-card__icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20"/>
+              </svg>
+            </span>
+            <div>
+              <p class="reach-card__label">Podcast</p>
+              <p class="reach-card__value">Iconoclast Insights</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN: Booking + Sidebar -->
+  <section class="contact-main" aria-labelledby="booking-heading">
+    <div class="container">
+      <div class="contact-main__inner">
+
+        <!-- Left: Booking -->
+        <div>
+          <p class="label">{isDE ? 'Entdeckungsgespräch' : 'Discovery call'}</p>
+          <h2 class="booking-heading" id="booking-heading">
+            {isDE ? 'Buchen Sie ein 30-minütiges Gespräch' : 'Book a 30-minute call'}
+          </h2>
+          <div class="booking-body">
+            <p>
+              {isDE
+                ? 'Das ist kein Verkaufsgespräch. Ich nutze es so, wie ich jedes Engagement nutze — um die Frage zu stellen, die noch niemand gestellt hat. Manchmal führt das zu etwas, das es wert ist, gemeinsam zu verfolgen. Manchmal nicht. In jedem Fall verlassen Sie das Gespräch mit etwas Nützlichem.'
+                : 'This isn\'t a sales call. I use it the same way I use every engagement — to ask the question nobody\'s asked yet. Sometimes that surfaces something worth pursuing together. Sometimes it doesn\'t. Either way, you leave with something useful.'
+              }
+            </p>
+            <p>
+              {isDE
+                ? 'Wählen Sie einen Termin. Kein Formular, kein Fragebogen vorher.'
+                : 'Pick a time that works. No form, no questionnaire beforehand.'
+              }
+            </p>
+          </div>
+
+          <!-- Cal.com booking block -->
+          <div class="booking-block" aria-label={isDE ? 'Buchungskalender' : 'Booking calendar'}>
+            <div class="booking-block__header">
+              <span class="booking-block__title">{isDE ? 'Entdeckungsgespräch — André Daus' : 'Discovery Call — André Daus'}</span>
+              <span class="booking-block__duration">{isDE ? '30 Min · Video oder Telefon' : '30 min · Video or phone'}</span>
+            </div>
+            <!-- Cal.com embed goes here — replace placeholder once configured -->
+            <div class="booking-placeholder" aria-label={isDE ? 'Kalender-Platzhalter' : 'Calendar placeholder'}>
+              <div class="booking-placeholder__icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/>
+                  <path d="M16 2v4M8 2v4M3 10h18"/>
+                </svg>
+              </div>
+              <p class="booking-placeholder__heading">
+                {isDE ? 'Cal.com-Widget wird hier geladen' : 'Cal.com widget loads here'}
+              </p>
+              <p class="booking-placeholder__note">
+                {isDE
+                  ? 'Wird durch das Cal.com-Inline-Embed ersetzt.'
+                  : 'Replace with Cal.com inline embed to enable direct booking.'
+                }
+              </p>
+              <a href="mailto:hello@andredaus.com?subject=Discovery%20Call%20Request" class="btn btn--outline">
+                {isDE ? 'Stattdessen per E-Mail anfragen' : 'Request by email instead'}
+              </a>
+            </div>
+          </div>
+
+          <!-- What happens in 30 minutes -->
+          <div class="expect fade-up" aria-labelledby="expect-heading">
+            <p class="expect__heading" id="expect-heading">
+              {isDE ? 'Was in 30 Minuten passiert' : 'What happens in 30 minutes'}
+            </p>
+            <div class="expect-steps" role="list">
+              <div class="expect-step" role="listitem">
+                <span class="expect-step__n" aria-hidden="true">1</span>
+                <div class="expect-step__body">
+                  <p class="expect-step__title">
+                    {isDE ? 'Ich frage nach dem Problem, das Sie bereits definiert haben' : 'I ask about the problem you\'ve already defined'}
+                  </p>
+                  <p class="expect-step__desc">
+                    {isDE
+                      ? 'Die Entscheidung, bei der Sie feststecken. Die Situation, die sich nicht verbessert. Die Strategie, die Sie in Frage stellen. Was auch immer Sie hierher gebracht hat.'
+                      : 'The decision you\'re stuck on, the situation that isn\'t improving, the strategy you\'re questioning. Whatever brought you here.'
+                    }
+                  </p>
+                </div>
+              </div>
+              <div class="expect-step" role="listitem">
+                <span class="expect-step__n" aria-hidden="true">2</span>
+                <div class="expect-step__body">
+                  <p class="expect-step__title">
+                    {isDE ? 'Ich hinterfrage die Problemdefinition selbst' : 'I question the problem definition itself'}
+                  </p>
+                  <p class="expect-step__desc">
+                    {isDE
+                      ? 'Meistens enthält das Framing des Problems die Annahme, die es tatsächlich verursacht. Das ist es, wonach ich suche.'
+                      : 'Most of the time, the framing of the problem contains the assumption that\'s actually causing it. That\'s what I\'m looking for.'
+                    }
+                  </p>
+                </div>
+              </div>
+              <div class="expect-step" role="listitem">
+                <span class="expect-step__n" aria-hidden="true">3</span>
+                <div class="expect-step__body">
+                  <p class="expect-step__title">
+                    {isDE ? 'Wir entscheiden, ob wir weitermachen' : 'We determine whether to go further'}
+                  </p>
+                  <p class="expect-step__desc">
+                    {isDE
+                      ? 'Wenn es etwas gibt, das es wert ist zu verfolgen, sage ich direkt, wie das aussieht. Wenn nicht, sage ich das auch.'
+                      : 'If there\'s something worth pursuing, I\'ll be direct about what that looks like. If not, I\'ll tell you that too.'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Sidebar -->
+        <aside class="contact-sidebar" aria-label={isDE ? 'Kontaktinformationen' : 'Contact information'}>
+
+          <!-- Fit card -->
+          <div class="fit-card fade-up">
+            <div class="fit-card__header">
+              <p class="fit-card__label">{isDE ? 'Passt / Passt nicht' : 'Good fit / not a fit'}</p>
+              <p class="fit-card__heading">
+                {isDE ? 'Bevor Sie buchen, ein nützlicher Filter.' : 'Before you book, a useful filter.'}
+              </p>
+            </div>
+            <ul>
+              <li class="fit-item">
+                <span class="fit-icon fit-icon--yes" aria-label={isDE ? 'Gut geeignet' : 'Good fit'}>✓</span>
+                {isDE ? 'Sie vermuten, das eigentliche Problem ist ein anderes als das stated' : 'You suspect the real problem is different from the stated one'}
+              </li>
+              <li class="fit-item">
+                <span class="fit-icon fit-icon--yes" aria-label={isDE ? 'Gut geeignet' : 'Good fit'}>✓</span>
+                {isDE ? 'Sie wollen Widerspruch, keine Bestätigung' : 'You want disagreement, not validation'}
+              </li>
+              <li class="fit-item">
+                <span class="fit-icon fit-icon--yes" aria-label={isDE ? 'Gut geeignet' : 'Good fit'}>✓</span>
+                {isDE ? 'Sie sind Entscheidungsträger mit Handlungsbefugnis' : 'You\'re a decision-maker with authority to act on what you find'}
+              </li>
+              <li class="fit-item">
+                <span class="fit-icon fit-icon--yes" aria-label={isDE ? 'Gut geeignet' : 'Good fit'}>✓</span>
+                {isDE ? 'Sie haben die konventionellen Ansätze bereits ausprobiert' : 'You\'ve already tried the conventional approaches'}
+              </li>
+              <li class="fit-item">
+                <span class="fit-icon fit-icon--no" aria-label={isDE ? 'Nicht geeignet' : 'Not a fit'}>✗</span>
+                {isDE ? 'Sie suchen Implementierungsunterstützung oder Projektmanagement' : 'You\'re looking for implementation support or project management'}
+              </li>
+              <li class="fit-item">
+                <span class="fit-icon fit-icon--no" aria-label={isDE ? 'Nicht geeignet' : 'Not a fit'}>✗</span>
+                {isDE ? 'Sie brauchen jemanden, der eine bereits getroffene Entscheidung bestätigt' : 'You need someone to confirm a decision already made'}
+              </li>
+            </ul>
+          </div>
+
+          <!-- Alt contact -->
+          <div class="alt-card fade-up" aria-labelledby="alt-heading">
+            <p class="alt-card__header" id="alt-heading">
+              {isDE ? 'Andere Wege, mich zu erreichen' : 'Other ways to reach me'}
+            </p>
+            <ul>
+              <li>
+                <a href="mailto:hello@andredaus.com" class="alt-item">
+                  <span class="alt-item__icon" aria-hidden="true">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="2" y="4" width="20" height="16" rx="2"/>
+                      <path d="m2 7 10 7 10-7"/>
+                    </svg>
+                  </span>
+                  <div>
+                    <span class="alt-item__label">hello@andredaus.com</span>
+                    <span class="alt-item__sub">{isDE ? 'Für längere oder komplexe Anfragen' : 'For longer or complex enquiries'}</span>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="https://linkedin.com/in/andredaus" class="alt-item" target="_blank" rel="noopener noreferrer">
+                  <span class="alt-item__icon" aria-hidden="true">
+                    <svg width="13" height="13" viewBox="0 5 1036 990" fill="currentColor">
+                      <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/>
+                    </svg>
+                  </span>
+                  <div>
+                    <span class="alt-item__label">LinkedIn DM<span class="sr-only"> {isDE ? '(öffnet neues Tab)' : '(opens in new tab)'}</span></span>
+                    <span class="alt-item__sub">{isDE ? 'Meist schneller für kurze Fragen' : 'Usually faster for short questions'}</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Response note -->
+          <div class="response-note fade-up" role="note">
+            <span class="response-note__icon" aria-hidden="true">◎</span>
+            <p class="response-note__text">
+              <strong>{isDE ? 'Antwortzeit:' : 'Response time:'}</strong>
+              {isDE
+                ? ' Ich antworte auf jede Nachricht innerhalb von 1–2 Werktagen. Wenn Sie nach 3 Tagen nichts gehört haben, prüfen Sie Ihren Spam-Ordner und versuchen Sie es über LinkedIn.'
+                : ' I respond to every message within 1–2 business days. If you haven\'t heard back in 3 days, check spam and try LinkedIn.'
+              }
+            </p>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ STRIP -->
+  <section class="faq-strip" aria-labelledby="faq-heading">
+    <div class="container">
+      <div class="faq-strip__inner">
+        <div>
+          <p class="label">{isDE ? 'Bevor Sie fragen' : 'Before you ask'}</p>
+          <h2 class="faq-intro-heading" id="faq-heading">
+            {isDE ? 'Häufige Fragen zur Zusammenarbeit' : 'Common questions about working together'}
+          </h2>
+          <p class="faq-intro-body">
+            {isDE
+              ? 'Wenn Ihre Frage nicht dabei ist, stellen Sie sie einfach im Gespräch oder per E-Mail.'
+              : 'If your question isn\'t here, just ask it in the call or by email.'
+            }
+          </p>
+        </div>
+
+        <div class="faq-list" role="list">
+          <div class="faq-item" role="listitem">
+            <button class="faq-btn" aria-expanded="false" aria-controls="faq1" id="faq1-btn">
+              {isDE ? 'Muss ich mich auf das Gespräch vorbereiten?' : 'Do I need to prepare anything before the call?'}
+              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
+                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="faq-panel" id="faq1" role="region" aria-labelledby="faq1-btn">
+              <p>
+                {isDE
+                  ? 'Nein. Kommen Sie mit dem Problem, wie Sie es derzeit verstehen — die Entscheidung, bei der Sie feststecken, die Situation, die sich nicht verbessert. Vorbereitung produziert in der Regel einstudierte Antworten, und genau das versuche ich zu umgehen.'
+                  : 'No. Come with the problem as you currently understand it — the decision you\'re stuck on, the situation that isn\'t improving, the strategy you\'re questioning. Preparation tends to produce rehearsed answers, which is exactly what I\'m trying to get past.'
+                }
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-btn" aria-expanded="false" aria-controls="faq2" id="faq2-btn">
+              {isDE ? 'Was, wenn ich nicht sicher bin, welche Leistung passt?' : 'What if I\'m not sure which service fits?'}
+              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
+                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="faq-panel" id="faq2" role="region" aria-labelledby="faq2-btn">
+              <p>
+                {isDE
+                  ? 'Das klärt das Entdeckungsgespräch. Ich habe kein Standardangebot für jede Situation. Was das richtige Engagement bedeutet, hängt davon ab, was wirklich los ist — und das werde ich erst wissen, nachdem wir gesprochen haben. Versuchen Sie nicht, sich vorher in eine Leistungskategorie einzuordnen.'
+                  : 'The discovery call determines that. I don\'t have a standard offer applied to every situation. What the right engagement looks like depends on what\'s actually going on — and I won\'t know that until we\'ve talked. Don\'t try to pre-fit yourself into a service category before we speak.'
+                }
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-btn" aria-expanded="false" aria-controls="faq3" id="faq3-btn">
+              {isDE ? 'Arbeiten Sie auf Deutsch oder Englisch?' : 'Do you work in German or English?'}
+              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
+                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="faq-panel" id="faq3" role="region" aria-labelledby="faq3-btn">
+              <p>
+                {isDE
+                  ? 'Beides. Engagements finden in der Sprache statt, die der Arbeit besser dient. Teams, die auf Deutsch arbeiten, arbeiten mit mir auf Deutsch; internationale Kunden auf Englisch. Nuancen reisen besser in der Sprache, in der Menschen wirklich denken.'
+                  : 'Both. Engagements happen in whichever language serves the work better. Teams operating in German work with me in German; international clients in English. Nuance travels better in the language people actually think in.'
+                }
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-btn" aria-expanded="false" aria-controls="faq4" id="faq4-btn">
+              {isDE ? 'Arbeiten Sie remote oder vor Ort?' : 'Do you work remotely or in person?'}
+              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
+                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="faq-panel" id="faq4" role="region" aria-labelledby="faq4-btn">
+              <p>
+                {isDE
+                  ? 'Coaching und Beratung finden remote statt. Team-Engagements und Workshops sind überwiegend vor Ort — die Dynamik, die Gruppen-Annahmenarbeit produktiv macht, überlebt Video nicht vollständig. Ich bin in Deutschland ansässig und reise für das richtige Engagement innerhalb Europas.'
+                  : 'Coaching and advisory work happens remotely. Team engagements and workshops are predominantly in person — the dynamics that make group assumption-work productive don\'t fully survive video. I\'m based in Germany and travel within Europe for the right engagement.'
+                }
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item" role="listitem">
+            <button class="faq-btn" aria-expanded="false" aria-controls="faq5" id="faq5-btn">
+              {isDE ? 'Was kostet das?' : 'What does this cost?'}
+              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
+                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="faq-panel" id="faq5" role="region" aria-labelledby="faq5-btn">
+              <p>
+                {isDE
+                  ? 'Die Preisgestaltung hängt von Umfang und Format ab und wird nach dem Entdeckungsgespräch besprochen. Ich veröffentliche keine Festpreise, weil die richtige Engagement-Größe erheblich variiert. Das Entdeckungsgespräch selbst ist kostenlos.'
+                  : 'Pricing depends on scope and format and is discussed after the discovery call. I don\'t publish fixed rates because the right engagement size varies considerably. The discovery call itself is free.'
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  /* ── HERO ─────────────────────────────────────────────── */
+  .contact-hero {
+    padding-top: 68px;
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+    border-bottom: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    pointer-events: none;
+  }
+
+  .contact-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: end;
+    padding-block: clamp(4rem, 8vw, 6.5rem) clamp(3rem, 5vw, 4rem);
+  }
+
+  .contact-hero__heading {
+    font-family: var(--serif);
+    font-size: clamp(2.6rem, 5.5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.05;
+    letter-spacing: -.03em;
+    color: var(--text-primary);
+    margin-top: 1.5rem;
+  }
+  .contact-hero__heading em { font-style: italic; color: var(--gold); }
+
+  .contact-hero__sub {
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
+    color: var(--text-secondary);
+    line-height: 1.85;
+    margin-top: 1.25rem;
+    max-width: 48ch;
+  }
+
+  /* Reach aside */
+  .reach-aside {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-self: end;
+  }
+
+  .reach-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .reach-card:hover {
+    border-color: rgba(196,154,60,.25);
+    background: var(--bg-elevated);
+  }
+
+  .reach-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 3px;
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .reach-card__label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: 3px;
+  }
+
+  .reach-card__value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1.3;
+    transition: color .2s ease;
+  }
+  .reach-card:hover .reach-card__value { color: var(--gold-light); }
+
+  @media (max-width: 820px) {
+    .contact-hero__inner { grid-template-columns: 1fr; gap: 3rem; }
+    .reach-aside { display: grid; grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 520px) {
+    .reach-aside { grid-template-columns: 1fr; }
+  }
+
+  /* ── CONTACT MAIN ─────────────────────────────────────── */
+  .contact-main { padding-block: var(--section); }
+
+  .contact-main__inner {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .booking-heading {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-top: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .booking-body {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    max-width: 52ch;
+    margin-bottom: 2rem;
+  }
+  .booking-body p + p { margin-top: .875rem; }
+
+  /* Booking block (Cal.com placeholder) */
+  .booking-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 2rem;
+  }
+
+  .booking-block__header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .booking-block__title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .booking-block__duration {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+  }
+
+  .booking-placeholder {
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2.5rem;
+    text-align: center;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(196,154,60,.015) 8px,
+      rgba(196,154,60,.015) 16px
+    );
+  }
+
+  .booking-placeholder__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+
+  .booking-placeholder__heading {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+  }
+
+  .booking-placeholder__note {
+    font-size: 13px;
+    color: var(--text-subtle);
+    max-width: 30ch;
+    line-height: 1.6;
+  }
+
+  /* Expect steps */
+  .expect { margin-top: 3rem; }
+
+  .expect__heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.25rem;
+  }
+
+  .expect-steps {
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .expect-step {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .expect-step:last-child { border-bottom: none; }
+
+  .expect-step__n {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 1.25rem .75rem;
+    padding-top: 1.4rem;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--gold);
+    line-height: 1;
+    border-right: 1px solid var(--border-light);
+    background: var(--bg-card-alt);
+  }
+
+  .expect-step__body {
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-card-alt);
+  }
+
+  .expect-step__title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: .375rem;
+  }
+
+  .expect-step__desc {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+
+  /* Sidebar */
+  .contact-sidebar {
+    position: sticky;
+    top: calc(68px + 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .fit-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .fit-card__header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .fit-card__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .625rem;
+  }
+
+  .fit-card__heading {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--text-primary);
+  }
+
+  .fit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: .875rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  .fit-item:last-child { border-bottom: none; }
+
+  .fit-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .fit-icon--yes {
+    background: rgba(122,182,72,.15);
+    color: #7ab648;
+    border: 1px solid rgba(122,182,72,.2);
+  }
+  .fit-icon--no {
+    background: rgba(196,80,60,.1);
+    color: #c4503c;
+    border: 1px solid rgba(196,80,60,.2);
+  }
+
+  .alt-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .alt-card__header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .alt-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    text-decoration: none;
+    color: inherit;
+    transition: background .15s ease;
+  }
+  .alt-item:last-child { border-bottom: none; }
+  .alt-item:hover { background: var(--gold-trans); }
+
+  .alt-item__icon {
+    color: var(--text-subtle);
+    width: 18px;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .alt-item__label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    transition: color .15s ease;
+    line-height: 1.3;
+  }
+  .alt-item:hover .alt-item__label { color: var(--text-primary); }
+
+  .alt-item__sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-subtle);
+    display: block;
+    margin-top: 1px;
+  }
+
+  .response-note {
+    background: var(--navy);
+    border: 1px solid rgba(29,45,68,.8);
+    border-radius: 3px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: .875rem;
+  }
+
+  .response-note__icon {
+    color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 14px;
+  }
+
+  .response-note__text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+  .response-note__text strong { color: var(--text-primary); }
+
+  @media (max-width: 900px) {
+    .contact-main__inner { grid-template-columns: 1fr; }
+    .contact-sidebar { position: static; }
+  }
+
+  /* ── FAQ STRIP ────────────────────────────────────────── */
+  .faq-strip {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+    padding-block: var(--section);
+  }
+
+  .faq-strip__inner {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .faq-intro-heading {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-top: 1.25rem;
+  }
+
+  .faq-intro-body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-top: .875rem;
+  }
+
+  .faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: .625rem;
+  }
+
+  .faq-item {
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .faq-btn {
+    width: 100%;
+    background: var(--bg-card-alt);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    min-height: 56px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: background .15s ease;
+    font-family: var(--sans);
+  }
+  .faq-btn:hover { background: var(--bg-card); }
+  .faq-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
+
+  .faq-chevron {
+    flex-shrink: 0;
+    color: var(--gold);
+    transition: transform .2s ease;
+  }
+  .faq-btn[aria-expanded="true"] .faq-chevron { transform: rotate(180deg); }
+
+  .faq-panel {
+    display: none;
+    padding: 0 1.5rem 1.25rem;
+    background: var(--bg-card-alt);
+  }
+  .faq-panel.is-open { display: block; }
+  .faq-panel p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 760px) {
+    .faq-strip__inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  }
+
+  /* ── FADE-UP ──────────────────────────────────────────── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll<HTMLButtonElement>('.faq-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panelId = btn.getAttribute('aria-controls')!;
+      const panel = document.getElementById(panelId);
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!open));
+      panel?.classList.toggle('is-open', !open);
+    });
+  });
+
+  // Fade-up on scroll
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll<HTMLElement>('.fade-up').forEach(el => observer.observe(el));
+</script>

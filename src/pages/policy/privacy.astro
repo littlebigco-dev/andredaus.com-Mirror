@@ -1,0 +1,975 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+
+const lastUpdated = '25 May 2025';
+---
+
+<Base
+  title={isDE ? 'Datenschutzerklärung — André Daus' : 'Privacy Policy — André Daus'}
+  description={isDE
+    ? 'Datenschutzerklärung gemäß DSGVO, BDSG und Schweizer DSG für andredaus.com.'
+    : 'Privacy Policy in accordance with GDPR, BDSG and Swiss DSG for andredaus.com.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="policy-hero" aria-labelledby="policy-title">
+    <div class="container">
+      <div class="policy-hero__inner">
+        <div>
+          <p class="policy-hero__type">{isDE ? 'Rechtliches · Datenschutz' : 'Legal · Privacy'}</p>
+          <h1 class="policy-hero__title" id="policy-title">
+            {isDE ? 'Datenschutzerklärung' : 'Privacy Policy'}
+          </h1>
+        </div>
+        <aside class="policy-meta" aria-label={isDE ? 'Dokumentinformationen' : 'Document information'}>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Zuletzt aktualisiert' : 'Last updated'}</span>
+            <span class="policy-meta__val policy-meta__val--updated">{lastUpdated}</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Verantwortlicher' : 'Controller'}</span>
+            <span class="policy-meta__val">André Daus, Cologne DE</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Gilt für' : 'Applies to'}</span>
+            <span class="policy-meta__val">andredaus.com</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">Framework</span>
+            <span class="policy-meta__val">GDPR · BDSG · Swiss DSG</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile meta strip -->
+  <div class="meta-strip" aria-label={isDE ? 'Dokumentinformationen' : 'Document info'}>
+    <span>{isDE ? 'Aktualisiert' : 'Updated'}: {lastUpdated}</span>
+    <span class="meta-strip__sep" aria-hidden="true">·</span>
+    <span>GDPR · BDSG · Swiss DSG</span>
+  </div>
+
+  <!-- Policy nav strip -->
+  <nav class="policy-nav-strip" aria-label={isDE ? 'Andere rechtliche Dokumente' : 'Other legal documents'}>
+    <div class="container">
+      <div class="policy-nav-strip__inner" role="list">
+        <a href={`${prefix}/policy/privacy`}       class="policy-nav-link is-active" role="listitem" aria-current="page">{isDE ? 'Datenschutz' : 'Privacy Policy'}</a>
+        <a href={`${prefix}/policy/legal-notice`}  class="policy-nav-link" role="listitem">{isDE ? 'Impressum' : 'Legal Notice'}</a>
+        <a href={`${prefix}/policy/terms`}         class="policy-nav-link" role="listitem">{isDE ? 'AGB' : 'Terms'}</a>
+        <a href={`${prefix}/policy/ai-use`}        class="policy-nav-link" role="listitem">{isDE ? 'KI-Richtlinie' : 'AI Policy'}</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main layout: TOC + content -->
+  <div class="container">
+    <div class="policy-layout">
+
+      <!-- TOC Sidebar -->
+      <aside class="toc-sidebar" aria-label={isDE ? 'Inhaltsverzeichnis' : 'Table of contents'}>
+        <nav class="toc-card" aria-labelledby="toc-heading">
+          <p class="toc-card__heading" id="toc-heading">{isDE ? 'Inhalt' : 'Contents'}</p>
+          <ul class="toc__list" aria-label={isDE ? 'Zum Abschnitt springen' : 'Jump to section'}>
+            <li><a href="#preamble"      class="toc__link is-active">{isDE ? 'Präambel' : 'Preamble'}</a></li>
+            <li><a href="#controller"    class="toc__link">{isDE ? 'Verantwortlicher' : 'Controller'}</a></li>
+            <li><a href="#overview"      class="toc__link">{isDE ? 'Verarbeitungsübersicht' : 'Overview of processing'}</a></li>
+            <li><a href="#legal-bases"   class="toc__link">{isDE ? 'Rechtsgrundlagen' : 'Legal bases'}</a></li>
+            <li><a href="#security"      class="toc__link">{isDE ? 'Sicherheit' : 'Security'}</a></li>
+            <li><a href="#transmission"  class="toc__link">{isDE ? 'Datenweitergabe' : 'Data transmission'}</a></li>
+            <li><a href="#international" class="toc__link">{isDE ? 'Internationaler Transfer' : 'International transfers'}</a></li>
+            <li><a href="#retention"     class="toc__link">{isDE ? 'Speicherung &amp; Löschung' : 'Retention &amp; deletion'}</a></li>
+            <li><a href="#rights"        class="toc__link">{isDE ? 'Ihre Rechte' : 'Your rights'}</a></li>
+            <li><a href="#business"      class="toc__link">{isDE ? 'Geschäftliche Dienste' : 'Business services'}</a></li>
+            <li><a href="#hosting"       class="toc__link">{isDE ? 'Hosting &amp; Online-Dienste' : 'Hosting &amp; online services'}</a></li>
+            <li><a href="#cookies"       class="toc__link">Cookies</a></li>
+            <li><a href="#contact"       class="toc__link">{isDE ? 'Kontakt &amp; Anfragen' : 'Contact &amp; enquiries'}</a></li>
+            <li><a href="#newsletter"    class="toc__link">Newsletter</a></li>
+            <li><a href="#analytics"     class="toc__link">{isDE ? 'Analyse' : 'Analytics'}</a></li>
+            <li><a href="#social"        class="toc__link">{isDE ? 'Soziale Medien' : 'Social media'}</a></li>
+            <li><a href="#ai"            class="toc__link">{isDE ? 'Künstliche Intelligenz' : 'Artificial intelligence'}</a></li>
+            <li><a href="#changes"       class="toc__link">{isDE ? 'Änderungen' : 'Changes &amp; updates'}</a></li>
+            <li><a href="#definitions"   class="toc__link">{isDE ? 'Begriffsbestimmungen' : 'Definitions'}</a></li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-contact">
+          <p class="sidebar-contact__heading">{isDE ? 'Fragen?' : 'Questions?'}</p>
+          <p class="sidebar-contact__body">{isDE ? 'Für Datenschutzanfragen kontaktieren Sie uns direkt.' : 'For data protection enquiries, contact us directly.'}</p>
+          <a href="mailto:hello@andredaus.com" class="sidebar-contact__link">hello@andredaus.com</a>
+        </div>
+      </aside>
+
+      <!-- Policy content -->
+      <article class="policy-body" aria-label={isDE ? 'Inhalt der Datenschutzerklärung' : 'Privacy Policy content'}>
+
+        <section id="preamble">
+          <h2>{isDE ? 'Präambel' : 'Preamble'}</h2>
+          <p>{isDE
+            ? 'Mit der folgenden Datenschutzerklärung möchten wir Sie darüber aufklären, welche Arten Ihrer personenbezogenen Daten (nachfolgend auch kurz als "Daten" bezeichnet) wir zu welchen Zwecken und in welchem Umfang verarbeiten. Die Datenschutzerklärung gilt für alle von uns durchgeführten Verarbeitungen personenbezogener Daten, sowohl im Rahmen der Erbringung unserer Leistungen als auch insbesondere auf unseren Webseiten.'
+            : 'With the following privacy policy we would like to inform you which types of your personal data (hereinafter also abbreviated as "data") we process for which purposes and in which scope. The privacy statement applies to all processing of personal data carried out by us, both in the context of providing our services and in particular on our websites, in mobile applications and within external online presences, such as our social media profiles (hereinafter collectively referred to as "online services").'
+          }</p>
+          <p>{isDE ? 'Die verwendeten Begriffe sind nicht geschlechtsspezifisch.' : 'The terms used are not gender-specific.'}</p>
+          <p>Source: <a href="https://datenschutz-generator.de/" target="_blank" rel="noopener noreferrer">datenschutz-generator.de <span class="sr-only">{isDE ? '(öffnet neues Tab)' : '(opens in new tab)'}</span></a></p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="controller">
+          <h2>{isDE ? 'Verantwortlicher' : 'Controller'}</h2>
+          <p>
+            André Daus<br />
+            c/o Block Services<br />
+            Stuttgarter Str. 106<br />
+            70736 Fellbach<br />
+            {isDE ? 'Deutschland' : 'Germany'}
+          </p>
+          <p>
+            Email: <a href="mailto:hello@andredaus.com">hello@andredaus.com</a><br />
+            {isDE ? 'Telefon' : 'Phone'}: <a href="tel:+492211653180">+49 (221) 1653180</a>
+          </p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="overview">
+          <h2>{isDE ? 'Übersicht der Verarbeitungen' : 'Overview of processing operations'}</h2>
+          <p>{isDE
+            ? 'Die nachfolgende Übersicht fasst die Arten der verarbeiteten Daten und die Zwecke ihrer Verarbeitung zusammen und verweist auf die betroffenen Personen.'
+            : 'The following table summarises the types of data processed, the purposes for which they are processed and the concerned data subjects.'
+          }</p>
+
+          <h3>{isDE ? 'Arten der verarbeiteten Daten' : 'Categories of processed data'}</h3>
+          <ul>
+            <li>{isDE ? 'Bestandsdaten' : 'Inventory data'}</li>
+            <li>{isDE ? 'Zahlungsdaten' : 'Payment data'}</li>
+            <li>{isDE ? 'Kontaktdaten' : 'Contact data'}</li>
+            <li>{isDE ? 'Inhaltsdaten' : 'Content data'}</li>
+            <li>{isDE ? 'Vertragsdaten' : 'Contract data'}</li>
+            <li>{isDE ? 'Nutzungsdaten' : 'Usage data'}</li>
+            <li>{isDE ? 'Meta-, Kommunikations- und Verfahrensdaten' : 'Meta, communication and process data'}</li>
+            <li>{isDE ? 'Protokolldaten' : 'Log data'}</li>
+          </ul>
+
+          <h3>{isDE ? 'Kategorien betroffener Personen' : 'Categories of data subjects'}</h3>
+          <ul>
+            <li>{isDE ? 'Leistungsempfänger und Auftraggeber' : 'Service recipients and clients'}</li>
+            <li>{isDE ? 'Interessenten' : 'Prospective customers'}</li>
+            <li>{isDE ? 'Kommunikationspartner' : 'Communication partners'}</li>
+            <li>{isDE ? 'Nutzer' : 'Users'}</li>
+            <li>{isDE ? 'Geschäfts- und Vertragspartner' : 'Business and contractual partners'}</li>
+          </ul>
+
+          <h3>{isDE ? 'Zwecke der Verarbeitung' : 'Purposes of processing'}</h3>
+          <ul>
+            <li>{isDE ? 'Erbringung vertraglicher Leistungen und Erfüllung vertraglicher Pflichten' : 'Provision of contractual services and fulfilment of contractual obligations'}</li>
+            <li>{isDE ? 'Kommunikation' : 'Communication'}</li>
+            <li>{isDE ? 'Sicherheitsmaßnahmen' : 'Security measures'}</li>
+            <li>{isDE ? 'Direktmarketing' : 'Direct marketing'}</li>
+            <li>{isDE ? 'Webanalyse' : 'Web analytics'}</li>
+            <li>{isDE ? 'Büro- und Organisationsverfahren' : 'Office and organisational procedures'}</li>
+            <li>{isDE ? 'Bereitstellung unserer Onlineangebote und Nutzerfreundlichkeit' : 'Provision of our online services and usability'}</li>
+            <li>{isDE ? 'Informationstechnische Infrastruktur' : 'Information technology infrastructure'}</li>
+            <li>{isDE ? 'Finanz- und Zahlungsmanagement' : 'Financial and payment management'}</li>
+          </ul>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="legal-bases">
+          <h2>{isDE ? 'Maßgebliche Rechtsgrundlagen' : 'Relevant legal bases'}</h2>
+
+          <h3>{isDE ? 'Rechtsgrundlagen nach der DSGVO' : 'Legal bases according to the GDPR'}</h3>
+          <p>{isDE
+            ? 'Im Folgenden erhalten Sie eine Übersicht der Rechtsgrundlagen der DSGVO, auf deren Basis wir personenbezogene Daten verarbeiten. Bitte nehmen Sie zur Kenntnis, dass neben den Regelungen der DSGVO nationale Datenschutzvorgaben in Ihrem oder unserem Wohn- oder Sitzland gelten können.'
+            : 'In the following, you will find an overview of the legal bases of the GDPR on which we base the processing of personal data. Please note that in addition to the provisions of the GDPR, national data protection provisions of your or our country of residence or domicile may apply.'
+          }</p>
+
+          <dl>
+            <dt>{isDE ? 'Einwilligung (Art. 6(1)(a) DSGVO)' : 'Consent (Art. 6(1)(a) GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Die betroffene Person hat ihre Einwilligung in die Verarbeitung der sie betreffenden personenbezogenen Daten für einen oder mehrere bestimmte Zwecke gegeben.'
+              : 'The data subject has given consent to the processing of their personal data for one or more specific purposes.'
+            }</dd>
+
+            <dt>{isDE ? 'Vertragserfüllung (Art. 6(1)(b) DSGVO)' : 'Performance of a contract (Art. 6(1)(b) GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Die Verarbeitung ist für die Erfüllung eines Vertrags, dessen Vertragspartei die betroffene Person ist, oder zur Durchführung vorvertraglicher Maßnahmen erforderlich.'
+              : 'Processing is necessary for the performance of a contract to which the data subject is party, or in order to take steps at the request of the data subject prior to entering into a contract.'
+            }</dd>
+
+            <dt>{isDE ? 'Rechtliche Verpflichtung (Art. 6(1)(c) DSGVO)' : 'Compliance with a legal obligation (Art. 6(1)(c) GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Die Verarbeitung ist zur Erfüllung einer rechtlichen Verpflichtung erforderlich, der der Verantwortliche unterliegt.'
+              : 'Processing is necessary for compliance with a legal obligation to which the controller is subject.'
+            }</dd>
+
+            <dt>{isDE ? 'Berechtigte Interessen (Art. 6(1)(f) DSGVO)' : 'Legitimate interests (Art. 6(1)(f) GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Die Verarbeitung ist zur Wahrung der berechtigten Interessen des Verantwortlichen oder eines Dritten erforderlich, sofern nicht die Interessen oder Grundrechte der betroffenen Person überwiegen.'
+              : 'Processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party, except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject.'
+            }</dd>
+          </dl>
+
+          <h3>{isDE ? 'Nationale Datenschutzregelungen in Deutschland' : 'National data protection regulations in Germany'}</h3>
+          <p>{isDE
+            ? 'Zusätzlich zu den Datenschutzregelungen der DSGVO gelten nationale Regelungen zum Datenschutz in Deutschland. Hierzu gehört insbesondere das Bundesdatenschutzgesetz (BDSG), das besondere Vorschriften über das Recht auf Auskunft, das Recht auf Löschung, das Widerspruchsrecht sowie die Verarbeitung besonderer Kategorien personenbezogener Daten enthält.'
+            : 'In addition to the data protection regulations of the GDPR, national regulations apply in Germany. This includes in particular the Federal Data Protection Act (BDSG), which contains special provisions on the right to access, the right to erasure, the right to object, and the processing of special categories of personal data.'
+          }</p>
+
+          <h3>{isDE ? 'Schweizerisches Datenschutzgesetz' : 'Swiss Data Protection Act'}</h3>
+          <p>{isDE
+            ? 'Wenn Sie sich in der Schweiz befinden, verarbeiten wir Ihre Daten auf Grundlage des Bundesgesetzes über den Datenschutz (Schweizer DSG). Diese Datenschutzhinweise gelten sowohl für die DSGVO als auch für das Schweizer DSG.'
+            : 'If you are located in Switzerland, we process your data on the basis of the Federal Act on Data Protection (Swiss DPA). These privacy policy provisions apply to both the GDPR and the Swiss DPA. Where terms differ between the two frameworks, GDPR terminology is used for readability; the legal meaning is determined by whichever framework applies to your situation.'
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="security">
+          <h2>{isDE ? 'Sicherheitsmaßnahmen' : 'Security precautions'}</h2>
+          <p>{isDE
+            ? 'Wir treffen nach Maßgabe der gesetzlichen Vorgaben unter Berücksichtigung des Stands der Technik, der Implementierungskosten und der Art, des Umfangs, der Umstände und der Zwecke der Verarbeitung sowie der unterschiedlichen Eintrittswahrscheinlichkeiten und des Ausmaßes der Bedrohung der Rechte und Freiheiten natürlicher Personen geeignete technische und organisatorische Maßnahmen.'
+            : 'We take appropriate technical and organisational measures in accordance with legal requirements, taking into account the state of the art, the costs of implementation, and the nature, scope, context and purposes of processing, as well as the varying risks to the rights and freedoms of natural persons.'
+          }</p>
+          <p>{isDE
+            ? 'Zu den Maßnahmen gehören insbesondere die Sicherung der Vertraulichkeit, Integrität und Verfügbarkeit von Daten durch Kontrolle des physischen und elektronischen Zugangs zu den Daten sowie des sie betreffenden Zugriffs, der Eingabe, der Weitergabe, der Sicherung der Verfügbarkeit und ihrer Trennung.'
+            : 'The measures include, in particular, safeguarding the confidentiality, integrity and availability of data by controlling physical and electronic access, as well as access to, input, transmission, securing and separation of data. We have established procedures to ensure that data subjects\' rights are respected, that data is erased, and that we are prepared to respond to data threats rapidly.'
+          }</p>
+
+          <h3>{isDE ? 'IP-Adressmasking' : 'IP address masking'}</h3>
+          <p>{isDE
+            ? 'Soweit IP-Adressen von uns oder von eingesetzten Dienstleistern verarbeitet werden und die Verarbeitung einer vollständigen IP-Adresse nicht erforderlich ist, wird die IP-Adresse gekürzt ("IP-Masking"). Dabei werden die letzten zwei Stellen bzw. der letzte Teil der IP-Adresse nach einem Punkt gelöscht oder durch Platzhalter ersetzt.'
+            : 'Where IP addresses are processed by us or by service providers and full IP address processing is not necessary, the IP address is shortened ("IP masking"). The last two digits or the last part of the IP address after a full stop are removed or replaced by wildcards. This prevents identification of a person by means of their IP address.'
+          }</p>
+
+          <h3>{isDE ? 'TLS/SSL-Verschlüsselung (HTTPS)' : 'TLS/SSL encryption (HTTPS)'}</h3>
+          <p>{isDE
+            ? 'Um die Daten der Nutzer vor einem unberechtigten Zugriff zu schützen, setzen wir das TLS/SSL-Verschlüsselungsverfahren ein. HTTPS in der URL zeigt an, dass Ihre Verbindung sicher verschlüsselt ist.'
+            : 'To protect user data from unauthorised access, we employ TLS/SSL encryption on all data transmitted via our online services. HTTPS in the URL indicates that your connection is securely encrypted.'
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="transmission">
+          <h2>{isDE ? 'Weitergabe von personenbezogenen Daten' : 'Transmission of personal data'}</h2>
+          <p>{isDE
+            ? 'Im Rahmen unserer Verarbeitung von personenbezogenen Daten kommt es vor, dass diese an andere Stellen, Unternehmen, rechtlich selbstständige Organisationseinheiten oder Personen übermittelt oder ihnen gegenüber offengelegt werden. Wir schließen entsprechende Verträge oder Vereinbarungen ab, die dem Schutz Ihrer Daten dienen.'
+            : 'In the course of processing personal data, it may happen that data is transmitted to or disclosed to other entities, companies, legally independent organisational units, or individuals. Recipients of this data may include service providers tasked with IT duties or providers of services and content integrated into a website. In such cases, we observe the legal requirements and, in particular, conclude relevant contracts or agreements that serve to protect your data with the recipients of your data.'
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="international">
+          <h2>{isDE ? 'Internationale Datentransfers' : 'International data transfers'}</h2>
+          <p>{isDE
+            ? 'Sofern wir Daten in einem Drittland (außerhalb der EU oder des EWR) verarbeiten oder dies im Rahmen der Inanspruchnahme von Diensten Dritter oder der Offenlegung von Daten an andere Personen, Stellen oder Unternehmen geschieht, erfolgt dies stets im Einklang mit den gesetzlichen Vorgaben.'
+            : 'If we transfer data to a third country (outside the European Union or European Economic Area), or if this occurs in the context of using third-party services or the disclosure of data to other parties, this is always done in accordance with legal requirements.'
+          }</p>
+          <p>{isDE
+            ? 'Für Datentransfers in die USA stützen wir uns primär auf den <strong>Data Privacy Framework (DPF)</strong>, der durch den Angemessenheitsbeschluss der EU-Kommission vom 10. Juli 2023 als sicherer Rechtsrahmen anerkannt wurde. Zusätzlich haben wir mit entsprechenden Anbietern Standardvertragsklauseln (SCC) abgeschlossen.'
+            : 'For data transfers to the USA, we primarily rely on the <strong>Data Privacy Framework (DPF)</strong>, recognised as a secure legal framework by the EU Commission\'s adequacy decision of 10 July 2023. Additionally, we have concluded Standard Contractual Clauses (SCCs) with respective providers, which comply with the EU Commission\'s requirements and establish contractual obligations to protect your data.'
+          }</p>
+
+          <div class="legal-box">
+            <p class="legal-box__label">{isDE ? 'Rechtsgrundlage' : 'Legal basis'}</p>
+            <p>Art. 46 GDPR (Standard Contractual Clauses); EU-US Data Privacy Framework adequacy decision (July 2023).</p>
+          </div>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="retention">
+          <h2>{isDE ? 'Allgemeine Informationen zur Datenspeicherung und Löschung' : 'General information on data retention and deletion'}</h2>
+          <p>{isDE
+            ? 'Wir löschen personenbezogene Daten, die wir verarbeiten, gemäß den gesetzlichen Vorgaben, sobald die zugrundeliegenden Einwilligungen widerrufen werden oder keine weiteren rechtlichen Grundlagen für die Verarbeitung bestehen und die Zwecke der Verarbeitung weggefallen sind.'
+            : 'We delete personal data that we process in accordance with legal requirements as soon as the consent on which the processing is based is revoked, or where no other permission applies and the purposes for which the data was originally stored have ceased to apply.'
+          }</p>
+          <p>{isDE
+            ? 'Sofern die Daten nicht gelöscht werden, weil sie für andere und gesetzlich zulässige Zwecke erforderlich sind, wird deren Verarbeitung auf diese Zwecke beschränkt. Gesetzliche Aufbewahrungsfristen nach deutschem Recht (HGB, AO) betragen in der Regel 6 bis 10 Jahre.'
+            : 'If data is not deleted because it is required for other and legally permissible purposes, its processing is restricted to those purposes. Legal retention periods under German law (HGB, AO) are typically 6 to 10 years. We will inform you of specific retention periods in the relevant sections of this policy where applicable.'
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="rights">
+          <h2>{isDE ? 'Rechte der betroffenen Personen' : 'Rights of data subjects'}</h2>
+          <p>{isDE
+            ? 'Ihnen stehen nach der DSGVO folgende Rechte zu:'
+            : 'Under the GDPR, you have the following rights with respect to personal data concerning you:'
+          }</p>
+
+          <dl>
+            <dt>{isDE ? 'Auskunftsrecht (Art. 15 DSGVO)' : 'Right of access (Art. 15 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, eine Bestätigung darüber zu verlangen, ob betreffende Daten verarbeitet werden und auf Auskunft über diese Daten sowie auf weitere Informationen und Kopie der Daten entsprechend den gesetzlichen Vorgaben.'
+              : 'You have the right to obtain confirmation of whether we process personal data concerning you, and if so, to access that data and receive a copy.'
+            }</dd>
+
+            <dt>{isDE ? 'Recht auf Berichtigung (Art. 16 DSGVO)' : 'Right to rectification (Art. 16 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, die Vervollständigung der Sie betreffenden Daten oder die Berichtigung der Sie betreffenden unrichtigen Daten zu verlangen.'
+              : 'You have the right to request correction of inaccurate personal data, or completion of incomplete personal data.'
+            }</dd>
+
+            <dt>{isDE ? 'Recht auf Löschung (Art. 17 DSGVO)' : 'Right to erasure (Art. 17 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, die Löschung der Sie betreffenden Daten unverzüglich zu verlangen, soweit die gesetzlichen Voraussetzungen vorliegen.'
+              : 'You have the right to request that personal data concerning you be deleted without undue delay where one of the statutory grounds applies.'
+            }</dd>
+
+            <dt>{isDE ? 'Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)' : 'Right to restriction of processing (Art. 18 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, unter den gesetzlichen Voraussetzungen die Einschränkung der Verarbeitung der Sie betreffenden Daten zu verlangen.'
+              : 'You have the right to request restriction of processing of personal data concerning you under certain conditions.'
+            }</dd>
+
+            <dt>{isDE ? 'Recht auf Datenübertragbarkeit (Art. 20 DSGVO)' : 'Right to data portability (Art. 20 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, die Sie betreffenden Daten, die Sie uns bereitgestellt haben, in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten oder deren Übermittlung an einen anderen Verantwortlichen zu fordern.'
+              : 'You have the right to receive personal data you have provided to us in a structured, commonly used and machine-readable format, and to transmit that data to another controller.'
+            }</dd>
+
+            <dt>{isDE ? 'Widerspruchsrecht (Art. 21 DSGVO)' : 'Right to object (Art. 21 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, jederzeit der Verarbeitung der Sie betreffenden Daten zu widersprechen, soweit die Verarbeitung auf Art. 6(1)(f) DSGVO basiert.'
+              : 'You have the right to object at any time to processing of personal data concerning you which is based on Art. 6(1)(f) GDPR (legitimate interests), including profiling based on those provisions.'
+            }</dd>
+
+            <dt>{isDE ? 'Recht auf Widerruf der Einwilligung (Art. 7(3) DSGVO)' : 'Right to withdraw consent (Art. 7(3) GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, erteilte Einwilligungen jederzeit zu widerrufen. Der Widerruf berührt nicht die Rechtmäßigkeit der vor dem Widerruf erfolgten Verarbeitung.'
+              : 'You have the right to withdraw consent at any time. Withdrawal does not affect the lawfulness of processing based on consent before its withdrawal.'
+            }</dd>
+
+            <dt>{isDE ? 'Beschwerderecht (Art. 77 DSGVO)' : 'Right to lodge a complaint (Art. 77 GDPR)'}</dt>
+            <dd>{isDE
+              ? 'Sie haben das Recht, sich bei einer Aufsichtsbehörde zu beschweren, insbesondere in dem EU-Mitgliedstaat Ihres gewöhnlichen Aufenthaltsorts, Ihres Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes.'
+              : 'You have the right to lodge a complaint with a supervisory authority, in particular in the EU Member State of your habitual residence, place of work or place of the alleged infringement.'
+            }</dd>
+          </dl>
+
+          <p>{isDE
+            ? <>Um Ihre Rechte geltend zu machen, kontaktieren Sie uns bitte unter: <a href="mailto:hello@andredaus.com">hello@andredaus.com</a></>
+            : <>To exercise your rights, please contact us at: <a href="mailto:hello@andredaus.com">hello@andredaus.com</a></>
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="business">
+          <h2>{isDE ? 'Geschäftliche Leistungen' : 'Business services'}</h2>
+          <p>{isDE
+            ? 'Wir verarbeiten Daten unserer Vertrags- und Geschäftspartner, z. B. Kunden und Interessenten, im Rahmen vertraglicher und vergleichbarer Rechtsverhältnisse sowie damit zusammenhängender Maßnahmen und im Rahmen der Kommunikation mit den Vertragspartnern.'
+            : 'We process data of our contractual and business partners, e.g. customers and prospective clients, in the context of contractual and comparable legal relationships, as well as related communications and pre-contractual actions.'
+          }</p>
+
+          <h4>{isDE ? 'Verarbeitete Datenarten' : 'Processed data types'}</h4>
+          <ul>
+            <li>{isDE ? 'Bestandsdaten (Name, Anschrift)' : 'Inventory data (name, address)'}</li>
+            <li>{isDE ? 'Zahlungsdaten (Bankdaten, Rechnungen)' : 'Payment data (bank details, invoices)'}</li>
+            <li>{isDE ? 'Kontaktdaten (E-Mail, Telefon)' : 'Contact data (email, phone number)'}</li>
+            <li>{isDE ? 'Vertragsdaten (Vertragsgegenstand, Laufzeit, Kundenkategorie)' : 'Contract data (subject matter, duration, customer category)'}</li>
+          </ul>
+
+          <h4>{isDE ? 'Rechtsgrundlage' : 'Legal basis'}</h4>
+          <p>Art. 6(1)(b) GDPR (performance of contract); Art. 6(1)(c) GDPR (legal obligation); Art. 6(1)(f) GDPR (legitimate interests).</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="hosting">
+          <h2>{isDE ? 'Bereitstellung von Onlineangeboten und Webhosting' : 'Provision of online services and web hosting'}</h2>
+          <p>{isDE
+            ? 'Wir verarbeiten die Daten der Nutzer, um ihnen unsere Onlineangebote bereitstellen zu können. Zu diesem Zweck verarbeiten wir die IP-Adresse des Nutzers, die notwendig ist, um die Inhalte und Funktionen unserer Onlineangebote an den Browser oder das Endgerät der Nutzer zu übermitteln.'
+            : 'We process user data in order to provide our online services. For this purpose, we process the IP address of the user, which is necessary to transmit the content and functions of our online services to the user\'s browser or device.'
+          }</p>
+
+          <h3>{isDE ? 'Hosting-Anbieter' : 'Hosting provider'}</h3>
+          <p>{isDE
+            ? 'Unsere Website wird bei einem professionellen Hosting-Dienstleister gehostet. Die Verarbeitung von Daten durch unseren Hosting-Anbieter erfolgt in unserem Auftrag und gemäß einem Auftragsverarbeitungsvertrag (AVV) nach Art. 28 DSGVO.'
+            : 'Our website is hosted by a professional hosting service provider. Processing of data by our hosting provider is carried out on our behalf and in accordance with a Data Processing Agreement (DPA) pursuant to Art. 28 GDPR.'
+          }</p>
+
+          <h3>{isDE ? 'Erhebung von Zugriffsdaten und Logfiles' : 'Collection of access data and log files'}</h3>
+          <p>{isDE
+            ? 'Wir, bzw. unser Hosting-Anbieter, erheben Daten zu jedem Zugriff auf den Server (sog. Serverlogfiles). Zu den Serverlogfiles können die Adresse und der Name der abgerufenen Webseiten und Dateien, Datum und Uhrzeit des Abrufs, übertragene Datenmengen, Meldung über erfolgreichen Abruf, Browsertyp sowie Version, das Betriebssystem des Nutzers, Referrer-URL sowie der anfragende Provider gehören.'
+            : 'We, or our hosting provider, collect data on the basis of each access to the server (server log files). Server log files may include the address and name of the web pages and files accessed, the date and time of access, data volumes transferred, notification of successful access, browser type and version, the user\'s operating system, referrer URL, and the requesting provider.'
+          }</p>
+          <p>{isDE
+            ? 'Die Serverlogfiles werden für Sicherheitszwecke (z. B. zur Aufklärung von Missbrauchs- oder Betrugshandlungen) für die Dauer von maximal 30 Tagen gespeichert und danach gelöscht.'
+            : 'Server log files are used for security purposes (e.g. to investigate abuse or fraudulent activity) and are deleted after a maximum of 30 days. Data whose retention is required for evidentiary purposes is excluded from deletion.'
+          }</p>
+
+          <h4>{isDE ? 'Rechtsgrundlage' : 'Legal basis'}</h4>
+          <p>Art. 6(1)(f) GDPR (legitimate interests in the secure and efficient provision of online services).</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="cookies">
+          <h2>{isDE ? 'Einsatz von Cookies' : 'Use of cookies'}</h2>
+          <p>{isDE
+            ? 'Cookies sind kleine Textdateien, die Informationen auf Endgeräten der Nutzer gespeichert werden. Sie dienen u. a. der Speicherung des Login-Status in einem Nutzerkonto, dem Inhalt eines Warenkorbs oder der abgerufenen Inhalte.'
+            : 'Cookies are small text files, or other storage and retrieval methods, that store information on devices and read it from them. For example, to store the login status in a user account, the contents of a shopping basket in an e-shop, the content accessed, or the functions used.'
+          }</p>
+
+          <h3>{isDE ? 'Von uns eingesetzte Cookie-Typen' : 'Types of cookies we use'}</h3>
+          <ul>
+            <li><strong>{isDE ? 'Technisch notwendige Cookies' : 'Technically necessary cookies'}</strong> — {isDE ? 'Für den Betrieb der Website erforderlich. Keine Einwilligung notwendig.' : 'Required for the operation of the website (session management, security). No consent required.'}</li>
+            <li><strong>{isDE ? 'Analyse-Cookies' : 'Analytics cookies'}</strong> — {isDE ? 'Dienen dem Verständnis der Websitenutzung. Erfordern eine vorherige Einwilligung.' : 'Used to understand how the website is used. Require prior consent.'}</li>
+            <li><strong>{isDE ? 'Marketing-Cookies' : 'Marketing cookies'}</strong> — {isDE ? 'Für personalisierte Werbung. Erfordern eine vorherige Einwilligung.' : 'Used to display personalised advertising. Require prior consent.'}</li>
+          </ul>
+          <p>{isDE
+            ? 'Sie können Ihre Einwilligung jederzeit über Ihre Browser-Einstellungen oder unser Cookie-Präferenztool widerrufen.'
+            : 'You can withdraw consent at any time via your browser settings or our cookie preferences tool.'
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="contact">
+          <h2>{isDE ? 'Kontakt und Anfrageverwaltung' : 'Contact and enquiry management'}</h2>
+          <p>{isDE
+            ? 'Bei der Kontaktaufnahme mit uns (z. B. per Kontaktformular, E-Mail, Telefon oder via sozialer Medien) sowie im Rahmen bestehender Nutzer- und Geschäftsbeziehungen verarbeiten wir die Daten anfragender Personen, soweit dies zur Beantwortung der Kontaktanfragen und etwaiger angefragter Maßnahmen erforderlich ist.'
+            : 'When you contact us (e.g. via contact form, email, telephone, or social media) and in the context of existing user and business relationships, we process the personal data of the enquiring persons to the extent necessary to respond to the contact requests and to any measures requested.'
+          }</p>
+
+          <h4>{isDE ? 'Verarbeitete Datenarten' : 'Processed data types'}</h4>
+          <ul>
+            <li>{isDE ? 'Bestandsdaten (Name)' : 'Inventory data (name)'}</li>
+            <li>{isDE ? 'Kontaktdaten (E-Mail-Adresse, Telefonnummer)' : 'Contact data (email address, phone number)'}</li>
+            <li>{isDE ? 'Inhaltsdaten (Inhalt Ihrer Nachricht)' : 'Content data (the content of your message)'}</li>
+            <li>{isDE ? 'Meta-, Kommunikations- und Verfahrensdaten (Datum und Uhrzeit des Kontakts)' : 'Meta, communication and process data (date and time of contact)'}</li>
+          </ul>
+
+          <h4>{isDE ? 'Speicherdauer' : 'Retention period'}</h4>
+          <p>{isDE
+            ? 'Kontaktanfragen werden nach 12 Monaten gelöscht, sofern kein Vertragsverhältnis entstanden ist, in welchem Fall die gesetzlichen Aufbewahrungsfristen gelten.'
+            : 'Contact requests are deleted after 12 months, unless a contractual relationship has arisen, in which case the statutory retention periods apply.'
+          }</p>
+
+          <h4>{isDE ? 'Rechtsgrundlage' : 'Legal basis'}</h4>
+          <p>Art. 6(1)(b) GDPR (pre-contractual measures); Art. 6(1)(f) GDPR (legitimate interests in responding to enquiries efficiently).</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="newsletter">
+          <h2>{isDE ? 'Newsletter und elektronische Benachrichtigungen' : 'Newsletter and electronic communications'}</h2>
+          <p>{isDE
+            ? 'Wir versenden Newsletter und andere elektronische Benachrichtigungen (nachfolgend "Newsletter") nur mit der Einwilligung der Empfänger oder wenn dies gesetzlich erlaubt ist. Wir nutzen ein Double-Opt-In-Verfahren.'
+            : 'We send newsletters and other electronic communications (hereinafter "newsletter") only with the consent of the recipients, or where permitted by law. We use a double opt-in procedure, where you first register and then confirm your registration by clicking a link in the confirmation email.'
+          }</p>
+          <p>{isDE
+            ? <>Sie können den Newsletter jederzeit abbestellen, indem Sie auf den Abbestelllink am Ende jedes Newsletters klicken oder uns per E-Mail kontaktieren: <a href="mailto:hello@andredaus.com">hello@andredaus.com</a>.</>
+            : <>You can unsubscribe from our newsletter at any time by clicking the unsubscribe link at the bottom of each newsletter, or by emailing us at <a href="mailto:hello@andredaus.com">hello@andredaus.com</a>.</>
+          }</p>
+
+          <h4>{isDE ? 'Newsletter-Dienstleister' : 'Newsletter service provider'}</h4>
+          <p>{isDE
+            ? 'Newsletter werden über Zoho Campaigns versendet. Wir haben mit der Zoho Corporation B.V. einen Auftragsverarbeitungsvertrag abgeschlossen. Ihre Daten werden ausschließlich innerhalb des EWR oder unter Einhaltung angemessener Schutzmaßnahmen für Drittlandtransfers verarbeitet.'
+            : 'Newsletters are sent via Zoho Campaigns. We have concluded a Data Processing Agreement with Zoho Corporation B.V. Your data will be processed exclusively within the EEA or subject to appropriate safeguards for third-country transfers.'
+          }</p>
+
+          <h4>{isDE ? 'Rechtsgrundlage' : 'Legal basis'}</h4>
+          <p>Art. 6(1)(a) GDPR (consent). {isDE ? 'Sie können die Einwilligung jederzeit ohne Auswirkung auf die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung widerrufen.' : 'You may withdraw consent at any time without affecting the lawfulness of processing based on consent before withdrawal.'}</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="analytics">
+          <h2>{isDE ? 'Webanalyse, Monitoring und Optimierung' : 'Web analytics, monitoring and optimisation'}</h2>
+          <p>{isDE
+            ? 'Wir setzen Analyseverfahren ein, um die Nutzung unseres Onlineangebotes auswerten und verbessern zu können. Nutzerdaten werden dabei, soweit möglich, pseudonymisiert.'
+            : 'We use analytics tools to evaluate the usage of our online services and to continuously improve them. User data is pseudonymised where possible.'
+          }</p>
+
+          <h3>PostHog</h3>
+          <p>{isDE
+            ? 'Wir nutzen PostHog für Web-Analytics. PostHog verarbeitet Nutzungsdaten und speichert diese auf Servern innerhalb der Europäischen Union. Es werden keine personenbezogenen Daten ohne Pseudonymisierung an PostHog übermittelt. Wir haben einen Auftragsverarbeitungsvertrag mit PostHog Inc. abgeschlossen.'
+            : 'We use PostHog for web analytics. PostHog processes usage data and stores it on servers within the European Union. No personally identifiable data is transmitted to PostHog without pseudonymisation. We have concluded a Data Processing Agreement with PostHog Inc.'
+          }</p>
+          <ul>
+            <li><strong>{isDE ? 'Verarbeitete Daten:' : 'Data processed:'}</strong> {isDE ? 'pseudonyme Nutzungsdaten, Seitenaufrufe, Events' : 'pseudonymous usage data, page views, events'}</li>
+            <li><strong>{isDE ? 'Rechtsgrundlage:' : 'Legal basis:'}</strong> Art. 6(1)(f) GDPR {isDE ? '(berechtigte Interessen an der Optimierung des Onlineangebotes)' : '(legitimate interests in optimising the online service)'}</li>
+            <li><strong>{isDE ? 'Opt-Out:' : 'Opt-out:'}</strong> {isDE
+              ? <>Sie können der Verarbeitung Ihrer Daten durch PostHog jederzeit widersprechen. Kontaktieren Sie uns dazu unter <a href="mailto:hello@andredaus.com">hello@andredaus.com</a>.</>
+              : <>You can object to the processing of your data by PostHog at any time. Please contact us at <a href="mailto:hello@andredaus.com">hello@andredaus.com</a>.</>
+            }</li>
+          </ul>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="social">
+          <h2>{isDE ? 'Profile in sozialen Netzwerken' : 'Profiles in social networks (social media)'}</h2>
+          <p>{isDE
+            ? 'Wir unterhalten Onlinepräsenzen in sozialen Netzwerken und verarbeiten in diesem Rahmen Nutzerdaten, um mit den dort aktiven Nutzern zu kommunizieren oder Informationen über uns anzubieten.'
+            : 'We maintain online presences within social networks and process user data in this context in order to communicate with users active there, or to offer information about ourselves.'
+          }</p>
+          <p>{isDE
+            ? 'Wir weisen darauf hin, dass Nutzerdaten außerhalb der Europäischen Union verarbeitet werden können. Dies kann Risiken für die Nutzer beinhalten, da z. B. die Durchsetzung der Rechte der Nutzer erschwert werden könnte.'
+            : 'We point out that user data may be processed outside the European Union. This may entail risks for users because, for example, enforcement of user rights may be more difficult. With respect to US providers that are certified under the Data Privacy Framework, we note that they thereby commit to complying with EU data protection standards.'
+          }</p>
+
+          <h3>LinkedIn</h3>
+          <p>LinkedIn Ireland Unlimited Company, Wilton Place, Dublin 2, Ireland. <a href="https://www.linkedin.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">LinkedIn Privacy Policy <span class="sr-only">{isDE ? '(öffnet neues Tab)' : '(opens in new tab)'}</span></a>. {isDE ? 'Daten werden teilweise in den USA verarbeitet; LinkedIn ist unter dem EU-US Data Privacy Framework zertifiziert.' : 'Data is processed in part in the USA; LinkedIn is certified under the EU-US Data Privacy Framework.'}</p>
+
+          <h3>YouTube / Google</h3>
+          <p>Google Ireland Ltd., Gordon House, Barrow Street, Dublin 4, Ireland. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy <span class="sr-only">{isDE ? '(öffnet neues Tab)' : '(opens in new tab)'}</span></a>.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="ai">
+          <h2>{isDE ? 'Künstliche Intelligenz (KI)' : 'Artificial intelligence (AI)'}</h2>
+          <p>{isDE
+            ? <>Wir nutzen KI-basierte Dienste in Teilen unserer Arbeit. Die Nutzung von KI-Werkzeugen, die personenbezogene Daten verarbeiten, unterliegt unserer <a href={`${prefix}/policy/ai-use`}>KI-Nutzungsrichtlinie</a> und dieser Datenschutzerklärung.</>
+            : <>We use AI-based services in some areas of our work. The use of AI tools that process personal data is governed by our <a href={`${prefix}/policy/ai-use`}>AI Use Policy</a> and this privacy policy.</>
+          }</p>
+          <p>{isDE
+            ? 'Wenn KI-Werkzeuge zur Verarbeitung von Nutzerdaten eingesetzt werden, stellen wir sicher, dass:'
+            : 'Where AI tools are used to process data provided by users or clients, we ensure that:'
+          }</p>
+          <ul>
+            <li>{isDE ? 'Eine Rechtsgrundlage für die Verarbeitung besteht (Einwilligung oder Vertragserfüllung)' : 'A legal basis for the processing exists (consent or contract performance)'}</li>
+            <li>{isDE ? 'Der KI-Dienstleister ggf. einen Auftragsverarbeitungsvertrag mit uns abgeschlossen hat' : 'The AI service provider has concluded a Data Processing Agreement with us where required'}</li>
+            <li>{isDE ? 'Daten nicht ohne ausdrückliche Einwilligung zum Training von KI-Modellen Dritter verwendet werden' : 'Data is not used to train third-party AI models without explicit consent'}</li>
+            <li>{isDE ? 'Besondere Kategorien von Daten nicht ohne spezifische Schutzmaßnahmen durch KI-Systeme verarbeitet werden' : 'Special categories of data are not processed by AI systems without specific safeguards'}</li>
+          </ul>
+          <h4>{isDE ? 'Rechtsgrundlage' : 'Legal basis'}</h4>
+          <p>Art. 6(1)(a) GDPR (consent) or Art. 6(1)(b) GDPR (performance of contract), {isDE ? 'je nach Kontext.' : 'depending on context.'}</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="changes">
+          <h2>{isDE ? 'Änderungen und Aktualisierungen' : 'Changes and updates'}</h2>
+          <p>{isDE
+            ? 'Wir bitten Sie, sich regelmäßig über den Inhalt unserer Datenschutzerklärung zu informieren. Wir passen die Datenschutzerklärung an, sobald die Änderungen der von uns durchgeführten Datenverarbeitungen dies erforderlich machen.'
+            : 'We ask you to inform yourself regularly about the content of our privacy policy. We update the policy as soon as changes in data processing make this necessary. We will inform you as soon as the changes require your cooperation (e.g. consent) or other individual notification.'
+          }</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <section id="definitions">
+          <h2>{isDE ? 'Begriffsbestimmungen' : 'Terminology and definitions'}</h2>
+          <p>{isDE
+            ? 'In diesem Abschnitt erhalten Sie eine Übersicht über die in dieser Datenschutzerklärung verwendeten Begrifflichkeiten. Soweit die Begrifflichkeiten gesetzlich definiert sind, gelten deren gesetzliche Definitionen.'
+            : 'This section provides an overview of the terms used in this privacy policy. To the extent that terms are legally defined, their legal definitions apply. The following explanations are intended primarily for comprehension.'
+          }</p>
+
+          <dl>
+            <dt>{isDE ? 'Personenbezogene Daten' : 'Personal data'}</dt>
+            <dd>{isDE
+              ? 'Alle Informationen, die sich auf eine identifizierte oder identifizierbare natürliche Person (Art. 4(1) DSGVO) beziehen.'
+              : 'Any information relating to an identified or identifiable natural person (Art. 4(1) GDPR). An identifiable person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, identification number, location data, online identifier or one or more factors specific to their identity.'
+            }</dd>
+
+            <dt>{isDE ? 'Verarbeitung' : 'Processing'}</dt>
+            <dd>{isDE
+              ? 'Jeder mit oder ohne Hilfe automatisierter Verfahren ausgeführte Vorgang oder jede solche Vorgangsreihe im Zusammenhang mit personenbezogenen Daten (Art. 4(2) DSGVO).'
+              : 'Any operation performed on personal data, whether by automated means or not, such as collection, recording, organisation, structuring, storage, adaptation or alteration, retrieval, consultation, use, disclosure by transmission, dissemination or otherwise making available, alignment or combination, restriction, erasure or destruction (Art. 4(2) GDPR).'
+            }</dd>
+
+            <dt>{isDE ? 'Verantwortlicher' : 'Controller'}</dt>
+            <dd>{isDE
+              ? 'Natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten entscheidet (Art. 4(7) DSGVO).'
+              : 'The natural or legal person, public authority, agency or other body which, alone or jointly with others, determines the purposes and means of the processing of personal data (Art. 4(7) GDPR).'
+            }</dd>
+
+            <dt>{isDE ? 'Auftragsverarbeiter' : 'Processor'}</dt>
+            <dd>{isDE
+              ? 'Natürliche oder juristische Person, die personenbezogene Daten im Auftrag des Verantwortlichen verarbeitet (Art. 4(8) DSGVO).'
+              : 'A natural or legal person, public authority, agency or other body which processes personal data on behalf of the controller (Art. 4(8) GDPR).'
+            }</dd>
+
+            <dt>{isDE ? 'Einwilligung' : 'Consent'}</dt>
+            <dd>{isDE
+              ? 'Jede freiwillig für den bestimmten Fall, in informierter Weise und unmissverständlich abgegebene Willensbekundung der betroffenen Person in Form einer Erklärung oder einer sonstigen eindeutigen bestätigenden Handlung (Art. 4(11) DSGVO).'
+              : 'Any freely given, specific, informed and unambiguous indication of the data subject\'s wishes by which they, by a statement or by a clear affirmative action, signify agreement to the processing of personal data relating to them (Art. 4(11) GDPR).'
+            }</dd>
+          </dl>
+        </section>
+
+      </article>
+    </div>
+  </div>
+
+</Base>
+
+<style>
+  /* ── HERO ─────────────────────────────────────────────── */
+  .policy-hero {
+    padding-top: calc(68px + clamp(3rem, 6vw, 5rem));
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 60%);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .policy-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: end;
+  }
+
+  .policy-hero__type {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .875rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .policy-hero__type::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .policy-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -.025em;
+    color: var(--text-primary);
+  }
+
+  .policy-meta {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .875rem;
+    align-self: end;
+    min-width: 220px;
+  }
+  .policy-meta__row { display: flex; flex-direction: column; gap: 2px; }
+  .policy-meta__key {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .policy-meta__val {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .policy-meta__val--updated {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold);
+  }
+
+  @media (max-width: 640px) {
+    .policy-hero__inner { grid-template-columns: 1fr; }
+    .policy-meta { display: none; }
+  }
+
+  /* Mobile meta strip */
+  .meta-strip {
+    display: none;
+    background: var(--bg-card-alt);
+    border-bottom: 1px solid var(--border-light);
+    padding: .75rem var(--gutter);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    color: var(--text-subtle);
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .meta-strip__sep { color: var(--border-light); user-select: none; }
+  @media (max-width: 640px) { .meta-strip { display: flex; } }
+
+  /* ── POLICY NAV STRIP ─────────────────────────────────── */
+  .policy-nav-strip {
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .policy-nav-strip__inner {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .policy-nav-strip__inner::-webkit-scrollbar { display: none; }
+
+  .policy-nav-link {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .875rem 1.25rem;
+    color: var(--text-subtle);
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all .15s ease;
+    text-decoration: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .policy-nav-link:hover { color: var(--text-secondary); }
+  .policy-nav-link.is-active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ── LAYOUT ───────────────────────────────────────────── */
+  .policy-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 4rem;
+    padding-block: var(--section);
+    align-items: start;
+  }
+  @media (max-width: 900px) { .policy-layout { grid-template-columns: 1fr; } }
+
+  /* ── TOC SIDEBAR ──────────────────────────────────────── */
+  .toc-sidebar {
+    position: sticky;
+    top: calc(68px + 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-light) transparent;
+  }
+  .toc-sidebar::-webkit-scrollbar { width: 3px; }
+  .toc-sidebar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+  .toc-card {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .toc-card__heading {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: .875rem 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .toc__list { padding: .375rem 0; list-style: none; }
+  .toc__link {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-secondary);
+    padding: .5rem 1.25rem;
+    display: block;
+    border-left: 2px solid transparent;
+    transition: all .15s ease;
+    text-decoration: none;
+  }
+  .toc__link:hover { color: var(--text-primary); background: var(--gold-trans); }
+  .toc__link.is-active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-trans); }
+
+  .sidebar-contact {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+  }
+  .sidebar-contact__heading {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .sidebar-contact__body { font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+  .sidebar-contact__link {
+    font-size: 12px;
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    display: block;
+    padding-block: 2px;
+  }
+  .sidebar-contact__link:hover { color: var(--gold-light); }
+
+  @media (max-width: 900px) { .toc-sidebar { display: none; } }
+
+  /* ── POLICY BODY ──────────────────────────────────────── */
+  .policy-body { min-width: 0; }
+  .policy-body section,
+  .policy-body [id] { scroll-margin-top: 90px; }
+
+  .policy-body h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-top: 3.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: .875rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .policy-body h2:first-child { margin-top: 0; }
+
+  .policy-body h3 {
+    font-family: var(--sans);
+    font-size: clamp(1rem, 1.4vw, 1.1rem);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--text-primary);
+    margin-top: 2.25rem;
+    margin-bottom: .75rem;
+  }
+
+  .policy-body h4 {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 1.75rem;
+    margin-bottom: .625rem;
+  }
+
+  .policy-body p {
+    font-size: clamp(14px, 1.05vw, 15.5px);
+    line-height: 1.9;
+    color: var(--text-secondary);
+    margin-bottom: 1.1rem;
+  }
+  .policy-body p:last-child { margin-bottom: 0; }
+  .policy-body p strong { color: var(--text-primary); font-weight: 600; }
+
+  .policy-body a {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .policy-body a:hover { color: var(--gold-light); }
+
+  .policy-body ul,
+  .policy-body ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+  .policy-body ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  .policy-body ul li {
+    padding-left: 1.25rem;
+    position: relative;
+    font-size: clamp(14px, 1.05vw, 15.5px);
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+  .policy-body ul li::before {
+    content: '–';
+    position: absolute;
+    left: 0;
+    color: var(--gold-dim);
+  }
+  .policy-body ol { list-style: decimal; }
+  .policy-body ol li {
+    font-size: clamp(14px, 1.05vw, 15.5px);
+    line-height: 1.8;
+    color: var(--text-secondary);
+    padding-left: .25rem;
+  }
+  .policy-body li strong { color: var(--text-primary); font-weight: 600; }
+
+  .policy-body dl {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .policy-body dt {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: .25rem;
+  }
+  .policy-body dd {
+    font-size: clamp(14px, 1.05vw, 15.5px);
+    line-height: 1.85;
+    color: var(--text-secondary);
+    padding-left: 1rem;
+    border-left: 2px solid var(--border-light);
+  }
+
+  .policy-divider {
+    height: 1px;
+    background: var(--border-light);
+    margin-block: 2.5rem;
+  }
+
+  .legal-box {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-left: 3px solid var(--gold-dim);
+    border-radius: 0 3px 3px 0;
+    padding: 1.25rem 1.5rem;
+    margin-block: 1.5rem;
+  }
+  .legal-box__label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .5rem !important;
+  }
+  .legal-box p { margin-bottom: 0 !important; }
+</style>
+
+<script>
+  // TOC active section tracking
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc__link');
+  const sections = document.querySelectorAll<HTMLElement>('.policy-body section[id]');
+
+  if (sections.length && tocLinks.length) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            tocLinks.forEach(l => l.classList.remove('is-active'));
+            const active = document.querySelector<HTMLAnchorElement>(`.toc__link[href="#${entry.target.id}"]`);
+            active?.classList.add('is-active');
+          }
+        });
+      },
+      { rootMargin: '-68px 0px -60% 0px', threshold: 0 }
+    );
+    sections.forEach(s => observer.observe(s));
+  }
+</script>

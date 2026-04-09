@@ -270,7 +270,34 @@ The Library archive is the most complex page on the site. It requires:
 - `Base.astro` — imports Header and Footer, wraps `<slot />` in `<main id="main-content">`
 - Nav path prefix is derived from `Astro.url.pathname`; isDE = pathname starts with `/de`
 - Nav route paths: `/services`, `/use-cases`, `/insights`, `/podcast`, `/about`, `/contact`
-- The reference HTML uses `/opposition` for the methodology page — Phase 3 should decide whether this becomes `/about` (combined About + Methodology) or two separate pages (`/about` and `/opposition`), then update the nav links accordingly
+- Decided in Phase 3: `/opposition` is a **separate page** from `/about` — methodology page lives at `/opposition`; nav links to both
+
+### DE page architecture
+- DE pages live at `src/pages/de/<route>.astro` as thin wrappers that import and render the EN page component
+- Pattern: `import PageName from '../page.astro'; --- <PageName />`
+- This works because `Astro.url.pathname` is request-scoped — the imported component sees `/de/...` as the URL and sets `isDE = true` automatically
+- Do NOT use `export { default }` syntax inside frontmatter — invalid in Astro
+
+### Bilingual page pattern
+- All static pages detect language from URL: `const isDE = Astro.url.pathname.startsWith('/de')`
+- Link prefix: `const prefix = isDE ? '/de' : ''` — all internal links use `${prefix}/route`
+- Content: inline ternaries `{isDE ? 'DE text' : 'EN text'}` for short strings; `{isDE ? (<>…</>) : (<>…</>)}` fragment blocks for multi-paragraph content
+- `<Base>` receives `lang={isDE ? 'de' : 'en'}` to set correct `<html lang>` attribute
+
+### Fixed nav height
+- Nav is fixed at `68px` — hero sections need `padding-top: 68px`
+- Sticky sidebars use `top: calc(68px + 2rem)`
+
+### Policy page pattern
+- All policy pages share the same structure: policy-hero → policy-nav-strip → container > policy-layout (TOC sidebar + article.policy-body)
+- TOC sidebar: sticky, hidden on mobile (`max-width: 900px`), active section tracked via `IntersectionObserver` with `rootMargin: '-68px 0px -60% 0px'`
+- Policy nav strip: horizontal list linking all 4 policy pages; `.is-active` on current page
+- Each policy page has its own scoped `<style>` block (CSS is identical across pages — consider extracting to a shared PolicyLayout component in Phase 5 if it becomes unwieldy)
+
+### Fade-up scroll reveal
+- `.fade-up` class: `opacity: 0; transform: translateY(18px)` — becomes `.visible` on intersection
+- Respects `prefers-reduced-motion` — motion disabled entirely for users who prefer it
+- Observer threshold: `0.08`, rootMargin `0px 0px -40px 0px`
 
 ### Content collection IDs
 - Because `glob` loader is used with `base: ./src/content/<collection>`, the `id` of each entry will be `en/slug.md` or `de/slug.md`
@@ -283,7 +310,7 @@ Work through these in order, one Claude Code session per phase:
 
 1. ~~**Foundation**~~ ✅ — Astro scaffold, Cloudflare adapter, i18n config, collection schemas, design system CSS, base layout with PostHog
 2. ~~**Components**~~ ✅ — Fonts self-hosted, global.css design tokens expanded, Header/Nav/Footer components built, Base.astro wired up
-3. **Static pages** — Home, About, Contact, 404, Policies
+3. ~~**Static pages**~~ ✅ — Home, About, Contact, 404, Policies (Privacy, Legal Notice, Terms, AI Use), Opposition/Methodology
 4. **Collection templates** — Single page templates per collection, archive/listing pages, Library archive with filters
 5. **Integrations** — Contact form Worker, OG image hook, Cal.com booking, Pagefind
 6. **Pipeline** — GitLab CI, Cloudflare Pages deployment, RSS podcast import, AI summary generation

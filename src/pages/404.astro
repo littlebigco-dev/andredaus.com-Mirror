@@ -1,0 +1,162 @@
+---
+import Base from '../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+---
+
+<Base
+  title={isDE ? 'Seite nicht gefunden — André Daus' : 'Page Not Found — André Daus'}
+  description={isDE ? 'Diese Seite existiert nicht.' : 'This page does not exist.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <section class="not-found" aria-labelledby="not-found-heading">
+    <div class="not-found__grid" aria-hidden="true"></div>
+    <div class="container">
+      <div class="not-found__inner">
+        <p class="not-found__code" aria-hidden="true">404</p>
+        <p class="label not-found__label">{isDE ? 'Seite nicht gefunden' : 'Page not found'}</p>
+        <h1 class="not-found__heading" id="not-found-heading">
+          {isDE
+            ? <Fragment>Das ist eine Annahme,<br />die wir <em>korrigieren können.</em></Fragment>
+            : <Fragment>That's an assumption<br />we can <em>correct.</em></Fragment>
+          }
+        </h1>
+        <p class="not-found__body">
+          {isDE
+            ? 'Die Seite, die Sie suchen, existiert nicht — oder wurde verschoben. Vielleicht haben Sie eine Annahme über die URL gemacht. Passiert den Besten.'
+            : 'The page you\'re looking for doesn\'t exist — or has moved. Perhaps you made an assumption about the URL. Happens to the best.'
+          }
+        </p>
+        <div class="not-found__actions">
+          <a href={`${prefix}/`} class="btn btn--primary btn-arrow">
+            {isDE ? 'Zurück zur Startseite' : 'Back to Home'}
+          </a>
+          <a href={`${prefix}/contact`} class="btn btn--outline">
+            {isDE ? 'Kontakt aufnehmen' : 'Get in Touch'}
+          </a>
+        </div>
+        <nav class="not-found__links" aria-label={isDE ? 'Nützliche Links' : 'Useful links'}>
+          <p class="not-found__links-label">{isDE ? 'Oder besuchen Sie:' : 'Or try:'}</p>
+          <ul>
+            <li><a href={`${prefix}/services`}>{isDE ? 'Leistungen' : 'Services'}</a></li>
+            <li><a href={`${prefix}/opposition`}>{isDE ? 'Die Methode' : 'The Opposition Method'}</a></li>
+            <li><a href={`${prefix}/about`}>{isDE ? 'Über André' : 'About André'}</a></li>
+            <li><a href={`${prefix}/insights`}>{isDE ? 'Einblicke' : 'Insights'}</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .not-found {
+    min-height: calc(100vh - 68px);
+    padding-top: 68px;
+    display: flex;
+    align-items: center;
+    background: var(--bg-base);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .not-found__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    pointer-events: none;
+  }
+
+  .not-found__inner {
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    padding-block: 5rem;
+  }
+
+  .not-found__code {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(6rem, 15vw, 12rem);
+    line-height: 1;
+    color: rgba(196,154,60,.08);
+    letter-spacing: -.04em;
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .not-found__label {
+    margin-bottom: 1.25rem;
+    position: relative;
+  }
+
+  .not-found__heading {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+  .not-found__heading em { font-style: italic; color: var(--gold); }
+
+  .not-found__body {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    max-width: 46ch;
+    margin-bottom: 2.5rem;
+  }
+
+  .not-found__actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .not-found__links {
+    border-top: 1px solid var(--border-light);
+    padding-top: 1.5rem;
+  }
+
+  .not-found__links-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    margin-bottom: .875rem;
+  }
+
+  .not-found__links ul {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    list-style: none;
+  }
+
+  .not-found__links a {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color .2s ease;
+    padding-block: 4px;
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+  }
+  .not-found__links a:hover { color: var(--gold); }
+</style>

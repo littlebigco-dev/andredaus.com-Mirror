@@ -1,0 +1,323 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+
+const lastUpdated = '1 January 2025';
+---
+
+<Base
+  title={isDE ? 'Allgemeine Geschäftsbedingungen — André Daus' : 'Terms of Service — André Daus'}
+  description={isDE
+    ? 'Allgemeine Geschäftsbedingungen für Coaching- und Beratungsleistungen von André Daus.'
+    : 'Terms of Service for coaching and consulting services provided by André Daus.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="policy-hero" aria-labelledby="policy-title">
+    <div class="container">
+      <div class="policy-hero__inner">
+        <div>
+          <p class="policy-hero__type">{isDE ? 'Rechtliches · AGB' : 'Legal · Terms'}</p>
+          <h1 class="policy-hero__title" id="policy-title">
+            {isDE ? 'Allgemeine Geschäftsbedingungen' : 'Terms of Service'}
+          </h1>
+        </div>
+        <aside class="policy-meta" aria-label={isDE ? 'Dokumentinformationen' : 'Document information'}>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Gültig ab' : 'Effective'}</span>
+            <span class="policy-meta__val">{lastUpdated}</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Gilt für' : 'Applies to'}</span>
+            <span class="policy-meta__val">{isDE ? 'Alle Dienste' : 'All Services'}</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- POLICY NAV STRIP -->
+  <nav class="policy-nav-strip" aria-label={isDE ? 'Rechtstexte-Navigation' : 'Policy navigation'}>
+    <div class="container">
+      <ul class="policy-nav-strip__list" role="list">
+        <li><a href={`${prefix}/policy/privacy`} class="policy-nav-strip__link">{isDE ? 'Datenschutz' : 'Privacy Policy'}</a></li>
+        <li><a href={`${prefix}/policy/legal-notice`} class="policy-nav-strip__link">{isDE ? 'Impressum' : 'Legal Notice'}</a></li>
+        <li><a href={`${prefix}/policy/terms`} class="policy-nav-strip__link is-active" aria-current="page">{isDE ? 'AGB' : 'Terms'}</a></li>
+        <li><a href={`${prefix}/policy/ai-use`} class="policy-nav-strip__link">{isDE ? 'KI-Nutzung' : 'AI Use'}</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- BODY -->
+  <div class="container">
+    <div class="policy-layout">
+
+      <!-- TOC SIDEBAR -->
+      <aside class="policy-toc" aria-label={isDE ? 'Inhaltsverzeichnis' : 'Table of contents'}>
+        <p class="policy-toc__title">{isDE ? 'Inhalt' : 'Contents'}</p>
+        <nav>
+          <ul class="policy-toc__list" role="list">
+            <li><a href="#scope" class="toc__link">{isDE ? 'Geltungsbereich' : 'Scope'}</a></li>
+            <li><a href="#services" class="toc__link">{isDE ? 'Leistungsgegenstand' : 'Services'}</a></li>
+            <li><a href="#engagement" class="toc__link">{isDE ? 'Vertragsschluss' : 'Engagement'}</a></li>
+            <li><a href="#payment" class="toc__link">{isDE ? 'Vergütung' : 'Payment'}</a></li>
+            <li><a href="#cancellation" class="toc__link">{isDE ? 'Stornierung' : 'Cancellation'}</a></li>
+            <li><a href="#confidentiality" class="toc__link">{isDE ? 'Vertraulichkeit' : 'Confidentiality'}</a></li>
+            <li><a href="#ip" class="toc__link">{isDE ? 'Geistiges Eigentum' : 'Intellectual Property'}</a></li>
+            <li><a href="#liability" class="toc__link">{isDE ? 'Haftungsbeschränkung' : 'Limitation of Liability'}</a></li>
+            <li><a href="#governing" class="toc__link">{isDE ? 'Anwendbares Recht' : 'Governing Law'}</a></li>
+            <li><a href="#changes" class="toc__link">{isDE ? 'Änderungen' : 'Changes'}</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- ARTICLE -->
+      <article class="policy-body" lang={isDE ? 'de' : 'en'}>
+
+        <section id="scope" aria-labelledby="h-scope">
+          <h2 id="h-scope">{isDE ? '1. Geltungsbereich' : '1. Scope'}</h2>
+          <p>{isDE
+            ? 'Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Coaching-, Beratungs- und Dienstleistungsverträge zwischen André Daus (nachfolgend "Anbieter") und dem Auftraggeber (nachfolgend "Klient").'
+            : 'These Terms of Service ("Terms") govern all coaching, consulting and service agreements between André Daus (hereafter "Provider") and the engaging party (hereafter "Client").'}</p>
+          <p>{isDE
+            ? 'Abweichende Bedingungen des Klienten haben keine Gültigkeit, sofern der Anbieter ihrer Geltung nicht ausdrücklich schriftlich zugestimmt hat.'
+            : 'Any differing terms of the Client have no validity unless the Provider has expressly agreed to them in writing.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="services" aria-labelledby="h-services">
+          <h2 id="h-services">{isDE ? '2. Leistungsgegenstand' : '2. Services'}</h2>
+          <p>{isDE
+            ? 'Der Anbieter erbringt Leistungen im Bereich Strategic Opposition Coaching und Beratung. Hierzu zählen insbesondere Einzel-Sessions, Projektbegleitungen und Workshop-Formate gemäß der aktuellen Leistungsbeschreibung auf andredaus.com.'
+            : 'The Provider delivers services in the area of Strategic Opposition coaching and consulting. This includes individual sessions, project engagements, and workshop formats as described in the current service listing on andredaus.com.'}</p>
+          <p>{isDE
+            ? 'Der Anbieter schuldet keinen bestimmten Erfolg (Dienstvertrag), sofern nicht ausdrücklich etwas anderes vereinbart wurde. Die Leistungen basieren auf dem aktuellen Stand des Wissens und der beruflichen Erfahrung des Anbieters.'
+            : 'The Provider does not owe a specific outcome (service contract) unless expressly agreed otherwise. Services are based on the Provider\'s current knowledge and professional experience.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="engagement" aria-labelledby="h-engagement">
+          <h2 id="h-engagement">{isDE ? '3. Vertragsschluss' : '3. Engagement'}</h2>
+          <p>{isDE
+            ? 'Ein Vertrag kommt zustande durch schriftliche (einschließlich E-Mail) Auftragsbestätigung des Anbieters oder durch Ausführung der vereinbarten Leistung. Buchungen über Cal.com oder ähnliche Systeme stellen eine verbindliche Anfrage dar; der Vertrag kommt mit Bestätigung durch den Anbieter zustande.'
+            : 'An agreement is concluded by written (including email) order confirmation by the Provider, or by performance of the agreed service. Bookings made via Cal.com or similar systems constitute a binding request; the agreement is concluded upon confirmation by the Provider.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="payment" aria-labelledby="h-payment">
+          <h2 id="h-payment">{isDE ? '4. Vergütung und Zahlung' : '4. Payment'}</h2>
+          <p>{isDE
+            ? 'Die Vergütung richtet sich nach dem jeweils gültigen Angebot. Alle Preise verstehen sich zuzüglich der gesetzlichen Mehrwertsteuer, sofern diese anfällt.'
+            : 'Remuneration is based on the current offer. All prices are exclusive of applicable statutory VAT where applicable.'}</p>
+          <p>{isDE
+            ? 'Rechnungen sind innerhalb von 14 Tagen nach Rechnungsdatum ohne Abzug zahlbar, sofern nicht anders vereinbart. Bei Zahlungsverzug sind Verzugszinsen in gesetzlicher Höhe fällig.'
+            : 'Invoices are payable within 14 days of the invoice date without deduction, unless otherwise agreed. Default interest at the statutory rate is due in case of late payment.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="cancellation" aria-labelledby="h-cancellation">
+          <h2 id="h-cancellation">{isDE ? '5. Stornierung und Verschiebung' : '5. Cancellation and Rescheduling'}</h2>
+          <p>{isDE
+            ? 'Stornierungen oder Verschiebungen von gebuchten Sessions sind bis 48 Stunden vor dem Termin kostenlos möglich. Bei kürzerer Ankündigung wird die volle Sessiongebühr in Rechnung gestellt. Ausnahmen gelten bei nachgewiesenen Notfällen nach billigem Ermessen des Anbieters.'
+            : 'Cancellations or rescheduling of booked sessions are free of charge up to 48 hours before the scheduled time. With shorter notice, the full session fee will be charged. Exceptions apply in proven emergencies at the Provider\'s reasonable discretion.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="confidentiality" aria-labelledby="h-confidentiality">
+          <h2 id="h-confidentiality">{isDE ? '6. Vertraulichkeit' : '6. Confidentiality'}</h2>
+          <p>{isDE
+            ? 'Der Anbieter behandelt alle im Rahmen der Zusammenarbeit erlangten Informationen über den Klienten vertraulich. Der Klient stimmt zu, dass der Anbieter anonymisierte Erkenntnisse aus der Zusammenarbeit in allgemeiner Form für Lehr- und Veröffentlichungszwecke nutzen darf, sofern keine Rückschlüsse auf den Klienten möglich sind.'
+            : 'The Provider treats all information obtained about the Client in the course of the engagement as confidential. The Client agrees that the Provider may use anonymised insights from the engagement in general terms for educational and publication purposes, provided no identification of the Client is possible.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="ip" aria-labelledby="h-ip">
+          <h2 id="h-ip">{isDE ? '7. Geistiges Eigentum' : '7. Intellectual Property'}</h2>
+          <p>{isDE
+            ? 'Alle vom Anbieter im Rahmen der Zusammenarbeit erstellten Materialien, Frameworks, Methoden und Werkzeuge bleiben geistiges Eigentum des Anbieters. Der Klient erhält ein nicht exklusives, nicht übertragbares Nutzungsrecht für den vereinbarten Zweck.'
+            : 'All materials, frameworks, methods and tools created by the Provider in the course of the engagement remain the intellectual property of the Provider. The Client receives a non-exclusive, non-transferable right of use for the agreed purpose.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="liability" aria-labelledby="h-liability">
+          <h2 id="h-liability">{isDE ? '8. Haftungsbeschränkung' : '8. Limitation of Liability'}</h2>
+          <p>{isDE
+            ? 'Der Anbieter haftet unbeschränkt für Vorsatz und grobe Fahrlässigkeit sowie bei Verletzung von Leben, Körper und Gesundheit. Im Übrigen ist die Haftung auf den vorhersehbaren Schaden begrenzt und auf den Auftragswert des jeweiligen Projekts beschränkt.'
+            : 'The Provider is liable without limitation for intent and gross negligence, and for injury to life, body and health. Otherwise, liability is limited to foreseeable damage and capped at the value of the respective project engagement.'}</p>
+          <p>{isDE
+            ? 'Der Anbieter haftet nicht für Ergebnisse von Entscheidungen, die der Klient auf Basis der Beratungsleistungen trifft. Die Verantwortung für unternehmerische Entscheidungen verbleibt beim Klienten.'
+            : 'The Provider is not liable for the results of decisions made by the Client based on the consulting services. Responsibility for business decisions remains with the Client.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="governing" aria-labelledby="h-governing">
+          <h2 id="h-governing">{isDE ? '9. Anwendbares Recht und Gerichtsstand' : '9. Governing Law and Jurisdiction'}</h2>
+          <p>{isDE
+            ? 'Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit gesetzlich zulässig, der Sitz des Anbieters.'
+            : 'The law of the Federal Republic of Germany applies. The place of jurisdiction is, to the extent permitted by law, the registered place of business of the Provider.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="changes" aria-labelledby="h-changes">
+          <h2 id="h-changes">{isDE ? '10. Änderungen der AGB' : '10. Changes to These Terms'}</h2>
+          <p>{isDE
+            ? 'Der Anbieter behält sich vor, diese AGB mit Wirkung für die Zukunft zu ändern. Änderungen werden auf der Website veröffentlicht. Für bestehende Verträge gelten die zum Zeitpunkt des Vertragsschlusses gültigen AGB.'
+            : 'The Provider reserves the right to modify these Terms with effect for the future. Changes will be published on the website. The Terms valid at the time of the agreement apply to existing contracts.'}</p>
+        </section>
+
+      </article>
+    </div>
+  </div>
+
+</Base>
+
+<style>
+  /* ── POLICY HERO ──────────────────────────────────────── */
+  .policy-hero {
+    padding-top: 68px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .policy-hero__inner {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 3rem; align-items: end;
+    padding-block: clamp(3rem,6vw,5rem) 2.5rem;
+  }
+  .policy-hero__type {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .policy-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+    font-weight: 400; line-height: 1.05; color: var(--text-primary);
+  }
+  .policy-meta {
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: 3px; padding: 1.25rem 1.5rem;
+    min-width: 220px; align-self: end;
+  }
+  .policy-meta__row {
+    display: flex; flex-direction: column; gap: .2rem;
+    padding-block: .625rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .policy-meta__row:first-child { padding-top: 0; }
+  .policy-meta__row:last-child { border-bottom: none; padding-bottom: 0; }
+  .policy-meta__key {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle);
+  }
+  .policy-meta__val { font-size: 13px; color: var(--text-secondary); }
+  @media (max-width: 700px) {
+    .policy-hero__inner { grid-template-columns: 1fr; }
+    .policy-meta { display: none; }
+  }
+
+  /* ── POLICY NAV STRIP ─────────────────────────────────── */
+  .policy-nav-strip {
+    background: var(--bg-card-alt);
+    border-bottom: 1px solid var(--border-light);
+    padding-block: .875rem;
+    overflow-x: auto;
+  }
+  .policy-nav-strip__list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; gap: 2rem; flex-wrap: nowrap;
+  }
+  .policy-nav-strip__link {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-subtle); text-decoration: none;
+    padding-bottom: .25rem;
+    border-bottom: 1px solid transparent;
+    transition: color .2s ease, border-color .2s ease;
+    white-space: nowrap;
+  }
+  .policy-nav-strip__link:hover { color: var(--text-secondary); }
+  .policy-nav-strip__link.is-active { color: var(--gold); border-color: var(--gold); }
+
+  /* ── POLICY LAYOUT ────────────────────────────────────── */
+  .policy-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 4rem; align-items: start;
+    padding-block: clamp(3rem,6vw,5rem);
+  }
+
+  /* ── TOC ──────────────────────────────────────────────── */
+  .policy-toc {
+    position: sticky; top: calc(68px + 2rem);
+    max-height: calc(100vh - 68px - 4rem);
+    overflow-y: auto; padding-right: .5rem;
+  }
+  .policy-toc__title {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--text-subtle); margin-bottom: 1rem;
+  }
+  .policy-toc__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .25rem; }
+  .toc__link {
+    font-size: 13px; line-height: 1.5; color: var(--text-subtle);
+    text-decoration: none; display: block; padding: .35rem 0;
+    border-left: 2px solid transparent; padding-left: .75rem;
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .toc__link:hover { color: var(--text-secondary); }
+  .toc__link.is-active { color: var(--gold); border-color: var(--gold); }
+  @media (max-width: 900px) {
+    .policy-layout { grid-template-columns: 1fr; }
+    .policy-toc { display: none; }
+  }
+
+  /* ── POLICY BODY ──────────────────────────────────────── */
+  .policy-body { min-width: 0; }
+  .policy-body h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-weight: 400; line-height: 1.2; color: var(--text-primary);
+    margin-bottom: 1.25rem;
+  }
+  .policy-body p {
+    font-size: clamp(14px, 1.05vw, 15.5px); line-height: 1.9;
+    color: var(--text-secondary); margin-bottom: 1rem;
+  }
+  .policy-body p:last-child { margin-bottom: 0; }
+  .policy-body a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+  .policy-body a:hover { color: var(--gold-light); }
+  .policy-body section { margin-bottom: 3rem; }
+  .policy-body section:last-child { margin-bottom: 0; }
+  .policy-divider { border: none; border-top: 1px solid var(--border-light); margin-block: 2.5rem; }
+</style>
+
+<script>
+  const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc__link'));
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('.policy-body section[id]'));
+
+  if (tocLinks.length && sections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(l => l.classList.remove('is-active'));
+          document.querySelector<HTMLAnchorElement>(`.toc__link[href="#${entry.target.id}"]`)?.classList.add('is-active');
+        }
+      }),
+      { rootMargin: '-68px 0px -60% 0px', threshold: 0 }
+    );
+    sections.forEach(s => observer.observe(s));
+  }
+</script>

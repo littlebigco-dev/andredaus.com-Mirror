@@ -1,0 +1,321 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+
+const lastUpdated = '1 January 2025';
+---
+
+<Base
+  title={isDE ? 'KI-Nutzungsrichtlinie — André Daus' : 'AI Use Policy — André Daus'}
+  description={isDE
+    ? 'Transparenz darüber, wie und wo Künstliche Intelligenz in der Arbeit von André Daus eingesetzt wird.'
+    : 'Transparency about how and where Artificial Intelligence is used in the work of André Daus.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="policy-hero" aria-labelledby="policy-title">
+    <div class="container">
+      <div class="policy-hero__inner">
+        <div>
+          <p class="policy-hero__type">{isDE ? 'Rechtliches · KI-Nutzung' : 'Legal · AI Use'}</p>
+          <h1 class="policy-hero__title" id="policy-title">
+            {isDE ? 'KI-Nutzungsrichtlinie' : 'AI Use Policy'}
+          </h1>
+        </div>
+        <aside class="policy-meta" aria-label={isDE ? 'Dokumentinformationen' : 'Document information'}>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Gültig ab' : 'Effective'}</span>
+            <span class="policy-meta__val">{lastUpdated}</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Zweck' : 'Purpose'}</span>
+            <span class="policy-meta__val">{isDE ? 'Transparenz' : 'Transparency'}</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- POLICY NAV STRIP -->
+  <nav class="policy-nav-strip" aria-label={isDE ? 'Rechtstexte-Navigation' : 'Policy navigation'}>
+    <div class="container">
+      <ul class="policy-nav-strip__list" role="list">
+        <li><a href={`${prefix}/policy/privacy`} class="policy-nav-strip__link">{isDE ? 'Datenschutz' : 'Privacy Policy'}</a></li>
+        <li><a href={`${prefix}/policy/legal-notice`} class="policy-nav-strip__link">{isDE ? 'Impressum' : 'Legal Notice'}</a></li>
+        <li><a href={`${prefix}/policy/terms`} class="policy-nav-strip__link">{isDE ? 'AGB' : 'Terms'}</a></li>
+        <li><a href={`${prefix}/policy/ai-use`} class="policy-nav-strip__link is-active" aria-current="page">{isDE ? 'KI-Nutzung' : 'AI Use'}</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- BODY -->
+  <div class="container">
+    <div class="policy-layout">
+
+      <!-- TOC SIDEBAR -->
+      <aside class="policy-toc" aria-label={isDE ? 'Inhaltsverzeichnis' : 'Table of contents'}>
+        <p class="policy-toc__title">{isDE ? 'Inhalt' : 'Contents'}</p>
+        <nav>
+          <ul class="policy-toc__list" role="list">
+            <li><a href="#position" class="toc__link">{isDE ? 'Grundposition' : 'Position'}</a></li>
+            <li><a href="#where-used" class="toc__link">{isDE ? 'Wo KI eingesetzt wird' : 'Where AI is used'}</a></li>
+            <li><a href="#where-not" class="toc__link">{isDE ? 'Wo KI nicht eingesetzt wird' : 'Where AI is not used'}</a></li>
+            <li><a href="#client-data" class="toc__link">{isDE ? 'Kundendaten und KI' : 'Client data and AI'}</a></li>
+            <li><a href="#tools" class="toc__link">{isDE ? 'Verwendete Tools' : 'Tools used'}</a></li>
+            <li><a href="#changes" class="toc__link">{isDE ? 'Änderungen' : 'Changes'}</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- ARTICLE -->
+      <article class="policy-body" lang={isDE ? 'de' : 'en'}>
+
+        <section id="position" aria-labelledby="h-position">
+          <h2 id="h-position">{isDE ? 'Grundposition' : 'Position on AI'}</h2>
+          <p>{isDE
+            ? 'KI ist ein Werkzeug, kein Ersatz für Urteilsvermögen. Diese Richtlinie erklärt transparent, wo KI-Werkzeuge in meiner Arbeit eingesetzt werden und — mindestens ebenso wichtig — wo nicht.'
+            : 'AI is a tool, not a replacement for judgement. This policy explains transparently where AI tools are used in my work and — at least equally important — where they are not.'}</p>
+          <p>{isDE
+            ? 'Strategic Opposition als Methode basiert auf dem Erkennen von Annahmen, Denkfehlern und bequemen Vereinfachungen. KI-Systeme sind besonders anfällig für genau diese Eigenschaften. Der unkritische Einsatz von KI in Kernberatungsleistungen würde die methodischen Grundlagen dieser Arbeit untergraben.'
+            : 'Strategic Opposition as a method is based on identifying assumptions, thinking errors, and comfortable simplifications. AI systems are particularly prone to these exact characteristics. Uncritical AI use in core consulting work would undermine the methodological foundations of this practice.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="where-used" aria-labelledby="h-where-used">
+          <h2 id="h-where-used">{isDE ? 'Wo KI eingesetzt wird' : 'Where AI is used'}</h2>
+
+          <h3>{isDE ? 'Website-Infrastruktur' : 'Website infrastructure'}</h3>
+          <p>{isDE
+            ? 'KI-Werkzeuge werden für die technische Entwicklung und das Codeschreiben dieser Website eingesetzt. Keine Inhalte, die öffentlich als eigene erscheinen, werden ohne menschliche Überprüfung und Redaktion veröffentlicht.'
+            : 'AI tools are used for technical development and code writing for this website. No content appearing publicly as my own is published without human review and editorial input.'}</p>
+
+          <h3>{isDE ? 'Erstrecherche und Literaturüberblick' : 'Initial research and literature scanning'}</h3>
+          <p>{isDE
+            ? 'KI kann eingesetzt werden, um große Mengen an Quellmaterial zu sichten und relevante Konzepte zu identifizieren. Alle veröffentlichten Schlussfolgerungen und Bewertungen stammen aus menschlichem Urteilsvermögen.'
+            : 'AI may be used to scan large volumes of source material and identify relevant concepts. All published conclusions and assessments originate from human judgement.'}</p>
+
+          <h3>{isDE ? 'Zusammenfassungen von Podcast-Transkripten' : 'Podcast transcript summaries'}</h3>
+          <p>{isDE
+            ? 'Automatisierte Zusammenfassungen von Episoden werden KI-unterstützt generiert und redaktionell überprüft. Wo KI-generierte Zusammenfassungen verwendet werden, wird dies entsprechend gekennzeichnet.'
+            : 'Automated episode summaries are generated with AI assistance and editorially reviewed. Where AI-generated summaries are used, this is indicated accordingly.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="where-not" aria-labelledby="h-where-not">
+          <h2 id="h-where-not">{isDE ? 'Wo KI nicht eingesetzt wird' : 'Where AI is not used'}</h2>
+
+          <h3>{isDE ? 'Kernberatungsleistungen' : 'Core consulting work'}</h3>
+          <p>{isDE
+            ? 'Alle Analyse-, Diagnose- und Empfehlungsarbeiten im Rahmen von Coaching- und Beratungsmandaten werden ausschließlich durch menschliches Urteilsvermögen durchgeführt. KI-generierte Analysen werden nicht an Klienten weitergegeben oder als Beratungsgrundlage verwendet.'
+            : 'All analysis, diagnosis, and recommendation work within coaching and consulting engagements is performed exclusively through human judgement. AI-generated analyses are not passed on to clients or used as the basis for consulting.'}</p>
+
+          <h3>{isDE ? 'Inhalte unter eigenem Namen' : 'Content published under my name'}</h3>
+          <p>{isDE
+            ? 'Artikel, Insights und Podcast-Episoden, die als meine eigene Perspektive erscheinen, sind keine KI-generierten Inhalte. Redaktionelle Unterstützung (Lektorat, Formatierung) ist möglich; die inhaltliche Substanz und Argumentation stammt von mir.'
+            : 'Articles, insights, and podcast episodes appearing as my own perspective are not AI-generated content. Editorial support (proofreading, formatting) may be used; the substantive content and argumentation originates from me.'}</p>
+
+          <h3>{isDE ? 'Klientenkommunikation' : 'Client communication'}</h3>
+          <p>{isDE
+            ? 'Direkte Kommunikation mit Klienten — E-Mails, Session-Notizen, Berichte — wird nicht KI-generiert. Klienten erhalten meine eigene Analyse und Formulierungen.'
+            : 'Direct communication with clients — emails, session notes, reports — is not AI-generated. Clients receive my own analysis and formulations.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="client-data" aria-labelledby="h-client-data">
+          <h2 id="h-client-data">{isDE ? 'Kundendaten und KI' : 'Client data and AI'}</h2>
+          <p>{isDE
+            ? 'Vertrauliche Kundendaten, Gesprächsinhalte oder projektspezifische Informationen werden grundsätzlich nicht in externe KI-Systeme eingegeben. Dies gilt unabhängig von den Datenschutzversprechen der jeweiligen Anbieter.'
+            : 'Confidential client data, conversation content, or project-specific information is not entered into external AI systems under any circumstances. This applies regardless of the privacy promises of the respective providers.'}</p>
+          <p>{isDE
+            ? 'Sollte sich dies für einen konkreten Anwendungsfall ändern, wird dies mit dem betroffenen Klienten vorab besprochen und schriftlich vereinbart.'
+            : 'Should this change for a specific use case, it will be discussed with the affected client in advance and agreed in writing.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="tools" aria-labelledby="h-tools">
+          <h2 id="h-tools">{isDE ? 'Verwendete KI-Tools' : 'AI tools used'}</h2>
+          <p>{isDE
+            ? 'Für die genannten zulässigen Verwendungszwecke werden derzeit folgende Systeme eingesetzt:'
+            : 'For the stated permitted use cases, the following systems are currently used:'}</p>
+          <ul class="policy-list">
+            <li>Claude (Anthropic) — {isDE ? 'Technische Entwicklung, Recherche' : 'Technical development, research'}</li>
+            <li>Whisper / {isDE ? 'ähnliche Systeme' : 'similar systems'} — {isDE ? 'Podcast-Transkription' : 'Podcast transcription'}</li>
+          </ul>
+          <p>{isDE
+            ? 'Diese Liste wird aktualisiert, wenn neue Tools dauerhaft eingesetzt werden.'
+            : 'This list is updated when new tools are adopted on a permanent basis.'}</p>
+        </section>
+
+        <hr class="policy-divider"/>
+
+        <section id="changes" aria-labelledby="h-changes">
+          <h2 id="h-changes">{isDE ? 'Änderungen dieser Richtlinie' : 'Changes to this policy'}</h2>
+          <p>{isDE
+            ? 'Diese Richtlinie wird aktualisiert, wenn sich die KI-Nutzung wesentlich ändert. Das Datum der letzten Änderung ist oben angegeben. Wesentliche Änderungen werden auf der Website kommuniziert.'
+            : 'This policy is updated when AI use changes materially. The date of last revision is shown above. Material changes will be communicated on the website.'}</p>
+        </section>
+
+      </article>
+    </div>
+  </div>
+
+</Base>
+
+<style>
+  /* ── POLICY HERO ──────────────────────────────────────── */
+  .policy-hero {
+    padding-top: 68px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+  }
+  .policy-hero__inner {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 3rem; align-items: end;
+    padding-block: clamp(3rem,6vw,5rem) 2.5rem;
+  }
+  .policy-hero__type {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .policy-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+    font-weight: 400; line-height: 1.05; color: var(--text-primary);
+  }
+  .policy-meta {
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: 3px; padding: 1.25rem 1.5rem;
+    min-width: 220px; align-self: end;
+  }
+  .policy-meta__row {
+    display: flex; flex-direction: column; gap: .2rem;
+    padding-block: .625rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .policy-meta__row:first-child { padding-top: 0; }
+  .policy-meta__row:last-child { border-bottom: none; padding-bottom: 0; }
+  .policy-meta__key {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--text-subtle);
+  }
+  .policy-meta__val { font-size: 13px; color: var(--text-secondary); }
+  @media (max-width: 700px) {
+    .policy-hero__inner { grid-template-columns: 1fr; }
+    .policy-meta { display: none; }
+  }
+
+  /* ── POLICY NAV STRIP ─────────────────────────────────── */
+  .policy-nav-strip {
+    background: var(--bg-card-alt);
+    border-bottom: 1px solid var(--border-light);
+    padding-block: .875rem;
+    overflow-x: auto;
+  }
+  .policy-nav-strip__list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; gap: 2rem; flex-wrap: nowrap;
+  }
+  .policy-nav-strip__link {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-subtle); text-decoration: none;
+    padding-bottom: .25rem;
+    border-bottom: 1px solid transparent;
+    transition: color .2s ease, border-color .2s ease;
+    white-space: nowrap;
+  }
+  .policy-nav-strip__link:hover { color: var(--text-secondary); }
+  .policy-nav-strip__link.is-active { color: var(--gold); border-color: var(--gold); }
+
+  /* ── POLICY LAYOUT ────────────────────────────────────── */
+  .policy-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 4rem; align-items: start;
+    padding-block: clamp(3rem,6vw,5rem);
+  }
+
+  /* ── TOC ──────────────────────────────────────────────── */
+  .policy-toc {
+    position: sticky; top: calc(68px + 2rem);
+    max-height: calc(100vh - 68px - 4rem);
+    overflow-y: auto; padding-right: .5rem;
+  }
+  .policy-toc__title {
+    font-family: var(--mono); font-size: 9px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--text-subtle); margin-bottom: 1rem;
+  }
+  .policy-toc__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .25rem; }
+  .toc__link {
+    font-size: 13px; line-height: 1.5; color: var(--text-subtle);
+    text-decoration: none; display: block; padding: .35rem 0;
+    border-left: 2px solid transparent; padding-left: .75rem;
+    transition: color .2s ease, border-color .2s ease;
+  }
+  .toc__link:hover { color: var(--text-secondary); }
+  .toc__link.is-active { color: var(--gold); border-color: var(--gold); }
+  @media (max-width: 900px) {
+    .policy-layout { grid-template-columns: 1fr; }
+    .policy-toc { display: none; }
+  }
+
+  /* ── POLICY BODY ──────────────────────────────────────── */
+  .policy-body { min-width: 0; }
+  .policy-body h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-weight: 400; line-height: 1.2; color: var(--text-primary);
+    margin-bottom: 1.25rem;
+  }
+  .policy-body h3 {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gold); margin-top: 2rem; margin-bottom: .75rem;
+  }
+  .policy-body p {
+    font-size: clamp(14px, 1.05vw, 15.5px); line-height: 1.9;
+    color: var(--text-secondary); margin-bottom: 1rem;
+  }
+  .policy-body p:last-child { margin-bottom: 0; }
+  .policy-body a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+  .policy-body a:hover { color: var(--gold-light); }
+  .policy-body section { margin-bottom: 3rem; }
+  .policy-body section:last-child { margin-bottom: 0; }
+  .policy-divider { border: none; border-top: 1px solid var(--border-light); margin-block: 2.5rem; }
+  .policy-list {
+    margin-block: .75rem 1rem; padding-left: 1.5rem;
+    display: flex; flex-direction: column; gap: .375rem;
+  }
+  .policy-list li {
+    font-size: clamp(14px, 1.05vw, 15.5px); line-height: 1.7;
+    color: var(--text-secondary);
+  }
+</style>
+
+<script>
+  const tocLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.toc__link'));
+  const sections = Array.from(document.querySelectorAll<HTMLElement>('.policy-body section[id]'));
+
+  if (tocLinks.length && sections.length) {
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          tocLinks.forEach(l => l.classList.remove('is-active'));
+          document.querySelector<HTMLAnchorElement>(`.toc__link[href="#${entry.target.id}"]`)?.classList.add('is-active');
+        }
+      }),
+      { rootMargin: '-68px 0px -60% 0px', threshold: 0 }
+    );
+    sections.forEach(s => observer.observe(s));
+  }
+</script>

@@ -1,10 +1,808 @@
 ---
 import Base from '../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
 ---
 
-<Base title="André Daus" description="Strategic Opposition consulting. The problem is rarely the problem.">
-  <main>
-    <h1>André Daus</h1>
-    <p>The problem is rarely the problem.</p>
-  </main>
+<Base
+  title={isDE ? 'André Daus — Strategic Opposition' : 'André Daus — Strategic Opposition'}
+  description={isDE
+    ? 'Strategic Opposition Coaching und Beratung. André Daus hinterfragt die Annahmen, auf denen Ihre Strategie basiert — bevor es der Markt tut.'
+    : 'Strategic Opposition consulting and coaching. André Daus challenges the assumptions your strategy depends on — before the market does it for you.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+<!-- ── HERO ─────────────────────────────────────────── -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="hero__bg" aria-hidden="true"></div>
+  <div class="hero__grid-overlay" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <div class="hero__content">
+      <p class="label hero__label">{isDE ? 'Strategic Opposition Beratung' : 'Strategic Opposition Consulting'}</p>
+      <h1 class="hero__headline" id="hero-heading">
+        {isDE ? (
+          <>Geben Sie Ihrer Strategie<em>einen ernsthaften Gegner</em></>
+        ) : (
+          <>Give your strategy<em>a worthy adversary</em></>
+        )}
+      </h1>
+      <p class="hero__lede">
+        {isDE
+          ? 'Jede strategische Annahme trägt den Mechanismus ihres eigenen Scheiterns in sich. Machen Sie die Widersprüche in Ihren sichtbar — solange Sie noch das Ergebnis kontrollieren. Finden Sie sie, bevor es der Markt tut.'
+          : 'Every strategic assumption carries the mechanism of its own failure. Surface the contradictions embedded in yours — while you still control the outcome. Find them before the market does.'}
+      </p>
+      <div class="hero__ctas">
+        <a href={`${prefix}/contact`}    class="btn btn--primary btn-arrow">{isDE ? 'Strategie testen' : 'Stress-Test Your Strategy'}</a>
+        <a href={`${prefix}/opposition`} class="btn btn--outline">{isDE ? 'Mein Denkansatz' : 'See How I Think'}</a>
+      </div>
+    </div>
+
+    <div class="hero__portrait" role="img" aria-label={isDE ? 'André Daus, Strategic Opposition Berater' : 'André Daus, Strategic Opposition consultant'}>
+      <div class="img-ph" style="min-height:400px">
+        <span class="img-ph__icon" aria-hidden="true">◎</span>
+        <span class="img-ph__label">Hero Portrait</span>
+        <p class="img-ph__desc">André Daus — head and shoulders, candid/editorial. Replace with AndreDaus-760x1024.png. 760×1024px, 3:4 ratio.</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="hero__scroll" aria-hidden="true">{isDE ? 'Scrollen' : 'Scroll'}</span>
+</section>
+
+<!-- ── PROBLEM ───────────────────────────────────────── -->
+<section class="problem section" aria-labelledby="problem-heading">
+  <div class="container">
+    <p class="label" style="margin-bottom:1.5rem">{isDE ? 'Die Grundursache' : 'The root cause'}</p>
+    <h2 class="problem__heading" id="problem-heading">
+      {isDE
+        ? 'Bahnbrechendes Wachstum scheitert selten an Talent. Es scheitert an blinden Flecken in drei kritischen Bereichen.'
+        : 'Breakthrough growth rarely fails because of talent. It fails because of blind spots in three critical areas.'}
+    </h2>
+
+    <ul class="problem__grid">
+      <li class="problem__card fade-up">
+        <span class="problem__card-number" aria-hidden="true">01</span>
+        <h3 class="problem__card-title">{isDE ? 'Jeder stimmt zu. Niemand hat recht.' : 'Every room agrees. Nobody\'s right.'}</h3>
+        <p class="problem__card-body">{isDE
+          ? 'Teams priorisieren Harmonie vor ehrlichem Diskurs — sie tauschen echte Agilität gegen den Komfort des Einvernehmens. Kritischer Widerspruch wird gefiltert, bevor er die Entscheidung erreicht. Das Ergebnis ist eine Strategie, die solide erscheint und nie getestet wurde.'
+          : 'Teams prioritize harmony over honest debate — trading real agility for the comfort of alignment. Critical dissent gets filtered before it reaches the decision. The result is a strategy that feels solid and hasn\'t been tested.'}</p>
+      </li>
+      <li class="problem__card fade-up">
+        <span class="problem__card-number" aria-hidden="true">02</span>
+        <h3 class="problem__card-title">{isDE ? 'Die Wahrheit, die zählt, erreicht Sie nie.' : 'The truth that matters never reaches you.'}</h3>
+        <p class="problem__card-body">{isDE
+          ? 'Die meisten Berater bestätigen, was Sie bereits glauben. Die Erkenntnis, die die Entscheidung verändert, wird neutralisiert, bevor sie zu Ihnen gelangt. Nicht weil sie falsch ist — weil sie jemanden im Raum bedroht.'
+          : 'Most advisors confirm what you already believe. The insight that changes the decision gets neutralized before it reaches you. Not because it\'s wrong — because it\'s threatening to someone in the room.'}</p>
+      </li>
+      <li class="problem__card fade-up">
+        <span class="problem__card-number" aria-hidden="true">03</span>
+        <h3 class="problem__card-title">{isDE ? 'Externe Hilfe, die Abhängigkeit schafft.' : 'External help that creates dependency.'}</h3>
+        <p class="problem__card-body">{isDE
+          ? 'Externe Hilfe, die Abhängigkeit schafft, ist eine Beratungsfalle. Echter Wandel bedeutet, dass Ihr Team die Methodik verinnerlicht — und auch nach dem Ende des Engagements weiter hinterfragt.'
+          : 'External help that creates dependency is a consulting trap. Real change means your team internalizes the methodology — and keeps questioning long after the engagement ends.'}</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── METHODOLOGY ───────────────────────────────────── -->
+<section class="method section" aria-labelledby="method-heading">
+  <div class="container">
+    <div class="method__intro">
+      <div>
+        <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Der Weg nach vorn' : 'The way forward'}</p>
+        <h2 class="method__heading" id="method-heading">
+          {isDE ? (
+            <>Die meisten Berater verstärken Ihr bestehendes Denken. Ich mache es <em>unmöglich</em>, der echten Frage weiter auszuweichen.</>
+          ) : (
+            <>Most advisors reinforce your existing thinking. I <em>make it impossible</em> to keep avoiding the real question.</>
+          )}
+        </h2>
+      </div>
+      <a href={`${prefix}/insights`} class="btn btn--outline" style="flex-shrink:0;align-self:flex-end">{isDE ? 'Artikel ansehen' : 'View Articles'}</a>
+    </div>
+
+    <ul class="method__cards">
+      <li class="method__card fade-up">
+        <h3 class="method__card-title">{isDE ? 'Strukturierte intellektuelle Opposition' : 'Structured Intellectual Opposition'}</h3>
+        <p class="method__card-body">{isDE
+          ? 'Ihr Team neigt natürlich zur Einigkeit. Ich führe systematische Methoden ein, um die grundlegenden Annahmen Ihrer Organisation zu hinterfragen, bevor externer Druck zur Erkenntnis zwingt. Sie erhalten Zugang zu Perspektiven, die interner Konsens strukturell ausschließt.'
+          : 'Your team naturally gravitates toward agreement. I introduce systematic methods for challenging your organization\'s fundamental assumptions before external pressure forces recognition. You gain access to perspectives that internal consensus structurally excludes.'}</p>
+        <a href={`${prefix}/services`} class="method__card-link">{isDE ? 'Diesen Ansatz erkunden' : 'Explore this approach'}</a>
+      </li>
+      <li class="method__card fade-up">
+        <h3 class="method__card-title">{isDE ? 'Unbequeme Wahrheiten, präzise vermittelt' : 'Uncomfortable Truths, Delivered Precisely'}</h3>
+        <p class="method__card-body">{isDE
+          ? 'Die meisten Berater sagen Ihnen, was die organisatorische Harmonie bewahrt. Ich identifiziere die Überzeugungen, die sich unverzichtbar anfühlen, aber strategische Verwundbarkeit erzeugen. Sie erhalten Klarheit über blinde Flecken, die interne Stimmen strukturell nicht sichtbar machen können.'
+          : 'Most advisors tell you what maintains organizational harmony. I identify the beliefs that feel essential but create strategic vulnerability. You get clarity about blind spots that internal voices are structurally unable to surface.'}</p>
+        <a href={`${prefix}/services`} class="method__card-link">{isDE ? 'Diesen Ansatz erkunden' : 'Explore this approach'}</a>
+      </li>
+      <li class="method__card fade-up">
+        <h3 class="method__card-title">{isDE ? 'Selbsttragende kritische Kapazität' : 'Self-Sustaining Critical Capacity'}</h3>
+        <p class="method__card-body">{isDE
+          ? 'Ich übertrage Methodik, nicht Abhängigkeit. Ihre Mitarbeiter lernen reproduzierbare Techniken, um ihre eigenen kognitiven Einschränkungen aufzudecken. Wenn das Engagement endet, behält Ihre Organisation die systematische Fähigkeit, ihre geschätztesten Betriebsannahmen zu hinterfragen.'
+          : 'I transfer methodology, not dependency. Your people learn reproducible techniques for exposing their own cognitive constraints. When the engagement ends, your organization retains systematic ability to question its most cherished operational assumptions.'}</p>
+        <a href={`${prefix}/services`} class="method__card-link">{isDE ? 'Diesen Ansatz erkunden' : 'Explore this approach'}</a>
+      </li>
+    </ul>
+
+    <div class="method__image-wrap" role="img" aria-label={isDE ? 'André Daus in einer Arbeitssitzung mit einem Klienten' : 'André Daus in a working session with a client'}>
+      <div class="img-ph" style="min-height:280px">
+        <span class="img-ph__icon" aria-hidden="true">◈</span>
+        <span class="img-ph__label">Working Context Image</span>
+        <p class="img-ph__desc">André at a whiteboard or table, mid-session. Candid, editorial — NOT posed. 1160×506px, 16:7 ratio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SERVICES ──────────────────────────────────────── -->
+<section class="services section" aria-labelledby="services-heading">
+  <div class="container">
+    <div class="services__intro">
+      <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Wie ich arbeite' : 'How I work'}</p>
+      <h2 class="services__heading" id="services-heading">
+        {isDE ? 'Wie ich hinterfrage, was Sie nicht hinterfragen können' : 'How I challenge what you can\'t question'}
+      </h2>
+      <p class="services__lede">{isDE
+        ? 'Die meisten Organisationen scheitern nicht an externen Bedrohungen, sondern an internen Gewissheiten. Sie verwechseln Konsens mit Klarheit, Komfort mit Kompetenz und nennen ihre blinden Flecken "Kultur".'
+        : 'Most organizations fail not from external threats, but from internal certainties. They mistake consensus for clarity, confuse comfort with competence, and call their blind spots "culture."'}</p>
+    </div>
+
+    <ul class="services__grid">
+      <li class="service-card fade-up">
+        <span class="service-card__label">{isDE ? 'Entdeckungs-Engagement' : 'Discovery engagement'}</span>
+        <h3 class="service-card__title">{isDE ? 'Annahmen-Jagd' : 'Assumption Hunting'}</h3>
+        <p class="service-card__body">{isDE
+          ? 'Ein strukturiertes Audit der Annahmen, auf denen Ihre Strategie aufgebaut ist. Nicht die, über die Sie sich Sorgen machen — die, die Sie aufgehört haben zu bemerken. Jeder strategische Plan hat tragende Überzeugungen, die nie getestet wurden. Ich finde sie, bevor es der Markt tut.'
+          : 'A structured audit of the assumptions your strategy is built on. Not the ones you worry about — the ones you\'ve stopped noticing. Every strategic plan has load-bearing beliefs that have never been tested. I find them before the market does.'}</p>
+        <a href={`${prefix}/services`} class="service-card__link">{isDE ? 'Dienst ansehen' : 'View service'}</a>
+      </li>
+      <li class="service-card fade-up">
+        <span class="service-card__label">{isDE ? '1:1 Engagement' : '1:1 engagement'}</span>
+        <h3 class="service-card__title">{isDE ? '1:1 Coaching' : '1:1 Coaching'}</h3>
+        <p class="service-card__body">{isDE
+          ? 'Für Führungskräfte, die einen Denkpartner ohne Agenda brauchen. Ich hinterfrage Ihr Denken, decke Ihre kognitiven Muster auf und helfe Ihnen, bessere Entscheidungen zu treffen, indem ich das Unsichtbare sichtbar mache. Kein Therapie. Kein Anfeuern. Rigorose intellektuelle Opposition.'
+          : 'For leaders who need a thinking partner without an agenda. I challenge your reasoning, expose your cognitive patterns, and help you make better decisions by making the invisible visible. Not therapy. Not cheerleading. Rigorous intellectual opposition.'}</p>
+        <a href={`${prefix}/services`} class="service-card__link">{isDE ? 'Dienst ansehen' : 'View service'}</a>
+      </li>
+      <li class="service-card fade-up">
+        <span class="service-card__label">{isDE ? 'Team-Engagement' : 'Team engagement'}</span>
+        <h3 class="service-card__title">{isDE ? 'Die Box verbrennen' : 'Burn the Box'}</h3>
+        <p class="service-card__body">{isDE
+          ? 'Vollständige Dekonstruktion der konzeptionellen Rahmen, die definieren, was Ihre Organisation für möglich hält. Kein Reframing. Keine Ideenfindung. Systematische Eliminierung der Grenzen, die Sie mit Fakten über die Welt verwechselt haben.'
+          : 'Complete deconstruction of the conceptual frameworks that define what your organization believes is possible. Not reframing. Not ideation. Systematic elimination of the boundaries you\'ve mistaken for facts about the world.'}</p>
+        <a href={`${prefix}/services`} class="service-card__link">{isDE ? 'Dienst ansehen' : 'View service'}</a>
+      </li>
+      <li class="service-card fade-up">
+        <span class="service-card__label">{isDE ? 'Workshop' : 'Workshop'}</span>
+        <h3 class="service-card__title">{isDE ? 'Strategic Opposition Workshop' : 'Strategic Opposition Workshop'}</h3>
+        <p class="service-card__body">{isDE
+          ? 'Kein Training zu Lösungen. Eine Konfrontation mit dem eigenen Denken Ihres Teams. Ihre Mitarbeiter lernen, die in ihren Entscheidungen eingebetteten Annahmen zu identifizieren und zu demontieren — damit sie es nach meinem Abgang weiter tun können. Methodiktransfer, keine Abhängigkeitserzeugung.'
+          : 'Not a training on solutions. A confrontation with your team\'s own thinking. Your people learn to identify and dismantle the assumptions embedded in their decisions — so they can keep doing it after I\'m gone. Methodology transfer, not dependency creation.'}</p>
+        <a href={`${prefix}/services`} class="service-card__link">{isDE ? 'Dienst ansehen' : 'View service'}</a>
+      </li>
+    </ul>
+
+    <div class="services__footer">
+      <a href={`${prefix}/services`} class="btn btn--outline btn-arrow">{isDE ? 'Alle Dienste ansehen' : 'View all services'}</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ───────────────────────────────────────── -->
+<section class="process section" aria-labelledby="process-heading">
+  <div class="container">
+    <div class="process__inner">
+      <div class="process__sidebar">
+        <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Wie es beginnt' : 'How it starts'}</p>
+        <h2 class="process__heading" id="process-heading">
+          {isDE ? <>Keine Vorrede.<br/>Keine Abhängigkeit.<br/>Keine Folgebesuche, es sei denn, Sie wollen sie.</> : <>No preamble.<br/>No dependency.<br/>No return visits unless you want them.</>}
+        </h2>
+        <p class="process__sub">{isDE
+          ? 'Die meisten Beratungsprozesse existieren, um Honorare zu rechtfertigen. Dieser Prozess existiert, um Fähigkeiten zu übertragen.'
+          : 'Most consulting processes exist to justify fees. This process exists to transfer capability.'}</p>
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">{isDE ? 'Gespräch vereinbaren' : 'Schedule a Call'}</a>
+      </div>
+
+      <ol class="process__steps" aria-label={isDE ? 'Engagement-Prozessschritte' : 'Engagement process steps'}>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">1</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">{isDE ? 'Discovery Call' : 'Discovery Call'}</h3>
+            <p class="process__step-body">{isDE
+              ? 'Ich decke auf, welche Annahmen Ihre Wettbewerbsfähigkeit schwächen. Dreißig Minuten systematischer Befragung enthüllen die blinden Flecken, die Ihr Team noch nie untersucht hat — und bringt das eigentliche Problem unter dem ans Licht, mit dem Sie kamen.'
+              : 'I expose which assumptions are killing your competitive edge. Thirty minutes of systematic questioning reveals the blind spots your team has never examined — and surfaces the real problem underneath the one you came with.'}</p>
+          </div>
+        </li>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">2</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">{isDE ? 'Maßgeschneidertes Opposition-Design' : 'Custom Opposition Design'}</h3>
+            <p class="process__step-body">{isDE
+              ? 'Ich entwickle adversarielle Methodik für Ihre spezifische Situation — strukturierten Widerstand gegen die Denkmuster, die Ihre Organisation gefangen halten. Kein generisches Framework. Eine gezielte Intervention für die genauen Einschränkungen, innerhalb derer Sie operieren.'
+              : 'I build adversarial methodology for your specific situation — structured resistance to the thinking patterns that trap your organization. Not a generic framework. A targeted intervention for the exact constraints you\'re operating inside.'}</p>
+          </div>
+        </li>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">3</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">{isDE ? 'Direkter Kapazitätstransfer' : 'Direct Capability Transfer'}</h3>
+            <p class="process__step-body">{isDE
+              ? 'Ihre Mitarbeiter lernen, ihre eigenen Annahmen anzugreifen, während ich den Prozess leite. Keine Beobachtung. Keine Delegation. Sie nehmen aktiv daran teil, was nicht funktioniert zu demontieren — damit die Kapazität bleibt, wenn ich gehe.'
+              : 'Your people learn to attack their own assumptions while I guide the process. No observation. No delegation. You participate in dismantling what doesn\'t work — so the capacity stays when I leave.'}</p>
+          </div>
+        </li>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">4</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">{isDE ? 'Realitätschecks auf Abruf' : 'On-Demand Reality Checks'}</h3>
+            <p class="process__step-body">{isDE
+              ? 'Periodischer Zugang verhindert, dass sich Konsens neu aufbaut. Ihr Team erhält systematische Opposition, wann immer bequemes Denken beginnt, sich zur strategischen Schwäche zu verfestigen — bevor es zur Krise wird.'
+              : 'Periodic access prevents consensus from rebuilding. Your team gets systematic opposition whenever comfortable thinking starts calcifying into strategic weakness — before it becomes a crisis.'}</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ── CALLOUT / POSITIONING ─────────────────────────── -->
+<section class="callout section" aria-labelledby="callout-heading">
+  <div class="container">
+    <div class="callout__inner">
+      <div class="callout__content">
+        <p class="label" style="margin-bottom:1.5rem">{isDE ? 'Die Methodik' : 'The methodology'}</p>
+        <blockquote class="callout__quote" id="callout-heading">
+          <p>{isDE ? 'Alte Taktiken können nicht reparieren, was sie mitgeholfen haben zu schaffen.' : 'Old tactics can\'t fix what they helped to create.'}</p>
+        </blockquote>
+        <p class="callout__body">{isDE
+          ? 'Jeder Durchbruch beginnt damit, dass jemand bereit ist, das aufzugeben, was alle anderen als Weisheit akzeptieren. Ihre Wettbewerber optimieren bestehende Ansätze, während Sie systematische Opposition gegen das Denken aufbauen, das aktuelle Einschränkungen geschaffen hat.'
+          : 'Every breakthrough begins with someone willing to abandon what everyone else accepts as wisdom. Your competitors optimize existing approaches while you build systematic opposition to the thinking that created current limitations.'}</p>
+        <p class="callout__body">{isDE
+          ? 'Die Methodik ist nicht neu — Red-Team-Denken hat militärische Operationen seit Jahrzehnten geschützt. Was neu ist, ist die Anwendung intellektueller Kriegsführung auf zivile strategische Probleme, bevor eine Krise zur Erkenntnis zwingt.'
+          : 'The methodology isn\'t new — Red Team thinking has protected military operations for decades. What\'s new is applying intellectual warfare to civilian strategic problems before crisis forces recognition.'}</p>
+        <a href={`${prefix}/use-cases`} class="btn btn--outline btn-arrow" style="margin-top:.5rem">{isDE ? 'Use Cases ansehen' : 'View Use Cases'}</a>
+      </div>
+
+      <div class="callout__aside">
+        <div class="callout__fact">
+          <p class="callout__fact-text">{isDE
+            ? 'Organisationen, die strukturierten Widerspruch institutionalisieren, treffen deutlich bessere strategische Entscheidungen — nicht weil sie mehr streiten, sondern weil sie Annahmen testen, bevor sie sich dazu verpflichten.'
+            : 'Organizations that institutionalize structured dissent make significantly better strategic decisions — not because they argue more, but because they test assumptions before committing to them.'}</p>
+          <span class="callout__fact-source">Red Team Thinking — Applied</span>
+        </div>
+        <div class="callout__fact">
+          <p class="callout__fact-text">{isDE
+            ? 'Die gefährlichste Überzeugung, die ein Führungsteam hegt, ist die, die es aufgehört hat zu bemerken. Strategic Opposition ist die Disziplin, unsichtbare Annahmen sichtbar zu machen — absichtlich, bevor sie als Krisen auftauchen.'
+            : 'The most dangerous belief any leadership team holds is the one they\'ve stopped noticing. Strategic Opposition is the discipline of making invisible assumptions visible — on purpose, before they surface as crises.'}</p>
+          <span class="callout__fact-source">Iconoclast Insights — Podcast</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PODCAST ───────────────────────────────────────── -->
+<section class="podcast section" aria-labelledby="podcast-heading">
+  <div class="container">
+    <div class="podcast__inner">
+
+      <div class="podcast__cover" role="img" aria-label="Iconoclast Insights — podcast cover art">
+        <div class="img-ph" style="min-height:240px">
+          <span class="img-ph__icon" aria-hidden="true">◎</span>
+          <span class="img-ph__label">Podcast Cover Art</span>
+          <p class="img-ph__desc">Iconoclast Insights cover art. Replace with existing podcast artwork. 600×600px, 1:1 ratio.</p>
+        </div>
+      </div>
+
+      <div class="podcast__main">
+        <p class="label podcast__label">{isDE ? 'Auch anhören' : 'Also listen'}</p>
+        <h2 class="podcast__heading" id="podcast-heading">Iconoclast Insights</h2>
+        <p class="podcast__desc">
+          {isDE
+            ? 'Keine Gäste, die Frameworks verkaufen. Keine höfliche Zustimmung. Nur die unbequemen Fragen, die Ihre Branche hören muss. Solo-Episoden, 10–15 Minuten. Business und Technologie, hinterfragt.'
+            : 'No guests selling frameworks. No polite agreement. Just the uncomfortable questions your industry needs to hear. Solo episodes, 10–15 minutes. Business and technology, questioned.'}
+        </p>
+        <div class="podcast__meta">
+          <div class="podcast__meta-item">
+            <strong>{isDE ? 'Format' : 'Format'}</strong>
+            {isDE ? '10–15 Min. Episoden' : '10–15 min episodes'}
+          </div>
+          <div class="podcast__meta-item">
+            <strong>{isDE ? 'Thema' : 'Focus'}</strong>
+            {isDE ? 'Business & Technologie' : 'Business & Technology'}
+          </div>
+          <div class="podcast__meta-item">
+            <strong>{isDE ? 'Episoden' : 'Episodes'}</strong>
+            50+
+          </div>
+        </div>
+
+        <ol class="episodes" aria-label={isDE ? 'Aktuelle Iconoclast Insights Episoden' : 'Recent Iconoclast Insights episodes'}>
+          <li>
+            <a href={`${prefix}/podcast`} class="episode">
+              <span class="episode__num" aria-hidden="true">—</span>
+              <div>
+                <p class="episode__title">{isDE ? '[Episodentitel folgt]' : '[Latest episode — coming soon]'}</p>
+                <p class="episode__topic">{isDE ? 'Strategie' : 'Strategy'}</p>
+              </div>
+              <span class="episode__dur">— min</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${prefix}/podcast`} class="episode">
+              <span class="episode__num" aria-hidden="true">—</span>
+              <div>
+                <p class="episode__title">{isDE ? '[Episodentitel folgt]' : '[Episode — coming soon]'}</p>
+                <p class="episode__topic">{isDE ? 'Führung' : 'Leadership'}</p>
+              </div>
+              <span class="episode__dur">— min</span>
+            </a>
+          </li>
+          <li>
+            <a href={`${prefix}/podcast`} class="episode">
+              <span class="episode__num" aria-hidden="true">—</span>
+              <div>
+                <p class="episode__title">{isDE ? '[Episodentitel folgt]' : '[Episode — coming soon]'}</p>
+                <p class="episode__topic">{isDE ? 'Technologie' : 'Technology'}</p>
+              </div>
+              <span class="episode__dur">— min</span>
+            </a>
+          </li>
+        </ol>
+
+        <a href={`${prefix}/podcast`} class="btn btn--outline btn-arrow" style="margin-top:1.5rem">{isDE ? 'Alle Episoden' : 'All Episodes'}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ──────────────────────────────────── -->
+<section class="testimonials section" aria-labelledby="testimonials-heading">
+  <div class="container">
+    <div class="testimonials__intro">
+      <p class="label" style="justify-content:center;margin-bottom:1.25rem">{isDE ? 'Referenzen' : 'Social proof'}</p>
+      <h2 class="testimonials__heading" id="testimonials-heading">
+        {isDE ? 'Vertraut von Führungskräften, die anders denken.' : 'Trusted by leaders who think differently.'}
+      </h2>
+      <p class="testimonials__sub">{isDE
+        ? 'Wenn Führungskräfte herkömmliche Spielbücher hinter sich lassen und die Wurzel ihrer Herausforderungen konfrontieren, sind das die Ergebnisse.'
+        : 'When leaders step away from conventional playbooks and confront the root of their challenges, these are the outcomes.'}</p>
+    </div>
+
+    <ul class="testimonials__grid">
+      <li class="testimonial fade-up">
+        <p class="testimonial__callout">"Clear communication, innovative solutions, never satisfied with 'can't.'"</p>
+        <blockquote class="testimonial__quote">
+          <p>André Daus stands for clear communication. There are few people who get to the heart of a matter with clear words — one could even say unsparingly — as André does. The problem analysis and the resulting solution proposals often appear surprising or innovative at first glance. In his analysis, he works purposefully with great perseverance and is never satisfied with "can't."</p>
+        </blockquote>
+        <div class="testimonial__byline">
+          <p class="testimonial__name">Wolfram Himpel</p>
+          <p class="testimonial__title">Managing Director, Helioceraptor GmbH &amp; Co KG</p>
+        </div>
+      </li>
+      <li class="testimonial fade-up">
+        <p class="testimonial__callout">"Excellent didactic skills, a pleasant and communicative manner."</p>
+        <blockquote class="testimonial__quote">
+          <p>With André Daus, we were able to gain a trainer who has extensive specialist and IT know-how. He knew how to prepare the topics in the best possible way, both in scope and time frame. Thanks to his excellent didactic skills, he was able to convey the material in an understandable and practical way at all times. His pleasant and communicative manner fostered a trusting learning environment.</p>
+        </blockquote>
+        <div class="testimonial__byline">
+          <p class="testimonial__name">Ulrich Keitel</p>
+          <p class="testimonial__title">Managing Director, Setis GmbH</p>
+        </div>
+      </li>
+      <li class="testimonial fade-up">
+        <p class="testimonial__callout">"The perfect link between IT and business."</p>
+        <blockquote class="testimonial__quote">
+          <p>André brings with him a wealth of knowledge and experience in both IT and business, making him the perfect link between the two increasingly merging worlds.</p>
+        </blockquote>
+        <div class="testimonial__byline">
+          <p class="testimonial__name">Kai Dünges</p>
+          <p class="testimonial__title">Director, Commerzbank AG</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────── -->
+<section class="faq section" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="faq__inner">
+      <div class="faq__sidebar">
+        <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Fragen' : 'Questions'}</p>
+        <h2 class="faq__heading" id="faq-heading">{isDE ? 'Häufig gestellte Fragen' : 'Frequently Asked Questions'}</h2>
+        <p class="faq__sub">{isDE
+          ? 'Was Sie wirklich fragen, ist, ob anders denken das Unbehagen wert ist. Diese Antworten werden neue Fragen aufwerfen. Das ist der Punkt.'
+          : 'What you\'re really asking is whether thinking differently is worth the discomfort. These answers will create new questions. That\'s the point.'}</p>
+        <a href={`${prefix}/contact`} class="btn btn--outline">{isDE ? 'Alle Fragen' : 'See all questions'}</a>
+      </div>
+
+      <ul class="faq__list">
+        <li class="faq__item">
+          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-1" id="faq-q-1">
+            {isDE ? 'Was genau ist Strategic Opposition — ist das nur Red-Team-Denken?' : 'What exactly is Strategic Opposition — is this just red team thinking?'}
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq__answer" id="faq-answer-1" role="region" aria-labelledby="faq-q-1">
+            <p class="faq__answer-text">{isDE
+              ? 'Red-Team-Denken ist die Grundlage — eine militärische Methodik zur Stresserprobung von Plänen durch strukturierte adversarielle Herausforderung. Strategic Opposition wendet diesen Rahmen auf Business, Führung und organisatorische Entscheidungsfindung an. Die Kerndisziplin ist dieselbe: systematische, strukturierte Herausforderung der Annahmen, auf die Ihre Strategie angewiesen ist. Was anders ist, ist, wie diese Methodik an Sie übertragen wird, damit Sie sie unabhängig weiter anwenden können.'
+              : 'Red Team thinking is the foundation — a military methodology for stress-testing plans through structured adversarial challenge. Strategic Opposition applies that framework to business, leadership, and organizational decision-making. The core discipline is the same: systematic, structured challenge of the assumptions your strategy depends on. What\'s different is how that methodology is transferred to you so you can keep doing it independently.'}</p>
+          </div>
+        </li>
+        <li class="faq__item">
+          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-2" id="faq-q-2">
+            {isDE ? 'Wie unterscheidet sich 1:1 Coaching von Beratung?' : 'How does 1:1 coaching differ from consulting?'}
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq__answer" id="faq-answer-2" role="region" aria-labelledby="faq-q-2">
+            <p class="faq__answer-text">{isDE
+              ? 'Beratung befasst sich mit organisatorischen Problemen. Coaching befasst sich damit, wie der Einzelne über Probleme denkt. In der Praxis überschneiden sich beide — die meisten strategischen Misserfolge haben ihren Ursprung in den unbestrittenen Annahmen eines einzigen Entscheidungsträgers. Das 1:1 Engagement konzentriert sich auf Ihre Denkmuster, Ihre blinden Flecken und die Überzeugungen, die Sie aufgehört haben zu bemerken. Das Ziel ist, dass Sie bessere Entscheidungen treffen, auch wenn ich nicht im Raum bin.'
+              : 'Consulting addresses organizational problems. Coaching addresses how the individual thinks about problems. In practice, the two overlap — most strategic failures originate in the unchallenged assumptions of a single decision-maker. The 1:1 engagement focuses on your reasoning patterns, your blind spots, and the beliefs you\'ve stopped noticing. The goal is that you make better decisions even when I\'m not in the room.'}</p>
+          </div>
+        </li>
+        <li class="faq__item">
+          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-3" id="faq-q-3">
+            {isDE ? 'Sie sagen, Sie lehren Denken, keine Lösungen. Was bedeutet das konkret im Raum?' : 'You say you teach thinking, not solutions. What does that actually mean in a room?'}
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq__answer" id="faq-answer-3" role="region" aria-labelledby="faq-q-3">
+            <p class="faq__answer-text">{isDE
+              ? 'Die meisten Strategie-Workshops produzieren Outputs: Pläne, Frameworks, Roadmaps. Meine produzieren eine andere Art von Output — die Fähigkeit, die Annahmen in Ihrem eigenen Denken zu sehen. Wir arbeiten nicht an Ihrer Strategie. Wir arbeiten daran, wie Ihr Team über Ihre Strategie denkt. Das Ergebnis ist eine Fähigkeit, die Ihr Team behält, nicht ein Dokument, das in dem Moment, in dem es gedruckt wird, veraltet.'
+              : 'Most strategy workshops produce outputs: plans, frameworks, roadmaps. Mine produce a different kind of output — the ability to see the assumptions inside your thinking. We don\'t work on your strategy. We work on how your team thinks about your strategy. The deliverable is a capability your team retains, not a document that ages the moment it\'s printed.'}</p>
+          </div>
+        </li>
+        <li class="faq__item">
+          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-4" id="faq-q-4">
+            {isDE ? 'Wie kann kritisches Denken branchenübergreifend angewendet werden?' : 'How can critical thinking be applied across different industries?'}
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq__answer" id="faq-answer-4" role="region" aria-labelledby="faq-q-4">
+            <p class="faq__answer-text">{isDE
+              ? 'Die spezifischen Annahmen unterscheiden sich. Die Methodik, sie aufzudecken und zu hinterfragen, nicht. Strategic Opposition ist branchenunabhängig, weil kognitive Verzerrung und Gruppendenken branchenunabhängig sind. Derselbe Mechanismus, der blinde Flecken in einem Fertigungsunternehmen erzeugt, erzeugt sie in einem Fintech-Startup. Was sich ändert, ist, wo Sie suchen — nicht wie Sie suchen.'
+              : 'The specific assumptions differ. The methodology for surfacing and challenging them doesn\'t. Strategic Opposition is industry-agnostic because cognitive bias and groupthink are industry-agnostic. The same mechanism that creates blind spots in a manufacturing firm creates them in a fintech startup. What changes is where you look — not how you look.'}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BAND ──────────────────────────────────────── -->
+<section class="cta-band" aria-labelledby="cta-heading">
+  <div class="container cta-band__inner">
+    <div class="cta-band__avatar" role="img" aria-label="André Daus">
+      <div class="img-ph" style="min-height:72px;border-radius:50%;border:none;background:var(--bg-elevated)">
+        <span class="img-ph__icon" style="font-size:1.25rem" aria-hidden="true">◎</span>
+      </div>
+    </div>
+    <p class="label cta-band__label">{isDE ? 'Nächster Schritt' : 'Next step'}</p>
+    <h2 class="cta-band__heading" id="cta-heading">
+      {isDE ? <>Ihre Annahmen sind nicht<br/>Ihre <em>Strategie.</em></> : <>Your assumptions are not<br/>your <em>strategy.</em></>}
+    </h2>
+    <p class="cta-band__sub">{isDE
+      ? 'Ein 30-minütiger Discovery Call reicht aus, um die Annahmen aufzudecken, von denen Ihre aktuelle Strategie abhängt — und zu entscheiden, ob sie es verdienen, einer Prüfung standzuhalten.'
+      : 'A 30-minute discovery call is enough to surface the assumptions your current strategy depends on — and decide whether they deserve to survive scrutiny.'}</p>
+    <div class="cta-band__actions">
+      <a href={`${prefix}/contact`}    class="btn btn--primary btn-arrow">{isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}</a>
+      <a href={`${prefix}/opposition`} class="btn btn--outline">{isDE ? 'Die Opposition-Methodik' : 'The Opposition Methodology'}</a>
+    </div>
+  </div>
+</section>
+
 </Base>
+
+<style>
+  /* ── HERO ─────────────────────────────────────────── */
+  .hero {
+    padding-top: 68px;
+    min-height: 100svh;
+    display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-base) 60%);
+  }
+  .hero__bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 70% 40%, rgba(29,45,68,.5), transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(196,154,60,.04), transparent 60%);
+    pointer-events: none;
+  }
+  .hero__grid-overlay {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black, transparent);
+    pointer-events: none;
+  }
+  .hero__inner {
+    position: relative; z-index: 1;
+    max-width: var(--max-w); margin: 0 auto;
+    width: 100%; padding: clamp(4rem,8vw,6rem) var(--gutter);
+    display: grid; grid-template-columns: 1fr 340px;
+    gap: clamp(3rem,6vw,5rem); align-items: center;
+  }
+  .hero__label { margin-bottom: 1.5rem; }
+  .hero__headline {
+    font-family: var(--serif);
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 400; line-height: 1.05;
+    letter-spacing: -.025em; color: var(--text-primary); margin-bottom: 1.5rem;
+  }
+  .hero__headline em { font-style: italic; color: var(--gold); display: block; }
+  .hero__lede {
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    color: var(--text-secondary); line-height: 1.85;
+    max-width: 52ch; margin-bottom: 2.5rem;
+  }
+  .hero__ctas { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  .hero__portrait {
+    border-radius: 4px; overflow: hidden;
+    aspect-ratio: 3/4; background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+  }
+  .hero__scroll {
+    position: absolute; bottom: 2rem; left: var(--gutter);
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--text-subtle);
+    display: flex; align-items: center; gap: .75rem;
+  }
+  .hero__scroll::before {
+    content: ''; display: block; width: 1px; height: 40px;
+    background: linear-gradient(var(--gold), transparent);
+  }
+  @media (max-width: 860px) {
+    .hero__inner { grid-template-columns: 1fr; }
+    .hero__portrait { aspect-ratio: 16/9; max-height: 320px; }
+    .hero__scroll { display: none; }
+  }
+
+  /* ── PROBLEM ──────────────────────────────────────── */
+  .problem { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+  .problem__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    font-weight: 400; line-height: 1.25; color: var(--text-primary);
+    max-width: 52ch; margin-bottom: 3rem;
+  }
+  .problem__grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border-light);
+    border: 1px solid var(--border-light); border-radius: 3px; overflow: hidden;
+  }
+  .problem__card { background: var(--bg-card-alt); padding: 2.5rem 2rem; display: flex; flex-direction: column; gap: 1rem; }
+  .problem__card-number { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; color: var(--gold); }
+  .problem__card-title { font-family: var(--serif); font-size: clamp(1.1rem, 1.8vw, 1.35rem); font-weight: 400; line-height: 1.3; color: var(--text-primary); }
+  .problem__card-body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); flex: 1; }
+  @media (max-width: 760px) { .problem__grid { grid-template-columns: 1fr; } }
+
+  /* ── METHOD ───────────────────────────────────────── */
+  .method__intro {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 3rem; align-items: end; margin-bottom: 3rem;
+  }
+  .method__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    font-weight: 400; line-height: 1.25; color: var(--text-primary); max-width: 44ch;
+  }
+  .method__heading em { font-style: italic; color: var(--gold); }
+  .method__cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .method__card {
+    background: var(--bg-card-alt); border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim); padding: 2rem; border-radius: 3px;
+    display: flex; flex-direction: column; gap: 1rem; transition: border-top-color .2s ease;
+  }
+  .method__card:hover { border-top-color: var(--gold); }
+  .method__card-title { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; line-height: 1.3; color: var(--text-primary); }
+  .method__card-body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); flex: 1; }
+  .method__card-link {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--gold); display: inline-flex; align-items: center; gap: 8px;
+    min-height: 24px; transition: gap .2s ease; text-decoration: none; width: fit-content;
+  }
+  .method__card-link:hover { gap: 14px; }
+  .method__card-link::after { content: '→'; }
+  .method__image-wrap {
+    margin-top: 3rem; border-radius: 4px; overflow: hidden;
+    aspect-ratio: 16/7; background: var(--bg-elevated); border: 1px solid var(--border-light);
+  }
+  @media (max-width: 760px) {
+    .method__intro { grid-template-columns: 1fr; }
+    .method__cards { grid-template-columns: 1fr; }
+  }
+
+  /* ── SERVICES ─────────────────────────────────────── */
+  .services { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+  .services__intro { margin-bottom: 3rem; }
+  .services__heading { font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 400; line-height: 1.25; color: var(--text-primary); margin-bottom: 1rem; }
+  .services__lede { font-size: 15px; color: var(--text-secondary); max-width: 60ch; line-height: 1.8; }
+  .services__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .service-card {
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-left: 3px solid var(--gold-dim); padding: 2rem 2rem 2rem 1.75rem;
+    border-radius: 0 3px 3px 0; display: flex; flex-direction: column; gap: 1rem;
+    transition: border-left-color .2s ease;
+  }
+  .service-card:hover { border-left-color: var(--gold); }
+  .service-card__label { font-family: var(--mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+  .service-card__title { font-family: var(--serif); font-size: 1.25rem; font-weight: 400; line-height: 1.3; color: var(--text-primary); }
+  .service-card__body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); flex: 1; }
+  .service-card__link {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--gold); display: inline-flex; align-items: center; gap: 8px;
+    min-height: 24px; transition: gap .2s ease; text-decoration: none; width: fit-content; margin-top: auto;
+  }
+  .service-card__link:hover { gap: 14px; }
+  .service-card__link::after { content: '→'; }
+  .services__footer { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; }
+  @media (max-width: 640px) { .services__grid { grid-template-columns: 1fr; } }
+
+  /* ── PROCESS ──────────────────────────────────────── */
+  .process__inner { display: grid; grid-template-columns: 300px 1fr; gap: 5rem; align-items: start; }
+  .process__sidebar { position: sticky; top: calc(68px + 2rem); }
+  .process__heading { font-family: var(--serif); font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 400; line-height: 1.25; color: var(--text-primary); margin-bottom: 1rem; }
+  .process__sub { font-size: 14px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 2rem; }
+  .process__steps { display: flex; flex-direction: column; gap: 0; }
+  .process__step {
+    display: grid; grid-template-columns: 2.5rem 1fr; gap: 1.5rem; align-items: start;
+    padding-block: 2rem; border-bottom: 1px solid var(--border-light);
+  }
+  .process__step:first-child { border-top: 1px solid var(--border-light); }
+  .process__step-number { font-family: var(--serif); font-style: italic; font-size: 2rem; color: var(--gold); line-height: 1.1; }
+  .process__step-title { font-family: var(--serif); font-size: 1.1rem; font-weight: 400; color: var(--text-primary); margin-bottom: .5rem; }
+  .process__step-body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+  @media (max-width: 820px) {
+    .process__inner { grid-template-columns: 1fr; }
+    .process__sidebar { position: static; }
+  }
+
+  /* ── CALLOUT ──────────────────────────────────────── */
+  .callout { background: var(--navy); border-top: 1px solid rgba(29,45,68,.8); }
+  .callout__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+  .callout__quote {
+    font-family: var(--serif); font-style: italic;
+    font-size: clamp(1.5rem, 2.8vw, 2.25rem); line-height: 1.3; color: var(--text-primary);
+    border-left: 3px solid var(--gold); padding-left: 1.5rem; margin-bottom: 1.5rem;
+  }
+  .callout__body { font-size: 15px; line-height: 1.85; color: var(--text-secondary); margin-bottom: 1rem; }
+  .callout__aside { display: flex; flex-direction: column; gap: 1.5rem; }
+  .callout__fact { padding: 1.75rem; background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.06); border-radius: 3px; }
+  .callout__fact-text { font-size: 14px; line-height: 1.8; color: var(--text-secondary); margin-bottom: .875rem; }
+  .callout__fact-source { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  @media (max-width: 820px) { .callout__inner { grid-template-columns: 1fr; } }
+
+  /* ── PODCAST ──────────────────────────────────────── */
+  .podcast { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+  .podcast__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+  .podcast__cover { border-radius: 4px; overflow: hidden; aspect-ratio: 1/1; background: var(--bg-elevated); border: 1px solid var(--border-light); flex-shrink: 0; }
+  .podcast__label { margin-bottom: 1.5rem; }
+  .podcast__heading { font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 400; line-height: 1.2; color: var(--text-primary); margin-bottom: 1rem; }
+  .podcast__desc { font-size: 15px; line-height: 1.85; color: var(--text-secondary); margin-bottom: 1.5rem; }
+  .podcast__meta { display: flex; gap: 2rem; flex-wrap: wrap; padding: 1rem 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); margin-bottom: 1.5rem; }
+  .podcast__meta-item { font-size: 13px; color: var(--text-secondary); }
+  .podcast__meta-item strong { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; }
+  .episodes { display: flex; flex-direction: column; gap: 0; }
+  .episode {
+    display: grid; grid-template-columns: 2.5rem 1fr auto; gap: 1rem; align-items: center;
+    padding-block: 1.25rem; border-bottom: 1px solid var(--border-light);
+    text-decoration: none; transition: background .15s ease; border-radius: 2px;
+    padding-inline: .5rem; min-height: 44px;
+  }
+  .episode:first-child { border-top: 1px solid var(--border-light); }
+  .episode:hover { background: rgba(196,154,60,.04); }
+  .episode__num { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: var(--gold); text-align: right; }
+  .episode__title { font-size: 14px; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
+  .episode__topic { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-secondary); margin-top: 3px; }
+  .episode__dur { font-family: var(--mono); font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+  @media (max-width: 820px) {
+    .podcast__inner { grid-template-columns: 1fr; }
+    .podcast__cover { max-width: 220px; }
+  }
+
+  /* ── TESTIMONIALS ─────────────────────────────────── */
+  .testimonials { background: var(--bg-base); border-top: 1px solid var(--border-light); }
+  .testimonials__intro { text-align: center; margin-bottom: 3rem; }
+  .testimonials__heading { font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 400; line-height: 1.25; color: var(--text-primary); margin-bottom: .75rem; }
+  .testimonials__sub { font-size: 15px; color: var(--text-secondary); max-width: 54ch; margin-inline: auto; line-height: 1.8; }
+  .testimonials__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+  .testimonial { background: var(--bg-card-alt); border: 1px solid var(--border-light); border-top: 2px solid var(--gold-dim); padding: 2rem; border-radius: 3px; display: flex; flex-direction: column; gap: 1rem; }
+  .testimonial__callout { font-family: var(--serif); font-style: italic; font-size: 1.05rem; line-height: 1.5; color: var(--gold-light); }
+  .testimonial__quote { font-size: 14px; line-height: 1.8; color: var(--text-secondary); flex: 1; }
+  .testimonial__byline { padding-top: 1rem; border-top: 1px solid var(--border-light); margin-top: auto; }
+  .testimonial__name { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+  .testimonial__title { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-secondary); margin-top: 3px; }
+  @media (max-width: 760px) { .testimonials__grid { grid-template-columns: 1fr; } }
+
+  /* ── FAQ ──────────────────────────────────────────── */
+  .faq { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+  .faq__inner { display: grid; grid-template-columns: 300px 1fr; gap: 5rem; align-items: start; }
+  .faq__sidebar { position: sticky; top: calc(68px + 2rem); }
+  .faq__heading { font-family: var(--serif); font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 400; line-height: 1.25; color: var(--text-primary); margin-bottom: 1rem; }
+  .faq__sub { font-size: 14px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 2rem; }
+  .faq__list { display: flex; flex-direction: column; gap: 0; }
+  .faq__item { border-bottom: 1px solid var(--border-light); }
+  .faq__item:first-child { border-top: 1px solid var(--border-light); }
+  .faq__question {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    width: 100%; min-height: 44px; padding: 1.25rem 0;
+    background: none; border: none; cursor: pointer;
+    font-family: var(--sans); font-size: 15px; font-weight: 500;
+    color: var(--text-primary); text-align: left; transition: color .2s ease;
+  }
+  .faq__question:hover { color: var(--gold); }
+  .faq__icon {
+    font-family: var(--mono); font-size: 1.25rem; color: var(--gold);
+    transition: transform .25s ease; flex-shrink: 0;
+    width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+  }
+  .faq__item.is-open .faq__icon { transform: rotate(45deg); }
+  .faq__answer { overflow: hidden; max-height: 0; transition: max-height .3s ease, padding .3s ease; }
+  .faq__item.is-open .faq__answer { max-height: 600px; }
+  .faq__answer-text { font-size: 15px; line-height: 1.85; color: var(--text-secondary); padding-bottom: 1.5rem; }
+  @media (max-width: 820px) {
+    .faq__inner { grid-template-columns: 1fr; }
+    .faq__sidebar { position: static; }
+  }
+
+  /* ── CTA BAND ─────────────────────────────────────── */
+  .cta-band {
+    background: var(--bg-elevated); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding-block: 6rem; text-align: center; position: relative; overflow: hidden;
+  }
+  .cta-band::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,.07), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-band__inner { position: relative; z-index: 1; }
+  .cta-band__avatar { width: 72px; height: 72px; border-radius: 50%; overflow: hidden; border: 2px solid var(--gold-dim); margin: 0 auto 1.5rem; background: var(--bg-elevated); }
+  .cta-band__label { margin-bottom: 1.5rem; justify-content: center; }
+  .cta-band__label::before { display: none; }
+  .cta-band__heading { font-family: var(--serif); font-size: clamp(2rem, 4.5vw, 3.5rem); font-weight: 400; line-height: 1.12; color: var(--text-primary); max-width: 22ch; margin-inline: auto; margin-bottom: 1.25rem; }
+  .cta-band__heading em { font-style: italic; color: var(--gold); }
+  .cta-band__sub { font-size: 15px; color: var(--text-secondary); max-width: 48ch; margin-inline: auto; line-height: 1.85; margin-bottom: 2.5rem; }
+  .cta-band__actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  /* ── FADE-UP ──────────────────────────────────────── */
+  .fade-up { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .fade-up:nth-child(2) { transition-delay: .1s; }
+  .fade-up:nth-child(3) { transition-delay: .2s; }
+  @media (prefers-reduced-motion: reduce) { .fade-up { opacity: 1; transform: none; transition: none; } }
+</style>
+
+<script>
+  // Fade-up scroll reveal
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+  }
+
+  // FAQ accordion
+  document.querySelectorAll<HTMLButtonElement>('.faq__question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item   = btn.closest<HTMLElement>('.faq__item')!;
+      const isOpen = item.classList.contains('is-open');
+      document.querySelectorAll('.faq__item.is-open').forEach(el => {
+        el.classList.remove('is-open');
+        el.querySelector<HTMLButtonElement>('.faq__question')!.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
