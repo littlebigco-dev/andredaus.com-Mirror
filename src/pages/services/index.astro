@@ -1,0 +1,246 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const currentPath = Astro.url.pathname;
+const isDE = currentPath.startsWith('/de');
+const prefix = isDE ? '/de' : '';
+
+const allServices = await getCollection('services');
+const services = allServices
+  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && e.data.status === 'active')
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+function slugify(entry: typeof services[number]) {
+  return entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+}
+---
+
+<Base
+  title={isDE ? 'Leistungen — André Daus' : 'Services — André Daus'}
+  description={isDE
+    ? 'Strategic Opposition Beratung und Coaching. Von der Clarity Session bis zum Team-Intensiv — finden Sie das richtige Engagement.'
+    : 'Strategic Opposition consulting and coaching. From the Clarity Session to the team intensive — find the right engagement.'}
+  lang={isDE ? 'de' : 'en'}
+>
+
+  <!-- HERO -->
+  <header class="coll-hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="container">
+      <p class="label">{isDE ? 'Leistungen' : 'Services'}</p>
+      <h1 class="coll-hero__heading">
+        {isDE
+          ? <Fragment>Die richtige Art <em>zusammenzuarbeiten.</em></Fragment>
+          : <Fragment>The right way to <em>work together.</em></Fragment>}
+      </h1>
+      <p class="coll-hero__sub">
+        {isDE
+          ? 'Jedes Engagement beginnt mit dem gleichen Ausgangspunkt: Ihren Annahmen. Das Format hängt davon ab, was wirklich los ist.'
+          : 'Every engagement starts from the same place: your assumptions. The format depends on what\'s actually going on.'}
+      </p>
+      <a href={`${prefix}/contact`} class="btn btn--outline" style="margin-top:2rem">
+        {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+      </a>
+    </div>
+  </header>
+
+  <!-- SERVICE CARDS -->
+  <section class="section" aria-label={isDE ? 'Leistungsübersicht' : 'Services overview'}>
+    <div class="container">
+      {services.length === 0 ? (
+        <p class="empty-state">{isDE ? 'Keine aktiven Leistungen.' : 'No active services.'}</p>
+      ) : (
+        <ul class="services-grid">
+          {services.map(entry => (
+            <li class="service-card fade-up">
+              <div class="service-card__body">
+                <div class="service-card__meta">
+                  <span class="service-price">{entry.data.price}</span>
+                  <span class="service-format">{entry.data.format}</span>
+                </div>
+                <h2 class="service-card__title">
+                  <a href={`${prefix}/services/${slugify(entry)}`} class="service-card__link">
+                    {entry.data.title}
+                  </a>
+                </h2>
+                <a href={`${prefix}/services/${slugify(entry)}`} class="btn btn--outline service-card__cta">
+                  {entry.data.cta_label}
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <!-- PROCESS STRIP -->
+  <section class="process-strip section" aria-labelledby="process-heading">
+    <div class="container">
+      <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Der Prozess' : 'The process'}</p>
+      <h2 class="process-strip__heading" id="process-heading">
+        {isDE
+          ? 'Jedes Engagement folgt dem gleichen Pfad. Die Tiefe variiert. Der Einstieg tut es nicht.'
+          : 'Every engagement follows the same path. The depth varies. The entry point doesn\'t.'}
+      </h2>
+      <div class="process-steps">
+        <div class="process-step">
+          <span class="process-step__num" aria-hidden="true">01</span>
+          <h3 class="process-step__title">{isDE ? 'Discovery Call' : 'Discovery Call'}</h3>
+          <p class="process-step__body">{isDE ? '30 Minuten. Kein Pitch. Ich stelle Fragen.' : '30 minutes. No pitch. I ask questions.'}</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step__num" aria-hidden="true">02</span>
+          <h3 class="process-step__title">{isDE ? 'Diagnose' : 'Diagnosis'}</h3>
+          <p class="process-step__body">{isDE ? 'Wir finden heraus, was wirklich los ist — und welches Format passt.' : 'We find out what\'s actually going on — and which format fits.'}</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step__num" aria-hidden="true">03</span>
+          <h3 class="process-step__title">{isDE ? 'Arbeit' : 'Work'}</h3>
+          <p class="process-step__body">{isDE ? 'Strukturierte gegnerische Untersuchung. Echte Ergebnisse.' : 'Structured adversarial examination. Real outcomes.'}</p>
+        </div>
+        <div class="process-step">
+          <span class="process-step__num" aria-hidden="true">04</span>
+          <h3 class="process-step__title">{isDE ? 'Transfer' : 'Transfer'}</h3>
+          <p class="process-step__body">{isDE ? 'Die Methodik gehört Ihnen. Sie brauchen mich nicht dauerhaft.' : 'The methodology is yours. You don\'t need me permanently.'}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</Base>
+
+<style>
+  .coll-hero {
+    position: relative;
+    padding: calc(68px + var(--section)) 0 var(--section);
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .coll-hero .label { margin-bottom: 1.25rem; }
+  .coll-hero__heading {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+  .coll-hero__heading em { font-style: italic; color: var(--gold); }
+  .coll-hero__sub {
+    max-width: 52ch;
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+  }
+
+  /* Services grid */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .service-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition-base);
+  }
+  .service-card:hover { border-color: var(--border); }
+
+  .service-card__body {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    height: 100%;
+  }
+
+  .service-card__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .service-price {
+    font-family: var(--mono);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--gold);
+  }
+  .service-format {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .service-card__title {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    flex: 1;
+  }
+  .service-card__link { text-decoration: none; color: inherit; }
+  .service-card__link:hover { color: var(--gold); }
+  .service-card__cta { align-self: flex-start; margin-top: auto; }
+
+  /* Process strip */
+  .process-strip {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+  }
+  .process-strip__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    max-width: 50ch;
+    margin-bottom: 3rem;
+  }
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  .process-step__num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--gold-dim);
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 1rem;
+  }
+  .process-step__title {
+    font-family: var(--sans);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+  .process-step__body {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .empty-state { color: var(--text-subtle); font-style: italic; padding: 3rem 0; }
+
+  @media (max-width: 800px) {
+    .process-steps { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .process-steps { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+  }
+</style>

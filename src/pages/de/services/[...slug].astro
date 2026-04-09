@@ -1,0 +1,252 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('services');
+  return entries
+    .filter(e => e.id.startsWith('de/') && e.data.status === 'active')
+    .map(entry => ({
+      params: { slug: entry.id.replace(/^de\//, '').replace(/\.md$/, '') },
+      props: { entry },
+    }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const featuredUseCases = await Promise.all(
+  entry.data.featured_use_cases.map(ref => getEntry(ref))
+);
+const validUseCases = featuredUseCases.filter(Boolean);
+---
+
+<Base
+  title={`${entry.data.title} — André Daus`}
+  description={`${entry.data.price} · ${entry.data.format}`}
+  lang="de"
+>
+
+  <header class="service-hero">
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/de/services">Leistungen</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{entry.data.title}</span>
+      </nav>
+
+      <div class="service-hero__inner">
+        <div class="service-hero__content">
+          <p class="label" style="margin-bottom:1.25rem">Leistung</p>
+          <h1 class="service-hero__title">{entry.data.title}</h1>
+
+          <div class="service-hero__details">
+            <div class="service-detail">
+              <span class="service-detail__label">Preis</span>
+              <span class="service-detail__value">{entry.data.price}</span>
+            </div>
+            <div class="service-detail">
+              <span class="service-detail__label">Format</span>
+              <span class="service-detail__value">{entry.data.format}</span>
+            </div>
+          </div>
+
+          <div class="service-hero__actions">
+            <a href="/de/contact" class="btn btn--primary btn-arrow">
+              {entry.data.cta_label}
+            </a>
+            <a href="/de/services" class="btn btn--outline">Alle Leistungen</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="service-layout container">
+    <article class="article-body prose">
+      <Content />
+    </article>
+
+    <aside class="article-aside">
+      <div class="aside-card aside-card--cta">
+        <p class="label" style="margin-bottom:1rem">Bereit?</p>
+        <p class="service-price-aside">{entry.data.price}</p>
+        <p class="aside-card__text">{entry.data.format}</p>
+        <a href="/de/contact" class="btn btn--primary" style="margin-top:1.5rem;width:100%;justify-content:center">
+          {entry.data.cta_label}
+        </a>
+      </div>
+
+      {validUseCases.length > 0 && (
+        <div class="aside-card" style="margin-top:1.5rem">
+          <p class="label" style="margin-bottom:1rem">Praxisbeispiele</p>
+          <ul class="aside-usecases">
+            {validUseCases.map(uc => {
+              if (!uc) return null;
+              const ucSlug = uc.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+              return (
+                <li>
+                  <a href={`/de/use-cases/${ucSlug}`} class="aside-uc-link">
+                    {uc.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <div class="aside-card" style="margin-top:1.5rem">
+        <a href="/de/services" class="back-link">← Alle Leistungen</a>
+      </div>
+    </aside>
+  </div>
+
+</Base>
+
+<style>
+  .service-hero {
+    position: relative;
+    padding: calc(68px + 4rem) 0 4rem;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+  .breadcrumb a { color: var(--gold); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .service-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+  }
+  .service-hero__details {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    width: fit-content;
+  }
+  .service-detail__label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+  }
+  .service-detail__value {
+    font-family: var(--mono);
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .service-hero__actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .service-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 5rem;
+    padding-top: 4rem;
+    padding-bottom: 6rem;
+    align-items: start;
+  }
+  .article-body :global(h2) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+  }
+  .article-body :global(h3) {
+    font-family: var(--sans);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .article-body :global(p) {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.25rem;
+  }
+  .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
+  .article-body :global(ul), .article-body :global(ol) {
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+  .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
+  .article-body :global(ol li) { list-style: decimal; }
+  .article-body :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border-light);
+    margin: 3rem 0;
+  }
+  .article-aside { position: sticky; top: calc(68px + 2rem); }
+  .aside-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+  }
+  .aside-card--cta { border-color: var(--border); }
+  .service-price-aside {
+    font-family: var(--mono);
+    font-size: var(--text-xl);
+    font-weight: 500;
+    color: var(--gold);
+    margin-bottom: 0.25rem;
+  }
+  .aside-card__text { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.7; }
+  .aside-usecases { display: flex; flex-direction: column; gap: 0.75rem; }
+  .aside-uc-link {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    line-height: 1.4;
+    display: block;
+  }
+  .aside-uc-link:hover { color: var(--gold); }
+  .back-link {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    text-decoration: none;
+  }
+  @media (max-width: 900px) {
+    .service-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .article-aside { position: static; }
+  }
+</style>
