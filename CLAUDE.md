@@ -224,6 +224,8 @@ The Library archive is the most complex page on the site. It requires:
 - All content in Markdown with YAML frontmatter
 - Categories defined as `string` initially — tighten to enum once content stabilises
 - `reference()` for all cross-collection relationships — never manual slug strings
+- Slug extraction: entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')
+- Dynamic routes use [...slug].astro with id.startsWith('en/') filter in getStaticPaths
 
 ### Global utility classes (defined in global.css — usable everywhere)
 - `.container` — max-width wrapper with gutter padding
@@ -298,6 +300,24 @@ The Library archive is the most complex page on the site. It requires:
 - `.fade-up` class: `opacity: 0; transform: translateY(18px)` — becomes `.visible` on intersection
 - Respects `prefers-reduced-motion` — motion disabled entirely for users who prefer it
 - Observer threshold: `0.08`, rootMargin `0px 0px -40px 0px`
+
+### FAQ accordion pattern
+- `.faq__item` toggles `.is-open` class; `aria-expanded` on the `<button>` is updated in sync
+- Opening one item closes all others (single-open accordion)
+- Answer panel uses `max-height: 0` → `max-height: 600px` transition (not `display:none` — avoids layout shift)
+- Icon rotates 45° on open: `+` becomes `×`
+- Used on home page (`.faq__question` / `.faq__answer`) and contact page (`.faq-btn` / `.faq-panel`) — same logic, different BEM names
+
+### Image placeholders
+- All real images are replaced with `.img-ph` placeholder divs during build phases 1–4
+- Home page placeholders: hero portrait (3:4), working context image (16:7), podcast cover art (1:1), CTA avatar (circle 72px)
+- Replace placeholders with `<img>` tags in Phase 5 once real assets are available
+- Portrait files expected: `AndreDaus-760x1024.png` (hero), `andredaus-headshot-circle.jpg` (avatar)
+
+### Home page sections
+- Hero → Problem (3 cards) → Methodology (3 cards + image) → Services (4 cards) → Process (4 steps) → Callout (navy, quote + 2 facts) → Podcast (cover + 3 episodes) → Testimonials (3 real) → FAQ (4 questions) → CTA band
+- Podcast episode list on home page uses placeholders — real data wired in Phase 6 from RSS import
+- Testimonials are real: Wolfram Himpel (Helioceraptor), Ulrich Keitel (Setis GmbH), Kai Dünges (Commerzbank)
 
 ### Content collection IDs
 - Because `glob` loader is used with `base: ./src/content/<collection>`, the `id` of each entry will be `en/slug.md` or `de/slug.md`
