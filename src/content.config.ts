@@ -6,7 +6,6 @@ const insights = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    slug: z.string(),
     og_title: z.string(),
     summary: z.string().optional(), // AI-generated at build time
     category: z.string(), // Strategy | Psychology | Technology | Business | Methodology
@@ -18,7 +17,6 @@ const services = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/services' }),
   schema: z.object({
     title: z.string(),
-    slug: z.string(),
     status: z.enum(['active', 'retired']),
     price: z.string(),
     format: z.string(),
@@ -32,7 +30,6 @@ const useCases = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    slug: z.string(),
     og_title: z.string(),
     summary: z.string().optional(), // AI-generated at build time
     status: z.enum(['draft', 'published']),
@@ -46,7 +43,6 @@ const library = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/library' }),
   schema: z.object({
     title: z.string(),
-    slug: z.string(),
     category: z.string(), // bias | liberating-structure | mental-model
     og_title: z.string(),
     summary: z.string().optional(), // AI-generated at build time
@@ -72,7 +68,6 @@ const podcast = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    slug: z.string(),
     episode_number: z.number(),
     summary: z.string().optional(), // AI-generated at build time
     og_title: z.string(),
