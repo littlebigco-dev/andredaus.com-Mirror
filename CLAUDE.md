@@ -50,7 +50,6 @@ Articles on Strategic Opposition methodology, business psychology, technology.
 ```yaml
 title: string
 date: date
-slug: string
 og_title: string        # shorter title for OG image generation
 summary: string         # AI-generated at build time
 category: string        # Strategy | Psychology | Technology | Business | Methodology
@@ -61,7 +60,6 @@ status: draft | published
 Consulting services — occasionally added or retired.
 ```yaml
 title: string
-slug: string
 status: active | retired
 price: string           # e.g. "€400" or "from €400"
 format: string          # e.g. "90 min video call"
@@ -74,7 +72,6 @@ PAS-framework articles showing how services solve real-world problems.
 ```yaml
 title: string
 date: date
-slug: string
 og_title: string
 summary: string
 status: draft | published
@@ -87,7 +84,6 @@ related_library: reference(library)[]
 Evergreen reference entries — cognitive biases, liberating structures, mental models.
 ```yaml
 title: string
-slug: string
 category: bias | liberating-structure | mental-model
 og_title: string
 summary: string
@@ -110,7 +106,6 @@ Manual entries with full transcript as Markdown body content.
 ```yaml
 title: string
 date: date
-slug: string
 episode_number: number
 summary: string
 og_title: string
@@ -246,6 +241,15 @@ The Library archive is the most complex page on the site. It requires:
 - Content config lives at `src/content.config.ts` (NOT `src/content/config.ts`)
 - Collections use `glob` loader from `astro/loaders`
 
+### Content collection IDs — CRITICAL CORRECTION
+- The glob loader's `generateIdDefault` uses the frontmatter `slug` field as the ID if present
+- Therefore: **DO NOT include `slug` in frontmatter** — it causes EN and DE entries to share the same ID (collision)
+- Without `slug` in frontmatter, the ID is the file path relative to the base directory WITHOUT extension: `en/assumption-blindness`
+- This makes `entry.id.startsWith('en/')` and `entry.id.startsWith('de/')` work as intended
+- The schema fields `slug` were removed from all collections in Phase 4 — do not re-add them
+- Slug extraction still works as documented: `entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')`
+- For `reference()` in frontmatter YAML, use the path-based ID: `related_service: en/clarity-session`
+
 ### Output mode
 - `output: 'static'` — site is fully static
 - When the contact form API route is added (Phase 5), add `export const prerender = false` to `src/pages/api/contact.ts`; the static adapter handles this via Cloudflare Pages Functions
@@ -320,8 +324,27 @@ The Library archive is the most complex page on the site. It requires:
 - Testimonials are real: Wolfram Himpel (Helioceraptor), Ulrich Keitel (Setis GmbH), Kai Dünges (Commerzbank)
 
 ### Content collection IDs
-- Because `glob` loader is used with `base: ./src/content/<collection>`, the `id` of each entry will be `en/slug.md` or `de/slug.md`
+- IDs are the file path relative to `base` WITHOUT extension: `en/assumption-blindness`
 - Filter by language in page templates: `entries.filter(e => e.id.startsWith('en/'))`
+- DO NOT add `slug` to frontmatter — it overrides the ID and breaks language filtering (confirmed Phase 4)
+
+### Collection page architecture
+- Archive pages (non-dynamic): DE wrapper can import + render EN page; URL context provides `isDE = true`
+  - Pattern: `import XIndex from '../../x/index.astro'; <XIndex />`
+- Single pages (dynamic `[...slug].astro`): DE page needs its own `getStaticPaths` filtering `de/` entries
+  - Template markup can be written once per language (shares structure; `isDE` from URL)
+- Archive pages load both EN and DE sets, select with `isDE` at render time for bilingual pages (home, contact)
+
+### Library archive specifics
+- Category filter tabs update `?category=bias` URL param via `history.replaceState` for shareability
+- Client-side filter also dims alpha-index letters not present in active filtered set
+- Search input is scaffolded (title + summary match); Pagefind full-text integration is Phase 5
+- `define:vars` passes serialised entries JSON to the client script
+
+### FAQ collection wiring
+- Home page (index.astro): loads Methodology category FAQs, sorted by `order`, slice 0–4
+- Contact page (contact.astro): loads Working Together category FAQs, sorted by `order`
+- Both load EN + DE sets and select with `isDE`; accordion IDs use index to avoid collisions
 
 ---
 
@@ -331,8 +354,8 @@ Work through these in order, one Claude Code session per phase:
 1. ~~**Foundation**~~ ✅ — Astro scaffold, Cloudflare adapter, i18n config, collection schemas, design system CSS, base layout with PostHog
 2. ~~**Components**~~ ✅ — Fonts self-hosted, global.css design tokens expanded, Header/Nav/Footer components built, Base.astro wired up
 3. ~~**Static pages**~~ ✅ — Home, About, Contact, 404, Policies (Privacy, Legal Notice, Terms, AI Use), Opposition/Methodology
-4. **Collection templates** — Single page templates per collection, archive/listing pages, Library archive with filters
-5. **Integrations** — Contact form Worker, OG image hook, Cal.com booking, Pagefind
+4. ~~**Collection templates**~~ ✅ — Archive + single pages for all 6 collections; FAQs wired to home + contact; Library with category filter, alpha index, search scaffold
+5. **Integrations** — Contact form Worker, OG image hook, Cal.com booking, Pagefind (wire to library search scaffold)
 6. **Pipeline** — GitLab CI, Cloudflare Pages deployment, RSS podcast import, AI summary generation
 
 End each session by asking Claude Code to:
