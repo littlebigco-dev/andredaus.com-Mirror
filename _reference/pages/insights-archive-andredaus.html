@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insights — André Daus · Strategic Opposition</title>
+<meta name="description" content="Articles on thinking, strategy, and the assumptions that quietly run both. No framework worship. No polite agreement.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────── */
+:root {
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Work Sans',system-ui,sans-serif;
+  --mono:'DM Mono','SF Mono',monospace;
+  --bg-base:#090c14; --bg-surface:#0d1120; --bg-elevated:#111828;
+  --bg-card:#141c2c; --bg-card-alt:#0f1520;
+  --gold:#c49a3c; --gold-light:#d4aa52; --gold-dim:#8a6a24;
+  --gold-trans:rgba(196,154,60,.06); --gold-glow:rgba(196,154,60,.10);
+  --navy:#1d2d44;
+  --text-primary:#ede8dc; --text-secondary:#96a0b0;
+  --text-subtle:#7d8799;
+  --border:rgba(196,154,60,.12); --border-light:rgba(255,255,255,.06);
+  --max-w:1160px; --gutter:clamp(1.25rem,4vw,2.5rem);
+  --section:clamp(4.5rem,9vw,8rem);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-primary);font-family:var(--sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none} img{max-width:100%;display:block} ul,ol{list-style:none}
+
+/* ── WCAG 2.2 AA ─────────────────────────────────────────── */
+.skip-link{position:absolute;top:-100%;left:1rem;z-index:9999;padding:.75rem 1.5rem;background:var(--gold);color:#080a10;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;border-radius:0 0 3px 3px;transition:top .15s ease}
+.skip-link:focus{top:0}
+*:focus{outline:none}
+*:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:2px}
+.btn:focus-visible,.nav__cta:focus-visible,.nav__link:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(prefers-reduced-motion:reduce){.fade-up{opacity:1!important;transform:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.container{max-width:var(--max-w);margin:0 auto;padding:0 var(--gutter)}
+.section{padding-block:var(--section)}
+.label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:12px}
+.label::before{content:'';display:block;width:28px;height:1px;background:var(--gold);flex-shrink:0}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;padding:14px 28px;min-height:44px;border-radius:3px;transition:all .2s ease;cursor:pointer;border:none;white-space:nowrap;text-decoration:none}
+.btn--primary{background:var(--gold);color:#080a10;font-weight:600}
+.btn--primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn--outline{background:transparent;color:var(--text-primary);border:1px solid rgba(196,154,60,.35)}
+.btn--outline:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+.btn-arrow::after{content:'→';font-family:var(--sans);font-size:14px;transition:transform .2s ease;display:inline-block}
+.btn-arrow:hover::after{transform:translateX(3px)}
+
+/* ── NAV ─────────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 var(--gutter);height:68px;display:flex;align-items:center;background:rgba(9,12,20,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-light);transition:border-color .3s ease}
+.nav__inner{max-width:var(--max-w);margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav__brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0;text-decoration:none}
+.nav__brand-name{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--text-primary);text-transform:uppercase}
+.nav__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.nav__links{display:flex;align-items:center;gap:clamp(1rem,2vw,1.75rem)}
+.nav__link{font-family:var(--sans);font-size:13px;color:var(--text-secondary);letter-spacing:.03em;transition:color .2s ease;position:relative;padding-block:4px;text-decoration:none}
+.nav__link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--gold);transition:width .25s ease}
+.nav__link:hover{color:var(--text-primary)} .nav__link:hover::after,.nav__link.is-active::after{width:100%}
+.nav__link.is-active{color:var(--gold)}
+.nav__cta{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,154,60,.35);padding:10px 18px;min-height:44px;border-radius:3px;transition:all .2s ease;display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none}
+.nav__cta:hover{background:var(--gold-trans);border-color:var(--gold)}
+.nav__toggle{display:none;width:44px;height:44px;background:none;border:none;cursor:pointer;color:var(--text-primary);align-items:center;justify-content:center;border-radius:3px;transition:color .2s ease;flex-shrink:0}
+.nav__toggle:hover{color:var(--gold)}
+.nav__drawer{display:none;position:fixed;top:68px;left:0;right:0;background:var(--bg-surface);border-bottom:1px solid var(--border-light);padding:1.5rem var(--gutter);flex-direction:column;gap:1rem;z-index:99}
+.nav__drawer.is-open{display:flex}
+.nav__drawer-link{font-size:15px;color:var(--text-secondary);padding-block:8px;border-bottom:1px solid var(--border-light);transition:color .2s ease;min-height:44px;display:flex;align-items:center;text-decoration:none}
+.nav__drawer-link:hover{color:var(--gold)}
+@media(max-width:820px){.nav__links{display:none}.nav__cta{display:none}.nav__toggle{display:flex}}
+
+/* ── PAGE HERO ───────────────────────────────────────────── */
+.page-hero{padding-top:68px;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-base) 55%);border-bottom:1px solid var(--border-light);position:relative;overflow:hidden}
+.page-hero__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(196,154,60,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(196,154,60,.03) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);pointer-events:none}
+.page-hero__inner{position:relative;z-index:1;padding-block:clamp(4rem,8vw,6.5rem) clamp(3rem,5vw,4rem)}
+.page-hero__label{margin-bottom:1.5rem}
+.page-hero__heading{font-family:var(--serif);font-size:clamp(2.4rem,5vw,4rem);font-weight:400;line-height:1.1;letter-spacing:-.02em;color:var(--text-primary);margin-bottom:1.25rem}
+.page-hero__heading em{font-style:italic;color:var(--gold)}
+.page-hero__lede{font-size:clamp(1rem,1.3vw,1.1rem);color:var(--text-secondary);line-height:1.85;max-width:52ch}
+
+/* ── CATEGORY FILTER ─────────────────────────────────────── */
+.cat-nav{background:var(--bg-surface);border-bottom:1px solid var(--border-light);position:sticky;top:68px;z-index:50}
+.cat-nav__inner{display:flex;gap:0;overflow-x:auto;scrollbar-width:none}
+.cat-nav__inner::-webkit-scrollbar{display:none}
+.cat-btn{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:1.1rem 1.4rem;color:var(--text-secondary);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s ease;white-space:nowrap;min-height:44px}
+.cat-btn:hover{color:var(--text-primary)}
+.cat-btn.is-active{color:var(--gold);border-bottom-color:var(--gold)}
+.cat-btn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+
+/* ── FEATURED ARTICLE ────────────────────────────────────── */
+.featured{padding-block:clamp(4rem,8vw,6rem);border-bottom:1px solid var(--border-light)}
+.featured__inner{
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+}
+.featured__image{
+  aspect-ratio:4/3;border-radius:3px;overflow:hidden;
+  background:var(--bg-elevated);border:1px solid var(--border-light);
+}
+.featured__image img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.featured:hover .featured__image img{transform:scale(1.03)}
+.img-ph{width:100%;height:100%;min-height:200px;background:var(--bg-elevated);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:2rem;text-align:center}
+.img-ph__icon{font-size:2rem;opacity:.2;display:block}
+.img-ph__label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.img-ph__desc{font-size:12px;line-height:1.65;color:var(--text-secondary);max-width:32ch}
+.featured__badge{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-trans);border:1px solid var(--border);padding:4px 10px;border-radius:2px;display:inline-block;margin-bottom:1rem}
+.featured__cat{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.cat-tag{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-trans);border:1px solid var(--border);padding:3px 8px;border-radius:2px}
+.featured__title{font-family:var(--serif);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;line-height:1.15;color:var(--text-primary);margin-bottom:1.25rem;transition:color .2s ease}
+.featured:hover .featured__title{color:var(--gold-light)}
+.featured__deck{font-size:15px;line-height:1.85;color:var(--text-secondary);margin-bottom:1.75rem;max-width:52ch}
+.featured__meta{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.featured__read{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:8px;transition:gap .2s ease}
+.featured:hover .featured__read{gap:14px}
+.featured__read::after{content:'→'}
+.featured__readtime{font-family:var(--mono);font-size:11px;color:var(--text-subtle)}
+@media(max-width:820px){.featured__inner{grid-template-columns:1fr}}
+
+/* ── ARTICLES GRID ───────────────────────────────────────── */
+.articles-section{padding-block:var(--section)}
+.section-header{display:flex;align-items:baseline;justify-content:space-between;gap:2rem;margin-bottom:2.5rem}
+.section-heading{font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;line-height:1.25;color:var(--text-primary)}
+.articles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+
+/* Article card */
+.article-card{
+  background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;
+  display:flex;flex-direction:column;text-decoration:none;color:inherit;
+  transition:border-color .2s ease,transform .2s ease;overflow:hidden;
+}
+.article-card:hover{border-color:rgba(196,154,60,.3);transform:translateY(-3px)}
+.article-card__image{aspect-ratio:16/9;overflow:hidden;background:var(--bg-elevated);border-bottom:1px solid var(--border-light)}
+.article-card__image img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.article-card:hover .article-card__image img{transform:scale(1.05)}
+.article-card__body{padding:1.5rem;display:flex;flex-direction:column;gap:.875rem;flex:1}
+.article-card__cats{display:flex;gap:.375rem;flex-wrap:wrap}
+.article-card__cat{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:var(--gold-trans);border:1px solid var(--border);padding:2px 7px;border-radius:2px}
+.article-card__title{font-family:var(--serif);font-size:clamp(1.1rem,1.8vw,1.35rem);font-weight:400;line-height:1.25;color:var(--text-primary);transition:color .2s ease}
+.article-card:hover .article-card__title{color:var(--gold-light)}
+.article-card__excerpt{font-size:13px;line-height:1.75;color:var(--text-secondary);flex:1}
+.article-card__footer{display:flex;align-items:center;justify-content:space-between;padding-top:.875rem;border-top:1px solid var(--border-light);margin-top:auto}
+.article-card__read{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:6px;transition:gap .2s ease}
+.article-card:hover .article-card__read{gap:12px}
+.article-card__read::after{content:'→'}
+.article-card__meta{font-family:var(--mono);font-size:10px;color:var(--text-subtle)}
+@media(max-width:900px){.articles-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.articles-grid{grid-template-columns:1fr}}
+
+/* Placeholder card */
+.article-card--placeholder{opacity:.55;cursor:default}
+.article-card--placeholder:hover{transform:none;border-color:var(--border-light)}
+.placeholder-strip{width:100%;height:140px;background:var(--bg-elevated);border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:center}
+.placeholder-strip span{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle)}
+.ph-line{height:10px;background:var(--bg-elevated);border-radius:2px}
+
+/* ── NEWSLETTER STRIP ────────────────────────────────────── */
+.newsletter{
+  background:var(--navy);border-top:1px solid rgba(29,45,68,.8);border-bottom:1px solid rgba(29,45,68,.8);
+  padding-block:4rem;
+}
+.newsletter__inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.newsletter__heading{font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,2rem);font-weight:400;line-height:1.2;color:var(--text-primary);margin-bottom:.875rem}
+.newsletter__heading em{font-style:italic;color:var(--gold)}
+.newsletter__sub{font-size:14px;line-height:1.8;color:var(--text-secondary)}
+.newsletter__form{display:flex;flex-direction:column;gap:1rem}
+.newsletter__input-row{display:flex;gap:.75rem}
+.newsletter__input{
+  flex:1;background:var(--bg-card);border:1px solid var(--border-light);border-radius:3px;
+  padding:.875rem 1.25rem;font-family:var(--sans);font-size:14px;color:var(--text-primary);
+  outline:none;transition:border-color .2s ease;min-height:44px;
+}
+.newsletter__input::placeholder{color:var(--text-subtle)}
+.newsletter__input:focus{border-color:var(--gold)}
+.newsletter__input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.newsletter__note{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--text-subtle);line-height:1.6}
+@media(max-width:760px){.newsletter__inner{grid-template-columns:1fr} .newsletter__input-row{flex-direction:column}}
+
+/* ── CTA BAND ────────────────────────────────────────────── */
+.cta-band{background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none}
+.cta-band__inner{position:relative;z-index:1}
+.cta-band__label{margin-bottom:1.5rem;justify-content:center}.cta-band__label::before{display:none}
+.cta-band__heading{font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem}
+.cta-band__heading em{font-style:italic;color:var(--gold)}
+.cta-band__sub{font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem}
+.cta-band__actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.footer{background:var(--bg-surface);padding-block:4rem 2rem;border-top:1px solid var(--border-light)}
+.footer__main{display:grid;grid-template-columns:1.2fr 2fr;gap:4rem;margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border-light)}
+.footer__brand-name{font-family:var(--sans);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-primary);margin-bottom:4px}
+.footer__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.footer__tagline{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:28ch;margin-bottom:1.5rem}
+.footer__social{display:flex;gap:1rem}
+.footer__social-link{width:44px;height:44px;border:1px solid var(--border-light);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all .2s ease;text-decoration:none}
+.footer__social-link:hover{border-color:var(--gold-dim);color:var(--gold)}
+.footer__nav{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.footer__nav-heading{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.footer__nav-list{display:flex;flex-direction:column;gap:.375rem}
+.footer__nav-link{font-size:13px;color:var(--text-secondary);transition:color .2s ease;padding-block:4px;min-height:24px;display:flex;align-items:center;text-decoration:none}
+.footer__nav-link:hover{color:var(--text-primary)}
+.footer__legal{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer__copyright{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-subtle)}
+.footer__legal-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.footer__legal-link{font-size:12px;color:var(--text-subtle);transition:color .2s ease;text-decoration:none;padding-block:4px;min-height:24px;display:flex;align-items:center}
+.footer__legal-link:hover{color:var(--text-secondary)}
+@media(max-width:760px){.footer__main{grid-template-columns:1fr;gap:2.5rem} .footer__nav{grid-template-columns:1fr 1fr}}
+
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+.fade-up:nth-child(2){transition-delay:.1s}
+.fade-up:nth-child(3){transition-delay:.2s}
+.fade-up:nth-child(4){transition-delay:.3s}
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav__inner">
+    <a href="/" class="nav__brand" aria-label="André Daus — home">
+      <span class="nav__brand-name">André Daus</span>
+      <span class="nav__brand-sub">Strategic Opposition</span>
+    </a>
+    <div class="nav__links" role="list">
+      <a href="/service"    class="nav__link" role="listitem">Services</a>
+      <a href="/use-case"   class="nav__link" role="listitem">Use Cases</a>
+      <a href="/insight"    class="nav__link is-active" role="listitem">Insights</a>
+      <a href="/podcast"    class="nav__link" role="listitem">Podcast</a>
+      <a href="/opposition" class="nav__link" role="listitem">Opposition</a>
+    </div>
+    <a href="/contact" class="nav__cta">Find Your Blind Spots</a>
+    <button class="nav__toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+        <rect y="0"  width="22" height="2" rx="1" fill="currentColor"/>
+        <rect y="7"  width="16" height="2" rx="1" fill="currentColor"/>
+        <rect y="14" width="22" height="2" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+<div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
+  <a href="/service"    class="nav__drawer-link">Services</a>
+  <a href="/use-case"   class="nav__drawer-link">Use Cases</a>
+  <a href="/insight"    class="nav__drawer-link">Insights</a>
+  <a href="/podcast"    class="nav__drawer-link">Podcast</a>
+  <a href="/opposition" class="nav__drawer-link">The Opposition Method</a>
+  <a href="/contact" class="btn btn--primary" style="margin-top:.5rem;justify-content:center">Find Your Blind Spots</a>
+</div>
+
+<main id="main-content">
+
+<!-- PAGE HERO -->
+<header class="page-hero" aria-labelledby="page-heading">
+  <div class="page-hero__grid" aria-hidden="true"></div>
+  <div class="container">
+    <div class="page-hero__inner">
+      <p class="label page-hero__label">Writing</p>
+      <h1 class="page-hero__heading" id="page-heading">
+        No framework worship.<br><em>No polite agreement.</em>
+      </h1>
+      <p class="page-hero__lede">Articles on thinking, strategy, and the assumptions that quietly run both. If you want validation, there are thousands of other blogs for that.</p>
+    </div>
+  </div>
+</header>
+
+<!-- CATEGORY FILTER -->
+<nav class="cat-nav" aria-label="Filter insights by category">
+  <div class="container">
+    <div class="cat-nav__inner" role="list">
+      <button class="cat-btn is-active" data-cat="all"           role="listitem">All</button>
+      <button class="cat-btn"           data-cat="thinking"      role="listitem">Thinking &amp; Cognition</button>
+      <button class="cat-btn"           data-cat="strategy"      role="listitem">Strategy</button>
+      <button class="cat-btn"           data-cat="leadership"    role="listitem">Leadership</button>
+      <button class="cat-btn"           data-cat="methodology"   role="listitem">Methodology</button>
+      <button class="cat-btn"           data-cat="assumptions"   role="listitem">Assumption Traps</button>
+    </div>
+  </div>
+</nav>
+
+<!-- FEATURED ARTICLE -->
+<section class="featured" aria-labelledby="featured-heading" data-cat="thinking assumptions">
+  <div class="container">
+    <a href="/insight/confirmation-bias-building-a-case" class="featured__inner" style="text-decoration:none;color:inherit">
+      <div class="featured__image" role="img" aria-label="Abstract: a figure viewing the world through a keyhole, seeing only what the keyhole allows">
+        <!--
+          IMAGE BRIEF — Featured article: Confirmation bias
+          Concept: Selective perception. Seeing only what you're looking for.
+          Options:
+          A) A figure standing before an enormous wall, looking through a single small keyhole.
+          B) A chess board where every piece is the same — seen from one player's angle.
+          C) Close-up of a human eye with a distorted, funhouse-mirror reflection of reality in it.
+          Style: Dark, editorial, conceptual. Amber/gold warm grade preferred.
+          Dimensions: 560×420px minimum (4:3 ratio).
+        -->
+        <div class="img-ph">
+          <span class="img-ph__icon" aria-hidden="true">◎</span>
+          <span class="img-ph__label">Article image — Confirmation bias</span>
+          <p class="img-ph__desc">Figure looking through a keyhole / funhouse mirror eye reflection. Conceptual, dark. 560×420px, 4:3.</p>
+        </div>
+      </div>
+      <div class="featured__content">
+        <span class="featured__badge" aria-label="Featured article">Featured</span>
+        <div class="featured__cat" role="list" aria-label="Categories">
+          <span class="cat-tag" role="listitem">Thinking &amp; Cognition</span>
+          <span class="cat-tag" role="listitem">Assumption Traps</span>
+        </div>
+        <h2 class="featured__title" id="featured-heading">
+          You're Not Gathering Evidence. You're Building a Case.
+        </h2>
+        <p class="featured__deck">
+          Confirmation bias isn't a flaw in irrational people. It's a structural feature of how intelligent minds protect themselves from being wrong. Understanding its mechanics is the first step to building the kind of thinking that can actually challenge it — in yourself and in the organisations that depend on you.
+        </p>
+        <div class="featured__meta">
+          <span class="featured__read">Read article</span>
+          <span class="featured__readtime">12 min read</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ARTICLES GRID -->
+<section class="articles-section section" aria-labelledby="articles-heading">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-heading" id="articles-heading">All articles</h2>
+    </div>
+
+    <ul class="articles-grid" id="articles-grid">
+
+      <!-- Article 01 — populated -->
+      <li class="fade-up" data-cat="thinking assumptions">
+        <a href="/insight/confirmation-bias-building-a-case" class="article-card">
+          <div class="article-card__image">
+            <!--
+              IMAGE BRIEF — Card thumbnail, confirmation bias
+              Same concept as featured but tighter crop for 16:9 card format.
+              Keyhole / selective view / single lit doorway in darkness.
+              560×315px minimum.
+            -->
+            <div class="img-ph" style="min-height:140px">
+              <span class="img-ph__icon" aria-hidden="true">◎</span>
+              <span class="img-ph__label">Card thumbnail</span>
+              <p class="img-ph__desc">Keyhole / selective view. 560×315px.</p>
+            </div>
+          </div>
+          <div class="article-card__body">
+            <div class="article-card__cats">
+              <span class="article-card__cat">Thinking &amp; Cognition</span>
+              <span class="article-card__cat">Assumption Traps</span>
+            </div>
+            <h3 class="article-card__title">You're Not Gathering Evidence. You're Building a Case.</h3>
+            <p class="article-card__excerpt">Confirmation bias isn't a quirk of irrational people. It's a structural feature of how intelligent minds protect themselves from being wrong — and why conventional approaches to fixing it mostly don't.</p>
+            <div class="article-card__footer">
+              <span class="article-card__read">Read</span>
+              <span class="article-card__meta">12 min</span>
+            </div>
+          </div>
+        </a>
+      </li>
+
+      <!-- Placeholder 02 -->
+      <li class="fade-up" data-cat="strategy assumptions">
+        <div class="article-card article-card--placeholder" aria-hidden="true">
+          <div class="placeholder-strip"><span>Coming soon</span></div>
+          <div class="article-card__body">
+            <div class="article-card__cats"><span class="article-card__cat">Strategy</span></div>
+            <h3 class="article-card__title" style="color:var(--text-subtle)">[Article — Assumption Traps in Strategy]</h3>
+            <p class="article-card__excerpt" style="color:var(--text-subtle)">Placeholder — add article slug, title, excerpt, and read time.</p>
+            <div class="article-card__footer"><span class="article-card__meta">— min</span></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- Placeholder 03 -->
+      <li class="fade-up" data-cat="leadership">
+        <div class="article-card article-card--placeholder" aria-hidden="true">
+          <div class="placeholder-strip"><span>Coming soon</span></div>
+          <div class="article-card__body">
+            <div class="article-card__cats"><span class="article-card__cat">Leadership</span></div>
+            <h3 class="article-card__title" style="color:var(--text-subtle)">[Article — Leadership &amp; Blind Spots]</h3>
+            <p class="article-card__excerpt" style="color:var(--text-subtle)">Placeholder — add article slug, title, excerpt, and read time.</p>
+            <div class="article-card__footer"><span class="article-card__meta">— min</span></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- Placeholder 04 -->
+      <li class="fade-up" data-cat="methodology">
+        <div class="article-card article-card--placeholder" aria-hidden="true">
+          <div class="placeholder-strip"><span>Coming soon</span></div>
+          <div class="article-card__body">
+            <div class="article-card__cats"><span class="article-card__cat">Methodology</span></div>
+            <h3 class="article-card__title" style="color:var(--text-subtle)">[Article — Red Team Thinking Applied]</h3>
+            <p class="article-card__excerpt" style="color:var(--text-subtle)">Placeholder — add article slug, title, excerpt, and read time.</p>
+            <div class="article-card__footer"><span class="article-card__meta">— min</span></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- Placeholder 05 -->
+      <li class="fade-up" data-cat="thinking">
+        <div class="article-card article-card--placeholder" aria-hidden="true">
+          <div class="placeholder-strip"><span>Coming soon</span></div>
+          <div class="article-card__body">
+            <div class="article-card__cats"><span class="article-card__cat">Thinking &amp; Cognition</span></div>
+            <h3 class="article-card__title" style="color:var(--text-subtle)">[Article — Cognitive Bias in Organisations]</h3>
+            <p class="article-card__excerpt" style="color:var(--text-subtle)">Placeholder — add article slug, title, excerpt, and read time.</p>
+            <div class="article-card__footer"><span class="article-card__meta">— min</span></div>
+          </div>
+        </div>
+      </li>
+
+      <!-- Placeholder 06 -->
+      <li class="fade-up" data-cat="strategy">
+        <div class="article-card article-card--placeholder" aria-hidden="true">
+          <div class="placeholder-strip"><span>Coming soon</span></div>
+          <div class="article-card__body">
+            <div class="article-card__cats"><span class="article-card__cat">Strategy</span></div>
+            <h3 class="article-card__title" style="color:var(--text-subtle)">[Article — Strategic Failure Modes]</h3>
+            <p class="article-card__excerpt" style="color:var(--text-subtle)">Placeholder — add article slug, title, excerpt, and read time.</p>
+            <div class="article-card__footer"><span class="article-card__meta">— min</span></div>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter" aria-labelledby="newsletter-heading">
+  <div class="container">
+    <div class="newsletter__inner">
+      <div>
+        <h2 class="newsletter__heading" id="newsletter-heading">
+          New thinking,<br><em>when there's something worth saying.</em>
+        </h2>
+        <p class="newsletter__sub">No weekly cadence. No content for content's sake. An email when there's an article that challenges something worth challenging.</p>
+      </div>
+      <div>
+        <form class="newsletter__form" action="/subscribe" method="POST" novalidate aria-label="Newsletter subscription">
+          <!-- Add your FluentForms embed here — replace this static form -->
+          <div class="newsletter__input-row">
+            <label for="newsletter-email" class="sr-only">Email address</label>
+            <input
+              type="email"
+              id="newsletter-email"
+              name="email"
+              class="newsletter__input"
+              placeholder="your@email.com"
+              autocomplete="email"
+              required
+              aria-required="true"
+            >
+            <button type="submit" class="btn btn--primary">Subscribe</button>
+          </div>
+          <p class="newsletter__note">No tracking. No sharing. Unsubscribe any time. GDPR-compliant double opt-in.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band" aria-labelledby="cta-heading">
+  <div class="container cta-band__inner">
+    <p class="label cta-band__label">Next step</p>
+    <h2 class="cta-band__heading" id="cta-heading">
+      Reading about assumptions<br>is not the same as <em>finding yours.</em>
+    </h2>
+    <p class="cta-band__sub">A discovery call is where the actual work starts. Come with your most confident strategic position. I'll challenge it.</p>
+    <div class="cta-band__actions">
+      <a href="/contact" class="btn btn--primary btn-arrow">Book a Discovery Call</a>
+      <a href="/use-case" class="btn btn--outline">View Use Cases</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__main">
+      <div>
+        <p class="footer__brand-name">André Daus</p>
+        <p class="footer__brand-sub">Strategic Opposition</p>
+        <p class="footer__tagline">Your thinking creates your limits.</p>
+        <nav class="footer__social" aria-label="Social media">
+          <a href="#" class="footer__social-link" aria-label="X (Twitter)"><svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true"><path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/></svg></a>
+          <a href="#" class="footer__social-link" aria-label="LinkedIn"><svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg></a>
+        </nav>
+      </div>
+      <nav class="footer__nav" aria-label="Site navigation">
+        <div><h3 class="footer__nav-heading">Services</h3><ul class="footer__nav-list"><li><a href="/service/assumption-hunting" class="footer__nav-link">Assumption Hunting</a></li><li><a href="/service/1-on-1-coaching" class="footer__nav-link">1:1 Coaching</a></li><li><a href="/service/burn-the-box" class="footer__nav-link">Burn the Box</a></li><li><a href="/service/workshop" class="footer__nav-link">Workshop</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Explore</h3><ul class="footer__nav-list"><li><a href="/use-case" class="footer__nav-link">Use Cases</a></li><li><a href="/opposition" class="footer__nav-link">The Opposition Method</a></li><li><a href="/insight" class="footer__nav-link">Insights</a></li><li><a href="/podcast" class="footer__nav-link">Iconoclast Insights</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Also by André</h3><ul class="footer__nav-list"><li><a href="https://littlebig.co" class="footer__nav-link" target="_blank" rel="noopener">LittleBig.Co <span style="color:#7ab648" aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a></li><li><a href="/contact" class="footer__nav-link">Contact</a></li><li><a href="/question" class="footer__nav-link">FAQ</a></li></ul></div>
+      </nav>
+    </div>
+    <div class="footer__legal">
+      <p class="footer__copyright">Copyright 2025 © André Daus</p>
+      <nav class="footer__legal-links" aria-label="Legal"><a href="/policy/privacy" class="footer__legal-link">Privacy Policy</a><a href="/policy/legal-notice" class="footer__legal-link">Legal Notice</a><a href="/legal/terms" class="footer__legal-link">Terms</a><a href="/policy/ai-use" class="footer__legal-link">AI Policy</a></nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var t=document.querySelector('.nav__toggle'),d=document.getElementById('nav-drawer');
+  if(t&&d){
+    t.addEventListener('click',function(){var o=d.classList.toggle('is-open');t.setAttribute('aria-expanded',String(o));t.setAttribute('aria-label',o?'Close navigation menu':'Open navigation menu');});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.classList.contains('is-open')){d.classList.remove('is-open');t.setAttribute('aria-expanded','false');t.focus();}});
+  }
+  document.querySelectorAll('.cat-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('is-active');b.removeAttribute('aria-current');});
+      btn.classList.add('is-active');btn.setAttribute('aria-current','true');
+      var cat=btn.dataset.cat;
+      // Featured
+      var feat=document.querySelector('.featured');
+      if(feat){var fc=feat.dataset.cat||'';feat.style.display=(cat==='all'||fc.includes(cat))?'':'none';}
+      // Grid items
+      document.querySelectorAll('#articles-grid > li').forEach(function(li){
+        var lc=li.dataset.cat||'';
+        li.style.display=(cat==='all'||lc.includes(cat))?'':'none';
+      });
+    });
+  });
+  if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.fade-up').forEach(function(el){io.observe(el);});
+  } else {
+    document.querySelectorAll('.fade-up').forEach(function(el){el.classList.add('visible');});
+  }
+  var nav=document.querySelector('.nav');
+  if(nav)window.addEventListener('scroll',function(){nav.style.borderBottomColor=scrollY>40?'rgba(196,154,60,.15)':'rgba(255,255,255,.06)';},{passive:true});
+})();
+</script>
+</body>
+</html>

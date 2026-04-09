@@ -1,0 +1,951 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — André Daus</title>
+<meta name="description" content="Privacy policy for andredaus.com. How personal data is collected, processed, and protected, in accordance with GDPR and German data protection law.">
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  POLICY PAGE TEMPLATE — andredaus.com                   ║
+  ║  Used for: Privacy Policy, Legal Notice, Terms, AI Use  ║
+  ║                                                          ║
+  ║  To adapt for another policy:                            ║
+  ║  1. Change <title>, <meta name="description">           ║
+  ║  2. Change <html lang=""> if German version             ║
+  ║  3. Update .policy-hero__title and .policy-hero__type   ║
+  ║  4. Update .policy-meta date                            ║
+  ║  5. Replace TOC links in .toc__list                     ║
+  ║  6. Replace .policy-body content                        ║
+  ║  7. Update <link rel="canonical">                       ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+<link rel="canonical" href="https://andredaus.com/policy/privacy">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────── */
+:root {
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Work Sans',system-ui,sans-serif;
+  --mono:'DM Mono','SF Mono',monospace;
+  --bg-base:#090c14; --bg-surface:#0d1120; --bg-elevated:#111828;
+  --bg-card:#141c2c; --bg-card-alt:#0f1520;
+  --gold:#c49a3c; --gold-light:#d4aa52; --gold-dim:#8a6a24;
+  --gold-trans:rgba(196,154,60,.06); --gold-glow:rgba(196,154,60,.10);
+  --text-primary:#ede8dc; --text-secondary:#96a0b0; --text-subtle:#7d8799;
+  --border:rgba(196,154,60,.12); --border-light:rgba(255,255,255,.06);
+  --max-w:1160px; --gutter:clamp(1.25rem,4vw,2.5rem);
+  --section:clamp(4rem,8vw,7rem);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-primary);font-family:var(--sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none} img{max-width:100%;display:block} ul,ol{list-style:none}
+
+/* ── WCAG 2.2 AA ─────────────────────────────────────────── */
+.skip-link{position:absolute;top:-100%;left:1rem;z-index:9999;padding:.75rem 1.5rem;background:var(--gold);color:#080a10;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;border-radius:0 0 3px 3px;transition:top .15s ease}
+.skip-link:focus{top:0}
+*:focus{outline:none}
+*:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:2px}
+.btn:focus-visible,.nav__cta:focus-visible,.nav__link:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress-bar{display:none}}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.container{max-width:var(--max-w);margin:0 auto;padding:0 var(--gutter)}
+.label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:12px}
+.label::before{content:'';display:block;width:28px;height:1px;background:var(--gold);flex-shrink:0}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;padding:14px 28px;min-height:44px;border-radius:3px;transition:all .2s ease;cursor:pointer;border:none;white-space:nowrap;text-decoration:none}
+.btn--primary{background:var(--gold);color:#080a10;font-weight:600}
+.btn--primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn--ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);font-size:11px;padding:10px 18px;min-height:44px}
+.btn--ghost:hover{border-color:rgba(196,154,60,.3);color:var(--text-primary)}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.progress-bar{position:fixed;top:0;left:0;height:2px;width:0%;background:var(--gold);z-index:200;transition:width .1s linear}
+
+/* ── NAV ─────────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 var(--gutter);height:68px;display:flex;align-items:center;background:rgba(9,12,20,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-light);transition:border-color .3s ease}
+.nav__inner{max-width:var(--max-w);margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav__brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0;text-decoration:none}
+.nav__brand-name{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--text-primary);text-transform:uppercase}
+.nav__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.nav__links{display:flex;align-items:center;gap:clamp(1rem,2vw,1.75rem)}
+.nav__link{font-family:var(--sans);font-size:13px;color:var(--text-secondary);letter-spacing:.03em;transition:color .2s ease;position:relative;padding-block:4px;text-decoration:none}
+.nav__link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--gold);transition:width .25s ease}
+.nav__link:hover{color:var(--text-primary)} .nav__link:hover::after{width:100%}
+.nav__cta{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,154,60,.35);padding:10px 18px;min-height:44px;border-radius:3px;transition:all .2s ease;display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none}
+.nav__cta:hover{background:var(--gold-trans);border-color:var(--gold)}
+.nav__toggle{display:none;width:44px;height:44px;background:none;border:none;cursor:pointer;color:var(--text-primary);align-items:center;justify-content:center;border-radius:3px;transition:color .2s ease;flex-shrink:0}
+.nav__toggle:hover{color:var(--gold)}
+.nav__drawer{display:none;position:fixed;top:68px;left:0;right:0;background:var(--bg-surface);border-bottom:1px solid var(--border-light);padding:1.5rem var(--gutter);flex-direction:column;gap:1rem;z-index:99}
+.nav__drawer.is-open{display:flex}
+.nav__drawer-link{font-size:15px;color:var(--text-secondary);padding-block:8px;border-bottom:1px solid var(--border-light);transition:color .2s ease;min-height:44px;display:flex;align-items:center;text-decoration:none}
+.nav__drawer-link:hover{color:var(--gold)}
+@media(max-width:820px){.nav__links{display:none}.nav__cta{display:none}.nav__toggle{display:flex}}
+
+/* ── BREADCRUMB ──────────────────────────────────────────── */
+.breadcrumb{padding-top:68px;background:var(--bg-surface);border-bottom:1px solid var(--border-light)}
+.breadcrumb__inner{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;padding-block:.875rem;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.breadcrumb__link{color:var(--text-secondary);transition:color .2s ease;text-decoration:none;min-height:24px;display:inline-flex;align-items:center}
+.breadcrumb__link:hover{color:var(--gold)}
+.breadcrumb__sep{color:var(--text-subtle);user-select:none;padding-inline:.125rem}
+.breadcrumb__current{color:var(--text-primary)}
+
+/* ── POLICY HERO ─────────────────────────────────────────── */
+.policy-hero{
+  background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-base) 60%);
+  border-bottom:1px solid var(--border-light);
+  padding-block:clamp(3rem,6vw,5rem);
+}
+.policy-hero__inner{display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:end}
+.policy-hero__type{
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.875rem;display:flex;align-items:center;gap:10px;
+}
+.policy-hero__type::before{content:'';display:block;width:24px;height:1px;background:var(--gold)}
+.policy-hero__title{
+  font-family:var(--serif);font-size:clamp(2.2rem,4.5vw,3.5rem);
+  font-weight:400;line-height:1.08;letter-spacing:-.025em;
+  color:var(--text-primary);
+}
+
+/* Meta block */
+.policy-meta{
+  background:var(--bg-card-alt);border:1px solid var(--border-light);
+  border-radius:3px;padding:1.25rem 1.5rem;
+  display:flex;flex-direction:column;gap:.875rem;
+  align-self:end;min-width:220px;
+}
+.policy-meta__row{display:flex;flex-direction:column;gap:2px}
+.policy-meta__key{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-subtle)}
+.policy-meta__val{font-size:13px;color:var(--text-secondary)}
+.policy-meta__val--date{font-family:var(--mono);font-size:12px;color:var(--text-primary);letter-spacing:.04em}
+.policy-meta__val--updated{font-family:var(--mono);font-size:11px;color:var(--gold)}
+
+@media(max-width:640px){.policy-hero__inner{grid-template-columns:1fr} .policy-meta{display:none}}
+
+/* ── MOBILE META STRIP ───────────────────────────────────── */
+.meta-strip{
+  display:none;
+  background:var(--bg-card-alt);border-bottom:1px solid var(--border-light);
+  padding:.75rem var(--gutter);
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  color:var(--text-subtle);
+  align-items:center;gap:1rem;flex-wrap:wrap;
+}
+@media(max-width:640px){.meta-strip{display:flex}}
+.meta-strip__sep{color:var(--border-light);user-select:none}
+
+/* ── OTHER POLICIES NAV ──────────────────────────────────── */
+.policy-nav-strip{
+  background:var(--bg-elevated);border-bottom:1px solid var(--border-light);
+}
+.policy-nav-strip__inner{
+  display:flex;gap:0;overflow-x:auto;scrollbar-width:none;
+}
+.policy-nav-strip__inner::-webkit-scrollbar{display:none}
+.policy-nav-link{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  padding:.875rem 1.25rem;color:var(--text-subtle);border-bottom:2px solid transparent;
+  white-space:nowrap;transition:all .15s ease;text-decoration:none;min-height:44px;
+  display:inline-flex;align-items:center;
+}
+.policy-nav-link:hover{color:var(--text-secondary)}
+.policy-nav-link.is-active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── PAGE LAYOUT ─────────────────────────────────────────── */
+.policy-layout{
+  display:grid;grid-template-columns:240px 1fr;gap:4rem;
+  padding-block:var(--section);
+  align-items:start;
+}
+@media(max-width:900px){.policy-layout{grid-template-columns:1fr}}
+
+/* ── TOC SIDEBAR ─────────────────────────────────────────── */
+.toc-sidebar{
+  position:sticky;top:calc(68px + 2rem);
+  display:flex;flex-direction:column;gap:1rem;
+  max-height:calc(100vh - 100px);
+  overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border-light) transparent;
+}
+.toc-sidebar::-webkit-scrollbar{width:3px}
+.toc-sidebar::-webkit-scrollbar-thumb{background:var(--border-light);border-radius:2px}
+
+.toc-card{
+  background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;overflow:hidden;
+}
+.toc-card__heading{
+  font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);padding:.875rem 1.25rem;border-bottom:1px solid var(--border-light);
+}
+.toc__list{padding:.375rem 0}
+.toc__link{
+  font-size:12px;line-height:1.4;color:var(--text-secondary);
+  padding:.5rem 1.25rem;display:block;border-left:2px solid transparent;
+  transition:all .15s ease;text-decoration:none;
+}
+.toc__link:hover{color:var(--text-primary);background:var(--gold-trans)}
+.toc__link.is-active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-trans)}
+.toc__link--sub{padding-left:2rem;font-size:11px;color:var(--text-subtle)}
+.toc__link--sub:hover{color:var(--text-secondary)}
+.toc__link--sub.is-active{color:var(--gold-light)}
+
+/* Contact card in sidebar */
+.sidebar-contact{
+  background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;
+  padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;
+}
+.sidebar-contact__heading{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.sidebar-contact__body{font-size:12px;line-height:1.7;color:var(--text-secondary)}
+.sidebar-contact__link{font-size:12px;color:var(--gold);text-decoration:underline;text-underline-offset:3px;display:block;padding-block:2px}
+.sidebar-contact__link:hover{color:var(--gold-light)}
+
+@media(max-width:900px){.toc-sidebar{display:none}}
+
+/* ── POLICY BODY TYPOGRAPHY ──────────────────────────────── */
+.policy-body{min-width:0}
+
+/* Section scroll anchor offset */
+.policy-body section,
+.policy-body [id]{scroll-margin-top:90px}
+
+/* Headings */
+.policy-body h1{display:none} /* title is in hero */
+
+.policy-body h2{
+  font-family:var(--serif);font-size:clamp(1.35rem,2.2vw,1.75rem);
+  font-weight:400;line-height:1.2;color:var(--text-primary);
+  margin-top:3.5rem;margin-bottom:1rem;padding-bottom:.875rem;
+  border-bottom:1px solid var(--border-light);
+}
+.policy-body h2:first-child{margin-top:0}
+
+.policy-body h3{
+  font-family:var(--sans);font-size:clamp(1rem,1.4vw,1.1rem);
+  font-weight:600;line-height:1.3;color:var(--text-primary);
+  margin-top:2.25rem;margin-bottom:.75rem;
+}
+
+.policy-body h4{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin-top:1.75rem;margin-bottom:.625rem;
+}
+
+/* Paragraphs */
+.policy-body p{
+  font-size:clamp(14px,1.05vw,15.5px);line-height:1.9;
+  color:var(--text-secondary);margin-bottom:1.1rem;
+}
+.policy-body p:last-child{margin-bottom:0}
+.policy-body p strong{color:var(--text-primary);font-weight:600}
+
+/* Links */
+.policy-body a{
+  color:var(--gold);text-decoration:underline;
+  text-underline-offset:3px;text-decoration-thickness:1px;
+}
+.policy-body a:hover{color:var(--gold-light)}
+.policy-body a:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:2px}
+
+/* Lists */
+.policy-body ul,.policy-body ol{
+  padding-left:1.5rem;margin-bottom:1.1rem;
+  display:flex;flex-direction:column;gap:.5rem;
+}
+.policy-body ul{list-style:none;padding-left:0}
+.policy-body ul li{
+  padding-left:1.25rem;position:relative;
+  font-size:clamp(14px,1.05vw,15.5px);line-height:1.8;color:var(--text-secondary);
+}
+.policy-body ul li::before{
+  content:'–';position:absolute;left:0;color:var(--gold-dim);font-family:var(--sans);
+}
+.policy-body ol{list-style:decimal;padding-left:1.5rem}
+.policy-body ol li{
+  font-size:clamp(14px,1.05vw,15.5px);line-height:1.8;color:var(--text-secondary);
+  padding-left:.25rem;
+}
+.policy-body li strong{color:var(--text-primary);font-weight:600}
+
+/* Definition-style list (GDPR terms) */
+.policy-body dl{margin-bottom:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.policy-body dt{
+  font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text-primary);
+  display:flex;align-items:flex-start;gap:.625rem;
+}
+.policy-body dt::before{
+  content:'';display:block;width:6px;height:6px;border-radius:50%;
+  background:var(--gold);flex-shrink:0;margin-top:.55rem;
+}
+.policy-body dd{
+  font-size:clamp(14px,1.05vw,15.5px);line-height:1.85;color:var(--text-secondary);
+  padding-left:1.25rem;border-left:2px solid var(--border-light);
+  margin-left:.25rem;
+}
+
+/* Blockquote / highlighted note */
+.policy-body blockquote{
+  border-left:3px solid var(--gold);padding:.75rem 1.5rem;
+  background:var(--gold-trans);border-radius:0 3px 3px 0;
+  margin-block:1.5rem;
+}
+.policy-body blockquote p{
+  font-family:var(--serif);font-style:italic;font-size:clamp(1rem,1.3vw,1.15rem);
+  color:var(--gold-light);margin-bottom:0;
+}
+
+/* Info box (legal article citation) */
+.legal-box{
+  background:var(--bg-card);border:1px solid var(--border-light);
+  border-left:2px solid var(--gold-dim);
+  border-radius:0 3px 3px 0;padding:1.25rem 1.5rem;margin-block:1.5rem;
+}
+.legal-box__label{
+  font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.5rem;
+}
+.legal-box p{font-size:13px;margin-bottom:0;color:var(--text-secondary)}
+
+/* Table */
+.policy-body table{
+  width:100%;border-collapse:collapse;font-size:13px;
+  margin-block:1.5rem;border:1px solid var(--border-light);border-radius:3px;overflow:hidden;
+}
+.policy-body thead{background:var(--bg-card)}
+.policy-body th{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);padding:.75rem 1.25rem;text-align:left;
+  border-bottom:1px solid var(--border-light);white-space:nowrap;
+}
+.policy-body td{
+  padding:.75rem 1.25rem;border-bottom:1px solid var(--border-light);
+  color:var(--text-secondary);line-height:1.6;vertical-align:top;
+}
+.policy-body tbody tr:last-child td{border-bottom:none}
+.policy-body tbody tr:hover td{background:rgba(196,154,60,.03)}
+.table-wrap{overflow-x:auto;margin-block:1.5rem;border-radius:3px}
+.table-wrap table{margin-block:0}
+
+/* Section divider */
+.policy-divider{
+  height:1px;background:var(--border-light);margin-block:3rem;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.footer{background:var(--bg-surface);padding-block:4rem 2rem;border-top:1px solid var(--border-light)}
+.footer__main{display:grid;grid-template-columns:1.2fr 2fr;gap:4rem;margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border-light)}
+.footer__brand-name{font-family:var(--sans);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-primary);margin-bottom:4px}
+.footer__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.footer__tagline{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:28ch;margin-bottom:1.5rem}
+.footer__social{display:flex;gap:1rem}
+.footer__social-link{width:44px;height:44px;border:1px solid var(--border-light);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all .2s ease;text-decoration:none}
+.footer__social-link:hover{border-color:var(--gold-dim);color:var(--gold)}
+.footer__nav{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.footer__nav-heading{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.footer__nav-list{display:flex;flex-direction:column;gap:.375rem}
+.footer__nav-link{font-size:13px;color:var(--text-secondary);transition:color .2s ease;padding-block:4px;min-height:24px;display:flex;align-items:center;text-decoration:none}
+.footer__nav-link:hover{color:var(--text-primary)}
+.footer__legal{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer__copyright{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-subtle)}
+.footer__legal-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.footer__legal-link{font-size:12px;color:var(--text-subtle);transition:color .2s ease;text-decoration:none;padding-block:4px;min-height:24px;display:flex;align-items:center}
+.footer__legal-link:hover{color:var(--text-secondary)}
+.footer__legal-link.is-current{color:var(--gold)}
+@media(max-width:760px){.footer__main{grid-template-columns:1fr;gap:2.5rem} .footer__nav{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress" role="progressbar" aria-label="Reading progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav__inner">
+    <a href="/" class="nav__brand" aria-label="André Daus — home">
+      <span class="nav__brand-name">André Daus</span>
+      <span class="nav__brand-sub">Strategic Opposition</span>
+    </a>
+    <div class="nav__links" role="list">
+      <a href="/service"    class="nav__link" role="listitem">Services</a>
+      <a href="/use-case"   class="nav__link" role="listitem">Use Cases</a>
+      <a href="/insight"    class="nav__link" role="listitem">Insights</a>
+      <a href="/library"    class="nav__link" role="listitem">Library</a>
+      <a href="/podcast"    class="nav__link" role="listitem">Podcast</a>
+    </div>
+    <a href="/contact" class="nav__cta">Find Your Blind Spots</a>
+    <button class="nav__toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+        <rect y="0"  width="22" height="2" rx="1" fill="currentColor"/>
+        <rect y="7"  width="16" height="2" rx="1" fill="currentColor"/>
+        <rect y="14" width="22" height="2" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+<div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
+  <a href="/service"    class="nav__drawer-link">Services</a>
+  <a href="/use-case"   class="nav__drawer-link">Use Cases</a>
+  <a href="/insight"    class="nav__drawer-link">Insights</a>
+  <a href="/library"    class="nav__drawer-link">Library</a>
+  <a href="/podcast"    class="nav__drawer-link">Podcast</a>
+  <a href="/opposition" class="nav__drawer-link">The Opposition Method</a>
+  <a href="/contact" class="btn btn--primary" style="margin-top:.5rem;justify-content:center">Find Your Blind Spots</a>
+</div>
+
+<main id="main-content">
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb__inner">
+        <li><a href="/" class="breadcrumb__link">Home</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><a href="/policy" class="breadcrumb__link">Legal</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><span class="breadcrumb__current" aria-current="page">Privacy Policy</span></li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="policy-hero" aria-labelledby="policy-title">
+    <div class="container">
+      <div class="policy-hero__inner">
+        <div>
+          <p class="policy-hero__type">Legal · Privacy</p>
+          <h1 class="policy-hero__title" id="policy-title">Privacy Policy</h1>
+        </div>
+        <aside class="policy-meta" aria-label="Document information">
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">Last updated</span>
+            <span class="policy-meta__val policy-meta__val--updated">25 May 2025</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">Controller</span>
+            <span class="policy-meta__val">André Daus, Cologne DE</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">Applies to</span>
+            <span class="policy-meta__val">andredaus.com</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">Framework</span>
+            <span class="policy-meta__val">GDPR · BDSG · Swiss DSG</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile meta strip -->
+  <div class="meta-strip" aria-label="Document metadata">
+    <span>Last updated: 25 May 2025</span>
+    <span class="meta-strip__sep" aria-hidden="true">·</span>
+    <span>GDPR · BDSG</span>
+    <span class="meta-strip__sep" aria-hidden="true">·</span>
+    <span>andredaus.com</span>
+  </div>
+
+  <!-- Other policy pages nav -->
+  <nav class="policy-nav-strip" aria-label="Other legal documents">
+    <div class="container">
+      <div class="policy-nav-strip__inner" role="list">
+        <a href="/policy/privacy"      class="policy-nav-link is-active" role="listitem" aria-current="page">Privacy Policy</a>
+        <a href="/policy/legal-notice" class="policy-nav-link" role="listitem">Legal Notice</a>
+        <a href="/legal/terms"         class="policy-nav-link" role="listitem">Terms &amp; Conditions</a>
+        <a href="/policy/ai-use"       class="policy-nav-link" role="listitem">AI Use Policy</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- BODY -->
+  <div class="container">
+    <div class="policy-layout">
+
+      <!-- TOC SIDEBAR -->
+      <aside class="toc-sidebar" aria-label="Table of contents">
+        <nav class="toc-card" aria-labelledby="toc-heading">
+          <p class="toc-card__heading" id="toc-heading">Contents</p>
+          <ul class="toc__list" aria-label="Jump to section">
+            <li><a href="#preamble"         class="toc__link is-active">Preamble</a></li>
+            <li><a href="#controller"       class="toc__link">Controller</a></li>
+            <li><a href="#overview"         class="toc__link">Overview of processing</a></li>
+            <li><a href="#legal-bases"      class="toc__link">Legal bases</a></li>
+            <li><a href="#security"         class="toc__link">Security</a></li>
+            <li><a href="#transmission"     class="toc__link">Data transmission</a></li>
+            <li><a href="#international"    class="toc__link">International transfers</a></li>
+            <li><a href="#retention"        class="toc__link">Retention &amp; deletion</a></li>
+            <li><a href="#rights"           class="toc__link">Your rights</a></li>
+            <li><a href="#business"         class="toc__link">Business services</a></li>
+            <li><a href="#hosting"          class="toc__link">Hosting &amp; online services</a></li>
+            <li><a href="#cookies"          class="toc__link">Cookies</a></li>
+            <li><a href="#contact"          class="toc__link">Contact &amp; enquiries</a></li>
+            <li><a href="#newsletter"       class="toc__link">Newsletter</a></li>
+            <li><a href="#analytics"        class="toc__link">Analytics</a></li>
+            <li><a href="#social"           class="toc__link">Social media</a></li>
+            <li><a href="#ai"               class="toc__link">Artificial intelligence</a></li>
+            <li><a href="#changes"          class="toc__link">Changes &amp; updates</a></li>
+            <li><a href="#definitions"      class="toc__link">Definitions</a></li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-contact">
+          <p class="sidebar-contact__heading">Questions?</p>
+          <p class="sidebar-contact__body">For data protection enquiries, contact us directly.</p>
+          <a href="mailto:hello@andredaus.com" class="sidebar-contact__link">hello@andredaus.com</a>
+        </div>
+      </aside>
+
+      <!-- POLICY CONTENT -->
+      <article class="policy-body" aria-label="Privacy Policy content">
+
+        <!-- ── PREAMBLE ───────────────────────────────────── -->
+        <section id="preamble">
+          <h2>Preamble</h2>
+          <p>With the following privacy policy we would like to inform you which types of your personal data (hereinafter also abbreviated as "data") we process for which purposes and in which scope. The privacy statement applies to all processing of personal data carried out by us, both in the context of providing our services and in particular on our websites, in mobile applications and within external online presences, such as our social media profiles (hereinafter collectively referred to as "online services").</p>
+          <p>The terms used are not gender-specific.</p>
+          <p>Source: <a href="https://datenschutz-generator.de/" target="_blank" rel="noopener noreferrer">datenschutz-generator.de <span class="sr-only">(opens in new tab)</span></a></p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── CONTROLLER ─────────────────────────────────── -->
+        <section id="controller">
+          <h2>Controller</h2>
+          <p>
+            André Daus<br>
+            c/o Block Services<br>
+            Stuttgarter Str. 106<br>
+            70736 Fellbach<br>
+            Germany
+          </p>
+          <p>
+            Email: <a href="mailto:hello@andredaus.com">hello@andredaus.com</a><br>
+            Phone: <a href="tel:+492211653180">+49 (221) 1653180</a>
+          </p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── OVERVIEW ───────────────────────────────────── -->
+        <section id="overview">
+          <h2>Overview of processing operations</h2>
+          <p>The following table summarises the types of data processed, the purposes for which they are processed and the concerned data subjects.</p>
+
+          <h3>Categories of processed data</h3>
+          <ul>
+            <li>Inventory data</li>
+            <li>Payment data</li>
+            <li>Contact data</li>
+            <li>Content data</li>
+            <li>Contract data</li>
+            <li>Usage data</li>
+            <li>Meta, communication and process data</li>
+            <li>Log data</li>
+          </ul>
+
+          <h3>Categories of data subjects</h3>
+          <ul>
+            <li>Service recipients and clients</li>
+            <li>Prospective customers</li>
+            <li>Communication partners</li>
+            <li>Users</li>
+            <li>Business and contractual partners</li>
+          </ul>
+
+          <h3>Purposes of processing</h3>
+          <ul>
+            <li>Provision of contractual services and fulfilment of contractual obligations</li>
+            <li>Communication</li>
+            <li>Security measures</li>
+            <li>Direct marketing</li>
+            <li>Web analytics</li>
+            <li>Office and organisational procedures</li>
+            <li>Provision of our online services and usability</li>
+            <li>Information technology infrastructure</li>
+            <li>Financial and payment management</li>
+          </ul>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── LEGAL BASES ────────────────────────────────── -->
+        <section id="legal-bases">
+          <h2>Relevant legal bases</h2>
+
+          <h3>Legal bases according to the GDPR</h3>
+          <p>In the following, you will find an overview of the legal bases of the GDPR on which we base the processing of personal data. Please note that in addition to the provisions of the GDPR, national data protection provisions of your or our country of residence or domicile may apply.</p>
+
+          <dl>
+            <dt>Consent (Art. 6(1)(a) GDPR)</dt>
+            <dd>The data subject has given consent to the processing of their personal data for one or more specific purposes.</dd>
+
+            <dt>Performance of a contract (Art. 6(1)(b) GDPR)</dt>
+            <dd>Processing is necessary for the performance of a contract to which the data subject is party, or in order to take steps at the request of the data subject prior to entering into a contract.</dd>
+
+            <dt>Compliance with a legal obligation (Art. 6(1)(c) GDPR)</dt>
+            <dd>Processing is necessary for compliance with a legal obligation to which the controller is subject.</dd>
+
+            <dt>Legitimate interests (Art. 6(1)(f) GDPR)</dt>
+            <dd>Processing is necessary for the purposes of the legitimate interests pursued by the controller or by a third party, except where such interests are overridden by the interests or fundamental rights and freedoms of the data subject.</dd>
+          </dl>
+
+          <h3>National data protection regulations in Germany</h3>
+          <p>In addition to the data protection regulations of the GDPR, national regulations apply in Germany. This includes in particular the Federal Data Protection Act (BDSG), which contains special provisions on the right to access, the right to erasure, the right to object, and the processing of special categories of personal data.</p>
+
+          <h3>Swiss Data Protection Act</h3>
+          <p>If you are located in Switzerland, we process your data on the basis of the Federal Act on Data Protection (Swiss DPA). These privacy policy provisions apply to both the GDPR and the Swiss DPA. Where terms differ between the two frameworks, GDPR terminology is used for readability; the legal meaning is determined by whichever framework applies to your situation.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── SECURITY ───────────────────────────────────── -->
+        <section id="security">
+          <h2>Security precautions</h2>
+          <p>We take appropriate technical and organisational measures in accordance with legal requirements, taking into account the state of the art, the costs of implementation, and the nature, scope, context and purposes of processing, as well as the varying risks to the rights and freedoms of natural persons.</p>
+          <p>The measures include, in particular, safeguarding the confidentiality, integrity and availability of data by controlling physical and electronic access, as well as access to, input, transmission, securing and separation of data. We have established procedures to ensure that data subjects' rights are respected, that data is erased, and that we are prepared to respond to data threats rapidly.</p>
+
+          <h3>IP address masking</h3>
+          <p>Where IP addresses are processed by us or by service providers and full IP address processing is not necessary, the IP address is shortened ("IP masking"). The last two digits or the last part of the IP address after a full stop are removed or replaced by wildcards. This prevents identification of a person by means of their IP address.</p>
+
+          <h3>TLS/SSL encryption (HTTPS)</h3>
+          <p>To protect user data from unauthorised access, we employ TLS/SSL encryption on all data transmitted via our online services. HTTPS in the URL indicates that your connection is securely encrypted.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── TRANSMISSION ───────────────────────────────── -->
+        <section id="transmission">
+          <h2>Transmission of personal data</h2>
+          <p>In the course of processing personal data, it may happen that data is transmitted to or disclosed to other entities, companies, legally independent organisational units, or individuals. Recipients of this data may include service providers tasked with IT duties or providers of services and content integrated into a website. In such cases, we observe the legal requirements and, in particular, conclude relevant contracts or agreements that serve to protect your data with the recipients of your data.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── INTERNATIONAL TRANSFERS ────────────────────── -->
+        <section id="international">
+          <h2>International data transfers</h2>
+          <p>If we transfer data to a third country (outside the European Union or European Economic Area), or if this occurs in the context of using third-party services or the disclosure of data to other parties, this is always done in accordance with legal requirements.</p>
+          <p>For data transfers to the USA, we primarily rely on the <strong>Data Privacy Framework (DPF)</strong>, recognised as a secure legal framework by the EU Commission's adequacy decision of 10 July 2023. Additionally, we have concluded Standard Contractual Clauses (SCCs) with respective providers, which comply with the EU Commission's requirements and establish contractual obligations to protect your data.</p>
+
+          <div class="legal-box">
+            <p class="legal-box__label">Legal basis</p>
+            <p>Art. 46 GDPR (Standard Contractual Clauses); EU-US Data Privacy Framework adequacy decision (July 2023).</p>
+          </div>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── RETENTION ──────────────────────────────────── -->
+        <section id="retention">
+          <h2>General information on data retention and deletion</h2>
+          <p>We delete personal data that we process in accordance with legal requirements as soon as the consent on which the processing is based is revoked, or where no other permission applies and the purposes for which the data was originally stored have ceased to apply.</p>
+          <p>If data is not deleted because it is required for other and legally permissible purposes, its processing is restricted to those purposes. That is, the data is blocked and not processed for other purposes. This applies, for example, to data that must be retained for commercial or tax law reasons, or for which storage is necessary for the assertion, exercise or defence of legal claims, or for the protection of the rights of another natural or legal person.</p>
+          <p>Legal retention periods under German law (HGB, AO) are typically 6 to 10 years. We will inform you of specific retention periods in the relevant sections of this policy where applicable.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── RIGHTS ─────────────────────────────────────── -->
+        <section id="rights">
+          <h2>Rights of data subjects</h2>
+          <p>Under the GDPR, you have the following rights with respect to personal data concerning you:</p>
+
+          <dl>
+            <dt>Right of access (Art. 15 GDPR)</dt>
+            <dd>You have the right to obtain confirmation of whether we process personal data concerning you, and if so, to access that data and receive a copy.</dd>
+
+            <dt>Right to rectification (Art. 16 GDPR)</dt>
+            <dd>You have the right to request correction of inaccurate personal data, or completion of incomplete personal data.</dd>
+
+            <dt>Right to erasure (Art. 17 GDPR)</dt>
+            <dd>You have the right to request that personal data concerning you be deleted without undue delay where one of the statutory grounds applies.</dd>
+
+            <dt>Right to restriction of processing (Art. 18 GDPR)</dt>
+            <dd>You have the right to request restriction of processing of personal data concerning you under certain conditions.</dd>
+
+            <dt>Right to data portability (Art. 20 GDPR)</dt>
+            <dd>You have the right to receive personal data you have provided to us in a structured, commonly used and machine-readable format, and to transmit that data to another controller.</dd>
+
+            <dt>Right to object (Art. 21 GDPR)</dt>
+            <dd>You have the right to object at any time to processing of personal data concerning you which is based on Art. 6(1)(f) GDPR (legitimate interests), including profiling based on those provisions.</dd>
+
+            <dt>Right to withdraw consent (Art. 7(3) GDPR)</dt>
+            <dd>You have the right to withdraw consent at any time. Withdrawal does not affect the lawfulness of processing based on consent before its withdrawal.</dd>
+
+            <dt>Right to lodge a complaint (Art. 77 GDPR)</dt>
+            <dd>You have the right to lodge a complaint with a supervisory authority, in particular in the EU Member State of your habitual residence, place of work or place of the alleged infringement.</dd>
+          </dl>
+
+          <p>To exercise your rights, please contact us at: <a href="mailto:hello@andredaus.com">hello@andredaus.com</a></p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── BUSINESS SERVICES ──────────────────────────── -->
+        <section id="business">
+          <h2>Business services</h2>
+          <p>We process data of our contractual and business partners, e.g. customers and prospective clients, in the context of contractual and comparable legal relationships, as well as related communications and pre-contractual actions.</p>
+          <p>We process this data in order to fulfil our contractual obligations, secure our rights, and for the purposes of administrative tasks associated with these obligations, as well as for business organisation.</p>
+
+          <h4>Processed data types</h4>
+          <ul>
+            <li>Inventory data (name, address)</li>
+            <li>Payment data (bank details, invoices)</li>
+            <li>Contact data (email, phone number)</li>
+            <li>Contract data (subject matter, duration, customer category)</li>
+          </ul>
+
+          <h4>Legal basis</h4>
+          <p>Art. 6(1)(b) GDPR (performance of contract); Art. 6(1)(c) GDPR (legal obligation); Art. 6(1)(f) GDPR (legitimate interests).</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── HOSTING ─────────────────────────────────────── -->
+        <section id="hosting">
+          <h2>Provision of online services and web hosting</h2>
+          <p>We process user data in order to provide our online services. For this purpose, we process the IP address of the user, which is necessary to transmit the content and functions of our online services to the user's browser or device.</p>
+
+          <h3>Hosting provider</h3>
+          <p>Our website is hosted by a professional hosting service provider. Processing of data by our hosting provider is carried out on our behalf and in accordance with a Data Processing Agreement (DPA) pursuant to Art. 28 GDPR.</p>
+
+          <h3>Collection of access data and log files</h3>
+          <p>We, or our hosting provider, collect data on the basis of each access to the server (server log files). Server log files may include the address and name of the web pages and files accessed, the date and time of access, data volumes transferred, notification of successful access, browser type and version, the user's operating system, referrer URL, and the requesting provider.</p>
+          <p>Server log files are used for security purposes (e.g. to investigate abuse or fraudulent activity) and are deleted after a maximum of 30 days. Data whose retention is required for evidentiary purposes is excluded from deletion.</p>
+
+          <h4>Legal basis</h4>
+          <p>Art. 6(1)(f) GDPR (legitimate interests in the secure and efficient provision of online services).</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── COOKIES ────────────────────────────────────── -->
+        <section id="cookies">
+          <h2>Use of cookies</h2>
+          <p>Cookies are small text files, or other storage and retrieval methods, that store information on devices and read it from them. For example, to store the login status in a user account, the contents of a shopping basket in an e-shop, the content accessed, or the functions used.</p>
+          <p>We use cookies in accordance with the legal requirements. We obtain your prior consent for cookies that are not strictly necessary. If prior consent is not required, we rely on Art. 6(1)(f) GDPR (legitimate interests in the operation of the online service) as our legal basis.</p>
+
+          <h3>Types of cookies we use</h3>
+          <ul>
+            <li><strong>Technically necessary cookies</strong> — Required for the operation of the website (session management, security). No consent required.</li>
+            <li><strong>Analytics cookies</strong> — Used to understand how the website is used. Require prior consent.</li>
+            <li><strong>Marketing cookies</strong> — Used to display personalised advertising. Require prior consent.</li>
+          </ul>
+
+          <p>You can withdraw consent at any time via your browser settings or our cookie preferences tool.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── CONTACT ────────────────────────────────────── -->
+        <section id="contact">
+          <h2>Contact and enquiry management</h2>
+          <p>When you contact us (e.g. via contact form, email, telephone, or social media) and in the context of existing user and business relationships, we process the personal data of the enquiring persons to the extent necessary to respond to the contact requests and to any measures requested.</p>
+
+          <h4>Processed data types</h4>
+          <ul>
+            <li>Inventory data (name)</li>
+            <li>Contact data (email address, phone number)</li>
+            <li>Content data (the content of your message)</li>
+            <li>Meta, communication and process data (date and time of contact)</li>
+          </ul>
+
+          <h4>Retention period</h4>
+          <p>Contact requests are deleted after 12 months, unless a contractual relationship has arisen, in which case the statutory retention periods apply.</p>
+
+          <h4>Legal basis</h4>
+          <p>Art. 6(1)(b) GDPR (pre-contractual measures); Art. 6(1)(f) GDPR (legitimate interests in responding to enquiries efficiently).</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── NEWSLETTER ─────────────────────────────────── -->
+        <section id="newsletter">
+          <h2>Newsletter and electronic communications</h2>
+          <p>We send newsletters and other electronic communications (hereinafter "newsletter") only with the consent of the recipients, or where permitted by law. We use a double opt-in procedure, where you first register and then confirm your registration by clicking a link in the confirmation email.</p>
+          <p>You can unsubscribe from our newsletter at any time by clicking the unsubscribe link at the bottom of each newsletter, or by emailing us at <a href="mailto:hello@andredaus.com">hello@andredaus.com</a>.</p>
+
+          <h4>Newsletter service provider</h4>
+          <p>Newsletters are sent via Zoho Campaigns. We have concluded a Data Processing Agreement with Zoho Corporation B.V. Your data will be processed exclusively within the EEA or subject to appropriate safeguards for third-country transfers.</p>
+
+          <h4>Legal basis</h4>
+          <p>Art. 6(1)(a) GDPR (consent). You may withdraw consent at any time without affecting the lawfulness of processing based on consent before withdrawal.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── ANALYTICS ──────────────────────────────────── -->
+        <section id="analytics">
+          <h2>Web analytics, monitoring and optimisation</h2>
+          <p>We use analytics tools to evaluate the usage of our online services and to continuously improve them. User data is pseudonymised where possible.</p>
+
+          <h3>PostHog</h3>
+          <p>We use PostHog for web analytics. PostHog processes usage data and stores it on servers within the European Union. No personally identifiable data is transmitted to PostHog without pseudonymisation. We have concluded a Data Processing Agreement with PostHog Inc.</p>
+          <ul>
+            <li><strong>Data processed:</strong> pseudonymous usage data, page views, events</li>
+            <li><strong>Legal basis:</strong> Art. 6(1)(f) GDPR (legitimate interests in optimising the online service)</li>
+            <li><strong>Opt-out:</strong> You can object to the processing of your data by PostHog at any time. Please contact us at <a href="mailto:hello@andredaus.com">hello@andredaus.com</a>.</li>
+          </ul>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── SOCIAL MEDIA ───────────────────────────────── -->
+        <section id="social">
+          <h2>Profiles in social networks (social media)</h2>
+          <p>We maintain online presences within social networks and process user data in this context in order to communicate with users active there, or to offer information about ourselves.</p>
+          <p>We point out that user data may be processed outside the European Union. This may entail risks for users because, for example, enforcement of user rights may be more difficult. With respect to US providers that are certified under the Data Privacy Framework, we note that they thereby commit to complying with EU data protection standards.</p>
+
+          <h3>LinkedIn</h3>
+          <p>LinkedIn Ireland Unlimited Company, Wilton Place, Dublin 2, Ireland. <a href="https://www.linkedin.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer">LinkedIn Privacy Policy <span class="sr-only">(opens in new tab)</span></a>. Data is processed in part in the USA; LinkedIn is certified under the EU-US Data Privacy Framework.</p>
+
+          <h3>YouTube / Google</h3>
+          <p>Google Ireland Ltd., Gordon House, Barrow Street, Dublin 4, Ireland. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy <span class="sr-only">(opens in new tab)</span></a>.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── AI ─────────────────────────────────────────── -->
+        <section id="ai">
+          <h2>Artificial intelligence (AI)</h2>
+          <p>We use AI-based services in some areas of our work. The use of AI tools that process personal data is governed by our <a href="/policy/ai-use">AI Use Policy</a> and this privacy policy.</p>
+          <p>Where AI tools are used to process data provided by users or clients, we ensure that:</p>
+          <ul>
+            <li>A legal basis for the processing exists (consent or contract performance)</li>
+            <li>The AI service provider has concluded a Data Processing Agreement with us where required</li>
+            <li>Data is not used to train third-party AI models without explicit consent</li>
+            <li>Special categories of data are not processed by AI systems without specific safeguards</li>
+          </ul>
+          <h4>Legal basis</h4>
+          <p>Art. 6(1)(a) GDPR (consent) or Art. 6(1)(b) GDPR (performance of contract), depending on context.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── CHANGES ────────────────────────────────────── -->
+        <section id="changes">
+          <h2>Changes and updates</h2>
+          <p>We ask you to inform yourself regularly about the content of our privacy policy. We update the policy as soon as changes in data processing make this necessary. We will inform you as soon as the changes require your cooperation (e.g. consent) or other individual notification.</p>
+          <p>Where we provide addresses and contact information of companies and organisations in this policy, please note that addresses may change over time and we ask you to check information before contacting us.</p>
+        </section>
+
+        <div class="policy-divider" aria-hidden="true"></div>
+
+        <!-- ── DEFINITIONS ────────────────────────────────── -->
+        <section id="definitions">
+          <h2>Terminology and definitions</h2>
+          <p>This section provides an overview of the terms used in this privacy policy. To the extent that terms are legally defined, their legal definitions apply. The following explanations are intended primarily for comprehension.</p>
+
+          <dl>
+            <dt>Personal data</dt>
+            <dd>Any information relating to an identified or identifiable natural person (Art. 4(1) GDPR). An identifiable person is one who can be identified, directly or indirectly, in particular by reference to an identifier such as a name, identification number, location data, online identifier or one or more factors specific to their identity.</dd>
+
+            <dt>Processing</dt>
+            <dd>Any operation performed on personal data, whether by automated means or not, such as collection, recording, organisation, structuring, storage, adaptation or alteration, retrieval, consultation, use, disclosure by transmission, dissemination or otherwise making available, alignment or combination, restriction, erasure or destruction (Art. 4(2) GDPR).</dd>
+
+            <dt>Controller</dt>
+            <dd>The natural or legal person, public authority, agency or other body which, alone or jointly with others, determines the purposes and means of the processing of personal data (Art. 4(7) GDPR).</dd>
+
+            <dt>Processor</dt>
+            <dd>A natural or legal person, public authority, agency or other body which processes personal data on behalf of the controller (Art. 4(8) GDPR).</dd>
+
+            <dt>Consent</dt>
+            <dd>Any freely given, specific, informed and unambiguous indication of the data subject's wishes by which they, by a statement or by a clear affirmative action, signify agreement to the processing of personal data relating to them (Art. 4(11) GDPR).</dd>
+          </dl>
+        </section>
+
+      </article><!-- /.policy-body -->
+
+    </div><!-- /.policy-layout -->
+  </div><!-- /.container -->
+
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__main">
+      <div>
+        <p class="footer__brand-name">André Daus</p>
+        <p class="footer__brand-sub">Strategic Opposition</p>
+        <p class="footer__tagline">Your thinking creates your limits.</p>
+        <nav class="footer__social" aria-label="Social media">
+          <a href="https://linkedin.com/in/andredaus" class="footer__social-link" aria-label="LinkedIn" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg></a>
+          <a href="#" class="footer__social-link" aria-label="X (Twitter)" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true"><path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/></svg></a>
+        </nav>
+      </div>
+      <nav class="footer__nav" aria-label="Site navigation">
+        <div><h3 class="footer__nav-heading">Services</h3><ul class="footer__nav-list"><li><a href="/service/assumption-hunting" class="footer__nav-link">Assumption Hunting</a></li><li><a href="/service/1-on-1-coaching" class="footer__nav-link">1:1 Coaching</a></li><li><a href="/service/burn-the-box" class="footer__nav-link">Burn the Box</a></li><li><a href="/service/workshop" class="footer__nav-link">Workshop</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Explore</h3><ul class="footer__nav-list"><li><a href="/use-case" class="footer__nav-link">Use Cases</a></li><li><a href="/library" class="footer__nav-link">Library</a></li><li><a href="/opposition" class="footer__nav-link">The Opposition Method</a></li><li><a href="/podcast" class="footer__nav-link">Podcast</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Legal</h3><ul class="footer__nav-list"><li><a href="/policy/privacy" class="footer__nav-link">Privacy Policy</a></li><li><a href="/policy/legal-notice" class="footer__nav-link">Legal Notice</a></li><li><a href="/legal/terms" class="footer__nav-link">Terms</a></li><li><a href="/policy/ai-use" class="footer__nav-link">AI Policy</a></li></ul></div>
+      </nav>
+    </div>
+    <div class="footer__legal">
+      <p class="footer__copyright">Copyright 2025 © André Daus</p>
+      <nav class="footer__legal-links" aria-label="Legal">
+        <a href="/policy/privacy"      class="footer__legal-link is-current" aria-current="page">Privacy Policy</a>
+        <a href="/policy/legal-notice" class="footer__legal-link">Legal Notice</a>
+        <a href="/legal/terms"         class="footer__legal-link">Terms</a>
+        <a href="/policy/ai-use"       class="footer__legal-link">AI Policy</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  // Nav toggle
+  var t=document.querySelector('.nav__toggle'),d=document.getElementById('nav-drawer');
+  if(t&&d){
+    t.addEventListener('click',function(){var o=d.classList.toggle('is-open');t.setAttribute('aria-expanded',String(o));t.setAttribute('aria-label',o?'Close navigation menu':'Open navigation menu');});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.classList.contains('is-open')){d.classList.remove('is-open');t.setAttribute('aria-expanded','false');t.focus();}});
+  }
+
+  // Reading progress bar
+  var bar=document.getElementById('progress');
+  if(bar&&!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    function upd(){
+      var s=document.documentElement.scrollTop,
+          h=document.documentElement.scrollHeight-document.documentElement.clientHeight,
+          p=h>0?Math.round(s/h*100):0;
+      bar.style.width=p+'%';
+      bar.setAttribute('aria-valuenow',p);
+    }
+    window.addEventListener('scroll',upd,{passive:true});upd();
+  }
+
+  // TOC active section tracking
+  var tocLinks=Array.from(document.querySelectorAll('.toc__link'));
+  var sections=tocLinks.map(function(l){
+    var href=l.getAttribute('href');
+    return href?document.querySelector(href):null;
+  }).filter(Boolean);
+
+  function setActive(){
+    var y=window.scrollY+90;
+    var active=0;
+    sections.forEach(function(s,i){if(s&&s.offsetTop<=y)active=i;});
+    tocLinks.forEach(function(l,i){l.classList.toggle('is-active',i===active);});
+  }
+  window.addEventListener('scroll',setActive,{passive:true});
+  setActive();
+
+  // Nav border on scroll
+  var nav=document.querySelector('.nav');
+  if(nav){
+    window.addEventListener('scroll',function(){
+      nav.style.borderBottomColor=scrollY>40?'rgba(196,154,60,.15)':'rgba(255,255,255,.06)';
+    },{passive:true});
+  }
+})();
+</script>
+</body>
+</html>

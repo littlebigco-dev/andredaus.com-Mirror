@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — André Daus · Strategic Opposition</title>
+<meta name="description" content="Book a discovery call or get in touch. A 30-minute conversation to find the assumptions your strategy depends on.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Work Sans',system-ui,sans-serif;
+  --mono:'DM Mono','SF Mono',monospace;
+  --bg-base:#090c14;--bg-surface:#0d1120;--bg-elevated:#111828;
+  --bg-card:#141c2c;--bg-card-alt:#0f1520;
+  --gold:#c49a3c;--gold-light:#d4aa52;--gold-dim:#8a6a24;
+  --gold-trans:rgba(196,154,60,.06);
+  --navy:#1d2d44;
+  --text-primary:#ede8dc;--text-secondary:#96a0b0;--text-subtle:#7d8799;
+  --border:rgba(196,154,60,.12);--border-light:rgba(255,255,255,.06);
+  --max-w:1160px;--gutter:clamp(1.25rem,4vw,2.5rem);
+  --section:clamp(4rem,8vw,7rem);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-primary);font-family:var(--sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}img{max-width:100%;display:block}ul,ol{list-style:none}
+.skip-link{position:absolute;top:-100%;left:1rem;z-index:9999;padding:.75rem 1.5rem;background:var(--gold);color:#080a10;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;border-radius:0 0 3px 3px;transition:top .15s ease}
+.skip-link:focus{top:0}
+*:focus{outline:none}*:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:2px}
+.btn:focus-visible,.nav__cta:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.fade-up{opacity:1!important;transform:none!important;transition:none!important}}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 var(--gutter)}
+.label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:12px}
+.label::before{content:'';display:block;width:28px;height:1px;background:var(--gold);flex-shrink:0}
+.btn{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;padding:14px 28px;min-height:44px;border-radius:3px;transition:all .2s ease;cursor:pointer;border:none;white-space:nowrap;text-decoration:none}
+.btn--primary{background:var(--gold);color:#080a10;font-weight:600}.btn--primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn--outline{background:transparent;color:var(--text-primary);border:1px solid rgba(196,154,60,.35)}.btn--outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-arrow::after{content:'→';font-family:var(--sans);font-size:14px;transition:transform .2s ease;display:inline-block}.btn-arrow:hover::after{transform:translateX(3px)}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 var(--gutter);height:68px;display:flex;align-items:center;background:rgba(9,12,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border-light);transition:border-color .3s ease}
+.nav__inner{max-width:var(--max-w);margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav__brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0;text-decoration:none}
+.nav__brand-name{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--text-primary);text-transform:uppercase}
+.nav__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.nav__links{display:flex;align-items:center;gap:clamp(1rem,2vw,1.75rem)}
+.nav__link{font-family:var(--sans);font-size:13px;color:var(--text-secondary);letter-spacing:.03em;transition:color .2s ease;position:relative;padding-block:4px;text-decoration:none}
+.nav__link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--gold);transition:width .25s ease}
+.nav__link:hover{color:var(--text-primary)}.nav__link:hover::after{width:100%}
+.nav__link:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.nav__cta{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#080a10;background:var(--gold);padding:10px 18px;min-height:44px;border-radius:3px;transition:all .2s ease;display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none;border:none}
+.nav__cta:hover{background:var(--gold-light)}
+.nav__toggle{display:none;width:44px;height:44px;background:none;border:none;cursor:pointer;color:var(--text-primary);align-items:center;justify-content:center;border-radius:3px;transition:color .2s ease;flex-shrink:0}
+.nav__toggle:hover{color:var(--gold)}
+.nav__drawer{display:none;position:fixed;top:68px;left:0;right:0;background:var(--bg-surface);border-bottom:1px solid var(--border-light);padding:1.5rem var(--gutter);flex-direction:column;gap:1rem;z-index:99}
+.nav__drawer.is-open{display:flex}
+.nav__drawer-link{font-size:15px;color:var(--text-secondary);padding-block:8px;border-bottom:1px solid var(--border-light);transition:color .2s ease;min-height:44px;display:flex;align-items:center;text-decoration:none}
+.nav__drawer-link:hover{color:var(--gold)}
+.nav__dropdown{position:relative;display:flex;align-items:center}
+.nav__dropdown-btn{font-family:var(--sans);font-size:13px;color:var(--text-secondary);letter-spacing:.03em;transition:color .2s ease;background:none;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding-block:4px;min-height:44px;position:relative}
+.nav__dropdown-btn::after{content:'';position:absolute;bottom:-2px;left:0;height:1px;width:0;background:var(--gold);transition:width .25s ease}
+.nav__dropdown-btn:hover,.nav__dropdown-btn[aria-expanded="true"]{color:var(--text-primary)}
+.nav__dropdown-btn:hover::after,.nav__dropdown-btn[aria-expanded="true"]::after{width:calc(100% - 16px)}
+.nav__dropdown-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:2px}
+.nav__chevron{transition:transform .2s ease;flex-shrink:0;opacity:.55}
+.nav__dropdown-btn[aria-expanded="true"] .nav__chevron{transform:rotate(180deg)}
+.nav__dropdown-panel{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%) translateY(-6px);background:var(--bg-surface);border:1px solid rgba(196,154,60,.18);border-radius:4px;min-width:230px;box-shadow:0 12px 40px rgba(0,0,0,.55);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s;z-index:200}
+.nav__dropdown-panel.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%) translateY(0);transition:opacity .18s ease,transform .18s ease,visibility 0s linear 0s}
+.nav__dropdown-panel::before{content:'';position:absolute;top:-5px;left:50%;width:8px;height:8px;background:var(--bg-surface);border-left:1px solid rgba(196,154,60,.18);border-top:1px solid rgba(196,154,60,.18);transform:translateX(-50%) rotate(45deg)}
+.nav__dropdown-list{padding:.5rem 0}
+.nav__dropdown-item{display:flex;flex-direction:column;gap:2px;padding:.7rem 1.25rem;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:all .15s ease}
+.nav__dropdown-item:hover{color:var(--text-primary);background:var(--gold-trans)}
+.nav__dropdown-item__name{font-weight:500;line-height:1.3}
+.nav__dropdown-item__desc{font-size:11px;line-height:1.45;color:var(--text-subtle)}
+.nav__dropdown-sep{height:1px;background:var(--border-light);margin:.375rem .875rem}
+.nav__dropdown-all{display:flex;align-items:center;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:.75rem 1.25rem;text-decoration:none;transition:color .15s ease}
+.nav__dropdown-all span{font-family:var(--sans);font-size:12px;transition:transform .15s ease;display:inline-block}
+.nav__dropdown-all:hover{color:var(--gold-light)}.nav__dropdown-all:hover span{transform:translateX(3px)}
+.nav__drawer-services-btn{font-size:15px;color:var(--text-secondary);padding-block:8px;border-bottom:1px solid var(--border-light);min-height:44px;width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding-inline:0;transition:color .2s ease}
+.nav__drawer-services-btn:hover{color:var(--gold)}
+.nav__drawer-services-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.nav__drawer-services-btn[aria-expanded="true"] .nav__chevron{transform:rotate(180deg)}
+.nav__drawer-sub{display:none;flex-direction:column;padding:.375rem 0 .375rem .75rem;border-bottom:1px solid var(--border-light)}
+.nav__drawer-sub.is-open{display:flex}
+.nav__drawer-sub-link{font-size:14px;color:var(--text-secondary);padding-block:7px;min-height:44px;display:flex;align-items:center;text-decoration:none;border-left:2px solid var(--border-light);padding-left:.875rem;transition:color .2s ease}
+.nav__drawer-sub-link:hover{color:var(--text-primary);border-left-color:var(--gold-dim)}
+.nav__drawer-sub-link--all{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+@media(max-width:820px){.nav__links{display:none}.nav__cta{display:none}.nav__toggle{display:flex}}
+
+/* HERO */
+.contact-hero{padding-top:68px;background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-base) 55%);border-bottom:1px solid var(--border-light);position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(196,154,60,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(196,154,60,.03) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);pointer-events:none}
+.contact-hero__inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:end;padding-block:clamp(4rem,8vw,6.5rem) clamp(3rem,5vw,4rem)}
+.contact-hero__heading{font-family:var(--serif);font-size:clamp(2.6rem,5.5vw,4.5rem);font-weight:400;line-height:1.05;letter-spacing:-.03em;color:var(--text-primary);margin-top:1.5rem}
+.contact-hero__heading em{font-style:italic;color:var(--gold)}
+.contact-hero__sub{font-size:clamp(1rem,1.3vw,1.1rem);color:var(--text-secondary);line-height:1.85;margin-top:1.25rem;max-width:48ch}
+.reach-aside{display:flex;flex-direction:column;gap:1rem;align-self:end}
+.reach-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:3px;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1.25rem;text-decoration:none;color:inherit;transition:border-color .2s ease,background .2s ease}
+.reach-card:hover{border-color:rgba(196,154,60,.25);background:var(--bg-elevated)}
+.reach-card__icon{width:40px;height:40px;border-radius:3px;background:var(--gold-trans);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gold);flex-shrink:0}
+.reach-card__label{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:3px}
+.reach-card__value{font-size:14px;color:var(--text-primary);font-weight:500;line-height:1.3;transition:color .2s ease}
+.reach-card:hover .reach-card__value{color:var(--gold-light)}
+@media(max-width:820px){.contact-hero__inner{grid-template-columns:1fr;gap:3rem}.reach-aside{display:grid;grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.reach-aside{grid-template-columns:1fr}}
+
+/* MAIN */
+.contact-main{padding-block:var(--section)}
+.contact-main__inner{display:grid;grid-template-columns:1fr 380px;gap:5rem;align-items:start}
+@media(max-width:900px){.contact-main__inner{grid-template-columns:1fr}}
+.booking-heading{font-family:var(--serif);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:400;line-height:1.2;color:var(--text-primary);margin-top:1.25rem;margin-bottom:1rem}
+.booking-body{font-size:15px;line-height:1.85;color:var(--text-secondary);max-width:52ch;margin-bottom:2rem}
+.booking-body p+p{margin-top:.875rem}
+.calendly-block{background:var(--bg-card);border:1px solid var(--border-light);border-top:2px solid var(--gold-dim);border-radius:3px;overflow:hidden;margin-top:2rem}
+.calendly-block__header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between}
+.calendly-block__title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.calendly-block__duration{font-family:var(--mono);font-size:11px;color:var(--text-subtle)}
+.calendly-placeholder{height:480px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:2.5rem;text-align:center;background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(196,154,60,.015) 8px,rgba(196,154,60,.015) 16px)}
+.calendly-placeholder__icon{width:56px;height:56px;border-radius:50%;background:var(--gold-trans);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gold)}
+.calendly-placeholder__heading{font-family:var(--serif);font-style:italic;font-size:1.2rem;color:var(--text-secondary)}
+.calendly-placeholder__note{font-size:13px;color:var(--text-subtle);max-width:30ch;line-height:1.6}
+.calendly-placeholder .btn{margin-top:.5rem}
+.expect{margin-top:3rem}
+.expect__heading{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.expect-steps{border:1px solid var(--border-light);border-radius:3px;overflow:hidden}
+.expect-step{display:grid;grid-template-columns:48px 1fr;border-bottom:1px solid var(--border-light)}
+.expect-step:last-child{border-bottom:none}
+.expect-step__n{display:flex;align-items:flex-start;justify-content:center;padding:1.25rem .75rem;padding-top:1.4rem;font-family:var(--serif);font-style:italic;font-size:1.4rem;color:var(--gold);line-height:1;border-right:1px solid var(--border-light);background:var(--bg-card-alt)}
+.expect-step__body{padding:1.25rem 1.5rem;background:var(--bg-card-alt)}
+.expect-step__title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:.375rem}
+.expect-step__desc{font-size:13px;line-height:1.7;color:var(--text-secondary)}
+
+/* SIDEBAR */
+.contact-sidebar{position:sticky;top:calc(68px + 2rem);display:flex;flex-direction:column;gap:1.5rem}
+.fit-card{background:var(--bg-card);border:1px solid var(--border-light);border-top:2px solid var(--gold-dim);border-radius:3px;overflow:hidden}
+.fit-card__header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-light)}
+.fit-card__label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.625rem}
+.fit-card__heading{font-family:var(--serif);font-size:1.05rem;font-weight:400;line-height:1.35;color:var(--text-primary)}
+.fit-item{display:flex;align-items:flex-start;gap:.875rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border-light);font-size:13px;line-height:1.6;color:var(--text-secondary)}
+.fit-item:last-child{border-bottom:none}
+.fit-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;margin-top:1px}
+.fit-icon--yes{background:rgba(122,182,72,.15);color:#7ab648;border:1px solid rgba(122,182,72,.2)}
+.fit-icon--no{background:rgba(196,80,60,.1);color:#c4503c;border:1px solid rgba(196,80,60,.2)}
+.alt-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:3px;overflow:hidden}
+.alt-card__header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border-light);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.alt-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border-light);text-decoration:none;color:inherit;transition:background .15s ease}
+.alt-item:last-child{border-bottom:none}
+.alt-item:hover{background:var(--gold-trans)}
+.alt-item__icon{color:var(--text-subtle);width:18px;display:flex;justify-content:center;flex-shrink:0}
+.alt-item__label{font-size:13px;color:var(--text-secondary);transition:color .15s ease;line-height:1.3}
+.alt-item:hover .alt-item__label{color:var(--text-primary)}
+.alt-item__sub{font-family:var(--mono);font-size:10px;color:var(--text-subtle);display:block;margin-top:1px}
+.response-note{background:var(--navy);border:1px solid rgba(29,45,68,.8);border-radius:3px;padding:1.25rem 1.5rem;display:flex;align-items:flex-start;gap:.875rem}
+.response-note__icon{color:var(--gold);flex-shrink:0;margin-top:2px;font-size:14px}
+.response-note__text{font-size:13px;line-height:1.7;color:var(--text-secondary)}
+.response-note__text strong{color:var(--text-primary)}
+
+/* FAQ */
+.faq-strip{background:var(--bg-surface);border-top:1px solid var(--border-light);padding-block:var(--section)}
+.faq-strip__inner{display:grid;grid-template-columns:280px 1fr;gap:5rem;align-items:start}
+.faq-intro-heading{font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;line-height:1.2;color:var(--text-primary);margin-top:1.25rem}
+.faq-intro-body{font-size:14px;line-height:1.8;color:var(--text-secondary);margin-top:.875rem}
+.faq-list{display:flex;flex-direction:column;gap:.625rem}
+.faq-item{border:1px solid var(--border-light);border-radius:3px;overflow:hidden}
+.faq-btn{width:100%;background:var(--bg-card-alt);border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.25rem 1.5rem;text-align:left;min-height:56px;color:var(--text-primary);font-size:14px;font-weight:500;line-height:1.4;transition:background .15s ease;font-family:var(--sans)}
+.faq-btn:hover{background:var(--bg-card)}
+.faq-btn:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.faq-chevron{flex-shrink:0;color:var(--gold);transition:transform .2s ease}
+.faq-btn[aria-expanded="true"] .faq-chevron{transform:rotate(180deg)}
+.faq-panel{display:none;padding:0 1.5rem 1.25rem;background:var(--bg-card-alt)}
+.faq-panel.is-open{display:block}
+.faq-panel p{font-size:14px;line-height:1.8;color:var(--text-secondary)}
+@media(max-width:760px){.faq-strip__inner{grid-template-columns:1fr;gap:2.5rem}}
+
+/* FOOTER */
+.footer{background:var(--bg-surface);padding-block:4rem 2rem;border-top:1px solid var(--border-light)}
+.footer__main{display:grid;grid-template-columns:1.2fr 2fr;gap:4rem;margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border-light)}
+.footer__brand-name{font-family:var(--sans);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-primary);margin-bottom:4px}
+.footer__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.footer__tagline{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:28ch;margin-bottom:1.5rem}
+.footer__social{display:flex;gap:1rem}
+.footer__social-link{width:44px;height:44px;border:1px solid var(--border-light);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all .2s ease;text-decoration:none}
+.footer__social-link:hover{border-color:var(--gold-dim);color:var(--gold)}
+.footer__nav{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.footer__nav-heading{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.footer__nav-list{display:flex;flex-direction:column;gap:.375rem}
+.footer__nav-link{font-size:13px;color:var(--text-secondary);transition:color .2s ease;padding-block:4px;min-height:24px;display:flex;align-items:center;text-decoration:none}
+.footer__nav-link:hover{color:var(--text-primary)}
+.footer__legal{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer__copyright{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-subtle)}
+.footer__legal-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.footer__legal-link{font-size:12px;color:var(--text-subtle);transition:color .2s ease;text-decoration:none;padding-block:4px;min-height:24px;display:flex;align-items:center}
+.footer__legal-link:hover{color:var(--text-secondary)}
+@media(max-width:760px){.footer__main{grid-template-columns:1fr;gap:2.5rem}.footer__nav{grid-template-columns:1fr 1fr}}
+.fade-up{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav__inner">
+    <a href="/" class="nav__brand" aria-label="André Daus — home"><span class="nav__brand-name">André Daus</span><span class="nav__brand-sub">Strategic Opposition</span></a>
+    <div class="nav__links" role="list">
+      <div class="nav__dropdown" role="listitem">
+        <button class="nav__dropdown-btn" aria-haspopup="true" aria-expanded="false" id="services-btn" aria-controls="services-panel">Services<svg class="nav__chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="nav__dropdown-panel" id="services-panel">
+          <ul class="nav__dropdown-list">
+            <li><a href="/service/assumption-hunting" class="nav__dropdown-item"><span class="nav__dropdown-item__name">Assumption Hunting</span><span class="nav__dropdown-item__desc">Find the beliefs your strategy depends on</span></a></li>
+            <li><a href="/service/1-on-1-coaching"    class="nav__dropdown-item"><span class="nav__dropdown-item__name">1:1 Coaching</span><span class="nav__dropdown-item__desc">Structured opposition for individual thinking</span></a></li>
+            <li><a href="/service/burn-the-box"       class="nav__dropdown-item"><span class="nav__dropdown-item__name">Burn the Box</span><span class="nav__dropdown-item__desc">Team-based assumption dismantling</span></a></li>
+            <li><a href="/service/workshop"           class="nav__dropdown-item"><span class="nav__dropdown-item__name">Strategic Opposition Workshop</span><span class="nav__dropdown-item__desc">Full-day facilitated red-team session</span></a></li>
+          </ul>
+          <div class="nav__dropdown-sep" aria-hidden="true"></div>
+          <a href="/service" class="nav__dropdown-all">View all services <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <a href="/use-case"   class="nav__link" role="listitem">Use Cases</a>
+      <a href="/insight"    class="nav__link" role="listitem">Insights</a>
+      <a href="/library"    class="nav__link" role="listitem">Library</a>
+      <a href="/opposition" class="nav__link" role="listitem">Opposition</a>
+    </div>
+    <span class="nav__cta" aria-current="page" aria-label="Current page: Contact">Find Your Blind Spots</span>
+    <button class="nav__toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer"><svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true"><rect y="0" width="22" height="2" rx="1" fill="currentColor"/><rect y="7" width="16" height="2" rx="1" fill="currentColor"/><rect y="14" width="22" height="2" rx="1" fill="currentColor"/></svg></button>
+  </div>
+</nav>
+<div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
+  <div><button class="nav__drawer-services-btn" aria-expanded="false" aria-controls="drawer-services">Services<svg class="nav__chevron" width="10" height="6" viewBox="0 0 10 6" fill="none" aria-hidden="true"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="nav__drawer-sub" id="drawer-services"><a href="/service/assumption-hunting" class="nav__drawer-sub-link">Assumption Hunting</a><a href="/service/1-on-1-coaching" class="nav__drawer-sub-link">1:1 Coaching</a><a href="/service/burn-the-box" class="nav__drawer-sub-link">Burn the Box</a><a href="/service/workshop" class="nav__drawer-sub-link">Workshop</a><a href="/service" class="nav__drawer-sub-link nav__drawer-sub-link--all">All Services →</a></div></div>
+  <a href="/use-case"   class="nav__drawer-link">Use Cases</a>
+  <a href="/insight"    class="nav__drawer-link">Insights</a>
+  <a href="/library"    class="nav__drawer-link">Library</a>
+  <a href="/opposition" class="nav__drawer-link">The Opposition Method</a>
+  <a href="/contact" class="btn btn--primary" style="margin-top:.5rem;justify-content:center">Find Your Blind Spots</a>
+</div>
+
+<main id="main-content">
+<header class="contact-hero" aria-labelledby="contact-heading">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="container">
+    <div class="contact-hero__inner">
+      <div>
+        <p class="label">Get in touch</p>
+        <h1 class="contact-hero__heading" id="contact-heading">Let's find out<br>what you're not<br><em>seeing yet.</em></h1>
+        <p class="contact-hero__sub">A 30-minute discovery call. No pitch deck, no agenda. I ask questions you probably haven't been asked, and we find out whether what I do is what you need.</p>
+      </div>
+      <div class="reach-aside" aria-label="Quick contact options">
+        <a href="mailto:hello@andredaus.com" class="reach-card">
+          <span class="reach-card__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></span>
+          <div><p class="reach-card__label">Email</p><p class="reach-card__value">hello@andredaus.com</p></div>
+        </a>
+        <a href="https://linkedin.com/in/andredaus" class="reach-card" target="_blank" rel="noopener noreferrer">
+          <span class="reach-card__icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 5 1036 990" fill="currentColor"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg></span>
+          <div><p class="reach-card__label">LinkedIn</p><p class="reach-card__value">Connect directly <span class="sr-only">(opens in new tab)</span></p></div>
+        </a>
+        <a href="/podcast" class="reach-card">
+          <span class="reach-card__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20"/></svg></span>
+          <div><p class="reach-card__label">Podcast</p><p class="reach-card__value">Iconoclast Insights</p></div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="contact-main" aria-labelledby="booking-heading">
+  <div class="container">
+    <div class="contact-main__inner">
+      <div>
+        <p class="label">Discovery call</p>
+        <h2 class="booking-heading" id="booking-heading">Book a 30-minute call</h2>
+        <div class="booking-body">
+          <p>This isn't a sales call. I use it the same way I use every engagement — to ask the question nobody's asked yet. Sometimes that surfaces something worth pursuing together. Sometimes it doesn't. Either way, you leave with something useful.</p>
+          <p>Pick a time that works. No form, no questionnaire beforehand.</p>
+        </div>
+        <div class="calendly-block" aria-label="Booking calendar">
+          <div class="calendly-block__header">
+            <span class="calendly-block__title">Discovery Call — André Daus</span>
+            <span class="calendly-block__duration">30 min · Video or phone</span>
+          </div>
+          <!-- INSERT: <div class="calendly-inline-widget" data-url="https://calendly.com/andredaus/discovery" style="min-width:320px;height:480px;"></div> -->
+          <!-- INSERT: <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script> -->
+          <div class="calendly-placeholder" aria-label="Calendar placeholder">
+            <div class="calendly-placeholder__icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+            <p class="calendly-placeholder__heading">Calendly widget loads here</p>
+            <p class="calendly-placeholder__note">Replace with the Calendly inline embed to enable direct booking.</p>
+            <a href="mailto:hello@andredaus.com?subject=Discovery%20Call%20Request" class="btn btn--outline">Request by email instead</a>
+          </div>
+        </div>
+        <div class="expect fade-up" aria-labelledby="expect-heading">
+          <p class="expect__heading" id="expect-heading">What happens in 30 minutes</p>
+          <div class="expect-steps" role="list">
+            <div class="expect-step" role="listitem"><span class="expect-step__n" aria-hidden="true">1</span><div class="expect-step__body"><p class="expect-step__title">I ask about the problem you've already defined</p><p class="expect-step__desc">The decision you're stuck on, the situation that isn't improving, the strategy you're questioning. Whatever brought you here.</p></div></div>
+            <div class="expect-step" role="listitem"><span class="expect-step__n" aria-hidden="true">2</span><div class="expect-step__body"><p class="expect-step__title">I question the problem definition itself</p><p class="expect-step__desc">Most of the time, the framing of the problem contains the assumption that's actually causing it. That's what I'm looking for.</p></div></div>
+            <div class="expect-step" role="listitem"><span class="expect-step__n" aria-hidden="true">3</span><div class="expect-step__body"><p class="expect-step__title">We determine whether to go further</p><p class="expect-step__desc">If there's something worth pursuing, I'll be direct about what that looks like. If not, I'll tell you that too.</p></div></div>
+          </div>
+        </div>
+      </div>
+      <aside class="contact-sidebar" aria-label="Contact information">
+        <div class="fit-card fade-up">
+          <div class="fit-card__header"><p class="fit-card__label">Good fit / not a fit</p><p class="fit-card__heading">Before you book, a useful filter.</p></div>
+          <ul>
+            <li class="fit-item"><span class="fit-icon fit-icon--yes" aria-label="Good fit">✓</span>You suspect the real problem is different from the stated one</li>
+            <li class="fit-item"><span class="fit-icon fit-icon--yes" aria-label="Good fit">✓</span>You want disagreement, not validation</li>
+            <li class="fit-item"><span class="fit-icon fit-icon--yes" aria-label="Good fit">✓</span>You're a decision-maker with authority to act on what you find</li>
+            <li class="fit-item"><span class="fit-icon fit-icon--yes" aria-label="Good fit">✓</span>You've already tried the conventional approaches</li>
+            <li class="fit-item"><span class="fit-icon fit-icon--no" aria-label="Not a fit">✗</span>You're looking for implementation support or project management</li>
+            <li class="fit-item"><span class="fit-icon fit-icon--no" aria-label="Not a fit">✗</span>You need someone to confirm a decision already made</li>
+          </ul>
+        </div>
+        <div class="alt-card fade-up" aria-labelledby="alt-heading">
+          <p class="alt-card__header" id="alt-heading">Other ways to reach me</p>
+          <ul>
+            <li><a href="mailto:hello@andredaus.com" class="alt-item"><span class="alt-item__icon" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg></span><div><span class="alt-item__label">hello@andredaus.com</span><span class="alt-item__sub">For longer or complex enquiries</span></div></a></li>
+            <li><a href="https://linkedin.com/in/andredaus" class="alt-item" target="_blank" rel="noopener noreferrer"><span class="alt-item__icon" aria-hidden="true"><svg width="13" height="13" viewBox="0 5 1036 990" fill="currentColor"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg></span><div><span class="alt-item__label">LinkedIn DM<span class="sr-only"> (opens in new tab)</span></span><span class="alt-item__sub">Usually faster for short questions</span></div></a></li>
+          </ul>
+        </div>
+        <div class="response-note fade-up" role="note">
+          <span class="response-note__icon" aria-hidden="true">◎</span>
+          <p class="response-note__text"><strong>Response time:</strong> I respond to every message within 1–2 business days. If you haven't heard back in 3 days, check spam and try LinkedIn.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="faq-strip" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="faq-strip__inner">
+      <div>
+        <p class="label">Before you ask</p>
+        <h2 class="faq-intro-heading" id="faq-heading">Common questions about working together</h2>
+        <p class="faq-intro-body">If your question isn't here, just ask it in the call or by email.</p>
+      </div>
+      <div class="faq-list" role="list">
+        <div class="faq-item" role="listitem"><button class="faq-btn" aria-expanded="false" aria-controls="faq1" id="faq1-btn">Do I need to prepare anything before the call?<svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-panel" id="faq1" role="region" aria-labelledby="faq1-btn"><p>No. Come with the problem as you currently understand it — the decision you're stuck on, the situation that isn't improving, the strategy you're questioning. Preparation tends to produce rehearsed answers, which is exactly what I'm trying to get past.</p></div></div>
+        <div class="faq-item" role="listitem"><button class="faq-btn" aria-expanded="false" aria-controls="faq2" id="faq2-btn">What if I'm not sure which service fits?<svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-panel" id="faq2" role="region" aria-labelledby="faq2-btn"><p>The discovery call determines that. I don't have a standard offer applied to every situation. What the right engagement looks like depends on what's actually going on — and I won't know that until we've talked. Don't try to pre-fit yourself into a service category before we speak.</p></div></div>
+        <div class="faq-item" role="listitem"><button class="faq-btn" aria-expanded="false" aria-controls="faq3" id="faq3-btn">Do you work in German or English?<svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-panel" id="faq3" role="region" aria-labelledby="faq3-btn"><p>Both. Engagements happen in whichever language serves the work better. Teams operating in German work with me in German; international clients in English. Nuance travels better in the language people actually think in.</p></div></div>
+        <div class="faq-item" role="listitem"><button class="faq-btn" aria-expanded="false" aria-controls="faq4" id="faq4-btn">Do you work remotely or in person?<svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-panel" id="faq4" role="region" aria-labelledby="faq4-btn"><p>Coaching and advisory work happens remotely. Team engagements and workshops are predominantly in person — the dynamics that make group assumption-work productive don't fully survive video. I'm based in Germany and travel within Europe for the right engagement.</p></div></div>
+        <div class="faq-item" role="listitem"><button class="faq-btn" aria-expanded="false" aria-controls="faq5" id="faq5-btn">What does this cost?<svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true"><path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="faq-panel" id="faq5" role="region" aria-labelledby="faq5-btn"><p>Pricing depends on scope and format and is discussed after the discovery call. I don't publish fixed rates because the right engagement size varies considerably. The discovery call itself is free.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__main">
+      <div><p class="footer__brand-name">André Daus</p><p class="footer__brand-sub">Strategic Opposition</p><p class="footer__tagline">Your thinking creates your limits.</p><nav class="footer__social" aria-label="Social media"><a href="#" class="footer__social-link" aria-label="X (Twitter)"><svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true"><path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/></svg></a><a href="#" class="footer__social-link" aria-label="LinkedIn"><svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg></a></nav></div>
+      <nav class="footer__nav" aria-label="Site navigation">
+        <div><h3 class="footer__nav-heading">Services</h3><ul class="footer__nav-list"><li><a href="/service/assumption-hunting" class="footer__nav-link">Assumption Hunting</a></li><li><a href="/service/1-on-1-coaching" class="footer__nav-link">1:1 Coaching</a></li><li><a href="/service/burn-the-box" class="footer__nav-link">Burn the Box</a></li><li><a href="/service/workshop" class="footer__nav-link">Workshop</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Explore</h3><ul class="footer__nav-list"><li><a href="/use-case" class="footer__nav-link">Use Cases</a></li><li><a href="/library" class="footer__nav-link">Library</a></li><li><a href="/opposition" class="footer__nav-link">The Opposition Method</a></li><li><a href="/insight" class="footer__nav-link">Insights</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Also by André</h3><ul class="footer__nav-list"><li><a href="https://littlebig.co" class="footer__nav-link" target="_blank" rel="noopener">LittleBig.Co ↗</a></li><li><a href="/contact" class="footer__nav-link">Contact</a></li></ul></div>
+      </nav>
+    </div>
+    <div class="footer__legal"><p class="footer__copyright">Copyright 2025 © André Daus</p><nav class="footer__legal-links" aria-label="Legal"><a href="/policy/privacy" class="footer__legal-link">Privacy Policy</a><a href="/policy/legal-notice" class="footer__legal-link">Legal Notice</a><a href="/legal/terms" class="footer__legal-link">Terms</a><a href="/policy/ai-use" class="footer__legal-link">AI Policy</a></nav></div>
+  </div>
+</footer>
+<script>
+(function(){
+  'use strict';
+  var t=document.querySelector('.nav__toggle'),d=document.getElementById('nav-drawer');
+  if(t&&d){t.addEventListener('click',function(){var o=d.classList.toggle('is-open');t.setAttribute('aria-expanded',String(o));t.setAttribute('aria-label',o?'Close navigation menu':'Open navigation menu');});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.classList.contains('is-open')){d.classList.remove('is-open');t.setAttribute('aria-expanded','false');t.focus();}});}
+  var dsBtn=document.querySelector('.nav__drawer-services-btn'),dsSub=document.getElementById('drawer-services');
+  if(dsBtn&&dsSub){dsBtn.addEventListener('click',function(){var o=dsSub.classList.toggle('is-open');dsBtn.setAttribute('aria-expanded',String(o));});}
+  var dropBtn=document.getElementById('services-btn'),dropPanel=document.getElementById('services-panel'),ct=null;
+  function openD(){clearTimeout(ct);dropPanel.classList.add('is-open');dropBtn.setAttribute('aria-expanded','true');}
+  function closeD(){dropPanel.classList.remove('is-open');dropBtn.setAttribute('aria-expanded','false');}
+  if(dropBtn&&dropPanel){var w=dropBtn.closest('.nav__dropdown');w.addEventListener('mouseenter',openD);w.addEventListener('mouseleave',function(){ct=setTimeout(closeD,120);});dropBtn.addEventListener('click',function(e){e.stopPropagation();dropPanel.classList.contains('is-open')?closeD():openD();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dropPanel.classList.contains('is-open')){closeD();dropBtn.focus();}});document.addEventListener('click',function(e){if(!w.contains(e.target))closeD();});dropPanel.addEventListener('mouseenter',function(){clearTimeout(ct);});dropPanel.addEventListener('mouseleave',function(){ct=setTimeout(closeD,120);});}
+  document.querySelectorAll('.faq-btn').forEach(function(btn){btn.addEventListener('click',function(){var p=document.getElementById(btn.getAttribute('aria-controls'));var open=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',String(!open));p.classList.toggle('is-open',!open);});});
+  if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}});},{threshold:.08,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-up').forEach(function(el){io.observe(el);});}
+  var nav=document.querySelector('.nav');
+  if(nav)window.addEventListener('scroll',function(){nav.style.borderBottomColor=scrollY>40?'rgba(196,154,60,.15)':'rgba(255,255,255,.06)';},{passive:true});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Not Gathering Evidence. You're Building a Case. — André Daus</title>
+<meta name="description" content="Confirmation bias isn't a flaw in irrational people. It's a structural feature of how intelligent minds protect themselves from being wrong. Understanding its mechanics is more useful than pretending you can escape it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ──────────────────────────────────────────────── */
+:root {
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Work Sans',system-ui,sans-serif;
+  --mono:'DM Mono','SF Mono',monospace;
+  --bg-base:#090c14; --bg-surface:#0d1120; --bg-elevated:#111828;
+  --bg-card:#141c2c; --bg-card-alt:#0f1520;
+  --gold:#c49a3c; --gold-light:#d4aa52; --gold-dim:#8a6a24;
+  --gold-trans:rgba(196,154,60,.06); --gold-glow:rgba(196,154,60,.10);
+  --navy:#1d2d44;
+  --text-primary:#ede8dc; --text-secondary:#96a0b0;
+  --text-subtle:#7d8799;
+  --border:rgba(196,154,60,.12); --border-light:rgba(255,255,255,.06);
+  --max-w:1160px; --gutter:clamp(1.25rem,4vw,2.5rem);
+  --section:clamp(4rem,8vw,7rem);
+  --prose-max:68ch;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-base);color:var(--text-primary);font-family:var(--sans);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none} img{max-width:100%;display:block} ul,ol{list-style:none}
+
+/* ── WCAG 2.2 AA ─────────────────────────────────────────── */
+.skip-link{position:absolute;top:-100%;left:1rem;z-index:9999;padding:.75rem 1.5rem;background:var(--gold);color:#080a10;font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.08em;border-radius:0 0 3px 3px;transition:top .15s ease}
+.skip-link:focus{top:0}
+*:focus{outline:none}
+*:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:2px}
+.btn:focus-visible,.nav__cta:focus-visible,.nav__link:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.progress-bar{display:none}}
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+.container{max-width:var(--max-w);margin:0 auto;padding:0 var(--gutter)}
+.label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:12px}
+.label::before{content:'';display:block;width:28px;height:1px;background:var(--gold);flex-shrink:0}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:10px;padding:14px 28px;min-height:44px;border-radius:3px;transition:all .2s ease;cursor:pointer;border:none;white-space:nowrap;text-decoration:none}
+.btn--primary{background:var(--gold);color:#080a10;font-weight:600}
+.btn--primary:hover{background:var(--gold-light);transform:translateY(-1px)}
+.btn--outline{background:transparent;color:var(--text-primary);border:1px solid rgba(196,154,60,.35)}
+.btn--outline:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+.btn--ghost{background:transparent;color:var(--text-secondary);border:1px solid var(--border-light);font-size:11px;padding:10px 18px;min-height:44px}
+.btn--ghost:hover{border-color:rgba(196,154,60,.3);color:var(--text-primary)}
+.btn-arrow::after{content:'→';font-family:var(--sans);font-size:14px;transition:transform .2s ease;display:inline-block}
+.btn-arrow:hover::after{transform:translateX(3px)}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.progress-bar{position:fixed;top:0;left:0;height:2px;width:0%;background:var(--gold);z-index:200;transition:width .1s linear}
+
+/* ── NAV ─────────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 var(--gutter);height:68px;display:flex;align-items:center;background:rgba(9,12,20,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border-light);transition:border-color .3s ease}
+.nav__inner{max-width:var(--max-w);margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.nav__brand{display:flex;flex-direction:column;gap:1px;flex-shrink:0;text-decoration:none}
+.nav__brand-name{font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.04em;color:var(--text-primary);text-transform:uppercase}
+.nav__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.nav__links{display:flex;align-items:center;gap:clamp(1rem,2vw,1.75rem)}
+.nav__link{font-family:var(--sans);font-size:13px;color:var(--text-secondary);letter-spacing:.03em;transition:color .2s ease;position:relative;padding-block:4px;text-decoration:none}
+.nav__link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--gold);transition:width .25s ease}
+.nav__link:hover{color:var(--text-primary)} .nav__link:hover::after,.nav__link.is-active::after{width:100%}
+.nav__link.is-active{color:var(--gold)}
+.nav__cta{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(196,154,60,.35);padding:10px 18px;min-height:44px;border-radius:3px;transition:all .2s ease;display:inline-flex;align-items:center;flex-shrink:0;text-decoration:none}
+.nav__cta:hover{background:var(--gold-trans);border-color:var(--gold)}
+.nav__toggle{display:none;width:44px;height:44px;background:none;border:none;cursor:pointer;color:var(--text-primary);align-items:center;justify-content:center;border-radius:3px;transition:color .2s ease;flex-shrink:0}
+.nav__toggle:hover{color:var(--gold)}
+.nav__drawer{display:none;position:fixed;top:68px;left:0;right:0;background:var(--bg-surface);border-bottom:1px solid var(--border-light);padding:1.5rem var(--gutter);flex-direction:column;gap:1rem;z-index:99}
+.nav__drawer.is-open{display:flex}
+.nav__drawer-link{font-size:15px;color:var(--text-secondary);padding-block:8px;border-bottom:1px solid var(--border-light);transition:color .2s ease;min-height:44px;display:flex;align-items:center;text-decoration:none}
+.nav__drawer-link:hover{color:var(--gold)}
+@media(max-width:820px){.nav__links{display:none}.nav__cta{display:none}.nav__toggle{display:flex}}
+
+/* ── BREADCRUMB ──────────────────────────────────────────── */
+.breadcrumb{padding-top:68px;background:var(--bg-surface);border-bottom:1px solid var(--border-light)}
+.breadcrumb__inner{display:flex;align-items:center;gap:.625rem;flex-wrap:wrap;padding-block:.875rem;font-family:var(--mono);font-size:11px;letter-spacing:.08em}
+.breadcrumb__link{color:var(--text-secondary);transition:color .2s ease;text-decoration:none;min-height:24px;display:inline-flex;align-items:center}
+.breadcrumb__link:hover{color:var(--gold)}
+.breadcrumb__sep{color:var(--text-subtle);user-select:none;padding-inline:.125rem}
+.breadcrumb__current{color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40ch}
+
+/* ── ARTICLE HERO ────────────────────────────────────────── */
+.article-hero{
+  background:linear-gradient(160deg,var(--bg-surface) 0%,var(--bg-base) 60%);
+  border-bottom:1px solid var(--border-light);
+  position:relative;overflow:hidden;
+}
+.article-hero__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(196,154,60,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(196,154,60,.03) 1px,transparent 1px);background-size:80px 80px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black,transparent);pointer-events:none}
+.article-hero__inner{position:relative;z-index:1;padding-block:clamp(3.5rem,7vw,5.5rem)}
+
+.article-hero__cats{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;role:list}
+.cat-tag{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-trans);border:1px solid var(--border);padding:4px 10px;border-radius:2px}
+
+.article-hero__title{
+  font-family:var(--serif);font-size:clamp(2.2rem,5vw,3.75rem);
+  font-weight:400;line-height:1.08;letter-spacing:-.025em;
+  color:var(--text-primary);max-width:22ch;margin-bottom:1.5rem;
+}
+.article-hero__title em{font-style:italic;color:var(--gold)}
+
+.article-hero__deck{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.1rem,1.8vw,1.35rem);line-height:1.6;
+  color:var(--text-secondary);max-width:56ch;margin-bottom:2rem;
+}
+
+.article-hero__meta{
+  display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-subtle);
+  padding-top:1.5rem;border-top:1px solid var(--border-light);
+}
+.article-hero__meta-sep{color:var(--border-light);user-select:none}
+
+/* Hero image — full width below headline block */
+.article-hero__image{
+  aspect-ratio:21/8;overflow:hidden;
+  border-radius:3px;
+  background:var(--bg-elevated);
+  border:1px solid var(--border-light);
+}
+.article-hero__image img{width:100%;height:100%;object-fit:cover}
+.img-ph{width:100%;height:100%;min-height:160px;background:var(--bg-elevated);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:2rem;text-align:center}
+.img-ph__icon{font-size:2rem;opacity:.2;display:block}
+.img-ph__label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.img-ph__desc{font-size:12px;line-height:1.65;color:var(--text-secondary);max-width:36ch}
+
+/* ── TWO-COLUMN LAYOUT ───────────────────────────────────── */
+.article-layout{
+  display:grid;grid-template-columns:1fr 300px;gap:4rem;align-items:start;
+  padding-block:var(--section);
+}
+.article-body{min-width:0}
+
+/* ── PROSE TYPOGRAPHY ────────────────────────────────────── */
+.article-body h2{
+  font-family:var(--serif);font-size:clamp(1.5rem,2.8vw,2.1rem);
+  font-weight:400;line-height:1.2;color:var(--text-primary);
+  margin-top:3rem;margin-bottom:1.25rem;
+  scroll-margin-top:90px;
+}
+.article-body h2:first-child{margin-top:0}
+.article-body h3{
+  font-family:var(--serif);font-size:clamp(1.1rem,2vw,1.35rem);
+  font-weight:400;line-height:1.3;color:var(--text-primary);
+  margin-top:2.25rem;margin-bottom:.875rem;
+}
+.article-body p{
+  font-size:clamp(15px,1.15vw,16.5px);line-height:1.9;
+  color:var(--text-secondary);margin-bottom:1.25rem;
+}
+.article-body p:last-child{margin-bottom:0}
+.article-body strong{color:var(--text-primary);font-weight:600}
+
+/* Pull quote */
+.pull-quote{
+  font-family:var(--serif);font-style:italic;
+  font-size:clamp(1.15rem,2vw,1.5rem);line-height:1.5;
+  color:var(--gold-light);
+  border-left:3px solid var(--gold);
+  padding:.875rem 1.75rem;
+  margin-block:2rem;
+  background:var(--gold-trans);border-radius:0 3px 3px 0;
+}
+
+/* Data table */
+.data-table-wrap{margin-block:2rem;overflow-x:auto;border-radius:3px;border:1px solid var(--border-light)}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table thead{background:var(--bg-card)}
+.data-table th{
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);padding:.875rem 1.25rem;text-align:left;
+  border-bottom:1px solid var(--border-light);white-space:nowrap;
+}
+.data-table td{
+  padding:.875rem 1.25rem;border-bottom:1px solid var(--border-light);
+  color:var(--text-secondary);line-height:1.6;vertical-align:top;
+}
+.data-table tbody tr:last-child td{border-bottom:none}
+.data-table tbody tr:hover td{background:rgba(196,154,60,.03)}
+.data-table td:first-child{color:var(--text-primary);font-weight:500}
+
+/* Insight box — the SO signature element */
+.insight-box{
+  background:var(--navy);border:1px solid rgba(196,154,60,.2);border-top:3px solid var(--gold);
+  border-radius:3px;padding:2rem;margin-block:2.5rem;
+}
+.insight-box__label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.875rem;
+  display:flex;align-items:center;gap:.625rem;
+}
+.insight-box__label::before{content:'⚑';font-size:12px}
+.insight-box__heading{
+  font-family:var(--serif);font-size:1.1rem;font-weight:400;line-height:1.35;
+  color:var(--text-primary);margin-bottom:.75rem;
+}
+.insight-box__body{font-size:14px;line-height:1.8;color:var(--text-secondary)}
+
+/* Related concepts list */
+.related-concepts{margin-block:2rem}
+.concept-item{
+  padding:1rem 0;border-bottom:1px solid var(--border-light);
+  display:grid;grid-template-columns:8rem 1fr;gap:1.25rem;align-items:start;
+}
+.concept-item:first-child{border-top:1px solid var(--border-light)}
+.concept-name{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);padding-top:.125rem}
+.concept-body{font-size:14px;line-height:1.75;color:var(--text-secondary)}
+@media(max-width:560px){.concept-item{grid-template-columns:1fr}}
+
+/* Further reading */
+.reading-list{display:flex;flex-direction:column;gap:1rem;margin-top:1.25rem}
+.reading-item{
+  padding:1.25rem;background:var(--bg-card-alt);
+  border:1px solid var(--border-light);border-left:2px solid var(--gold-dim);
+  border-radius:0 3px 3px 0;
+}
+.reading-item__title{font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:.25rem}
+.reading-item__author{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-subtle);margin-bottom:.5rem}
+.reading-item__note{font-size:13px;line-height:1.7;color:var(--text-secondary)}
+
+/* ── STICKY TOC SIDEBAR ──────────────────────────────────── */
+.article-sidebar{position:sticky;top:calc(68px + 2rem);display:flex;flex-direction:column;gap:1.5rem}
+.toc{background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;overflow:hidden}
+.toc__heading{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);padding:1rem 1.25rem;border-bottom:1px solid var(--border-light)}
+.toc__list{display:flex;flex-direction:column;padding:.5rem 0}
+.toc__link{
+  font-size:12px;color:var(--text-secondary);line-height:1.4;
+  padding:.625rem 1.25rem;transition:all .15s ease;
+  display:block;border-left:2px solid transparent;text-decoration:none;
+}
+.toc__link:hover{color:var(--text-primary);background:var(--gold-trans)}
+.toc__link.is-active{color:var(--gold);border-left-color:var(--gold);background:var(--gold-trans)}
+
+/* Author card */
+.author-card{
+  background:var(--bg-card);border:1px solid var(--border-light);
+  border-top:2px solid var(--gold-dim);border-radius:3px;padding:1.5rem;
+  display:flex;flex-direction:column;gap:1rem;
+}
+.author-card__top{display:flex;align-items:center;gap:1rem}
+.author-card__avatar{
+  width:48px;height:48px;border-radius:50%;overflow:hidden;
+  background:var(--bg-elevated);border:1px solid var(--border-light);flex-shrink:0;
+}
+.author-card__avatar img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
+.author-card__name{font-size:14px;font-weight:600;color:var(--text-primary)}
+.author-card__role{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-top:2px}
+.author-card__bio{font-size:12px;line-height:1.7;color:var(--text-secondary)}
+.author-card .btn{width:100%;justify-content:center;font-size:11px;padding:10px 14px}
+
+/* Share */
+.share-row{display:flex;gap:.75rem;align-items:center}
+.share-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle)}
+.share-btn{
+  width:44px;height:44px;background:var(--bg-card-alt);
+  border:1px solid var(--border-light);border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-secondary);cursor:pointer;transition:all .2s ease;
+  font-size:13px;
+}
+.share-btn:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+@media(max-width:960px){.article-layout{grid-template-columns:1fr}.article-sidebar{display:none}}
+.mobile-cta{display:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:1.25rem var(--gutter);position:sticky;bottom:0;z-index:50;gap:1rem;justify-content:center;flex-wrap:wrap}
+@media(max-width:960px){.mobile-cta{display:flex}}
+
+/* ── RELATED ARTICLES ────────────────────────────────────── */
+.related{background:var(--bg-surface);border-top:1px solid var(--border-light);padding-block:var(--section)}
+.related__heading{font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;color:var(--text-primary);margin-bottom:2.5rem}
+.related__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.related-card{background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;padding:1.75rem;display:flex;flex-direction:column;gap:.875rem;text-decoration:none;color:inherit;transition:border-color .2s ease,transform .2s ease}
+.related-card:hover{border-color:rgba(196,154,60,.25);transform:translateY(-2px)}
+.related-card__tag{font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-trans);border:1px solid var(--border);padding:3px 8px;border-radius:2px;width:fit-content}
+.related-card__title{font-family:var(--serif);font-size:1.1rem;font-weight:400;line-height:1.3;color:var(--text-primary);transition:color .2s ease}
+.related-card:hover .related-card__title{color:var(--gold-light)}
+.related-card__read{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:6px;margin-top:auto;transition:gap .2s ease}
+.related-card:hover .related-card__read{gap:12px}
+.related-card__read::after{content:'→'}
+@media(max-width:760px){.related__grid{grid-template-columns:1fr}}
+
+/* ── CTA BAND ────────────────────────────────────────────── */
+.cta-band{background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden}
+.cta-band::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none}
+.cta-band__inner{position:relative;z-index:1}
+.cta-band__label{margin-bottom:1.5rem;justify-content:center}.cta-band__label::before{display:none}
+.cta-band__heading{font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem}
+.cta-band__heading em{font-style:italic;color:var(--gold)}
+.cta-band__sub{font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem}
+.cta-band__actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+.footer{background:var(--bg-surface);padding-block:4rem 2rem;border-top:1px solid var(--border-light)}
+.footer__main{display:grid;grid-template-columns:1.2fr 2fr;gap:4rem;margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border-light)}
+.footer__brand-name{font-family:var(--sans);font-weight:600;font-size:16px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-primary);margin-bottom:4px}
+.footer__brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem}
+.footer__tagline{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--text-secondary);line-height:1.6;max-width:28ch;margin-bottom:1.5rem}
+.footer__social{display:flex;gap:1rem}
+.footer__social-link{width:44px;height:44px;border:1px solid var(--border-light);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all .2s ease;text-decoration:none}
+.footer__social-link:hover{border-color:var(--gold-dim);color:var(--gold)}
+.footer__nav{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}
+.footer__nav-heading{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.footer__nav-list{display:flex;flex-direction:column;gap:.375rem}
+.footer__nav-link{font-size:13px;color:var(--text-secondary);transition:color .2s ease;padding-block:4px;min-height:24px;display:flex;align-items:center;text-decoration:none}
+.footer__nav-link:hover{color:var(--text-primary)}
+.footer__legal{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer__copyright{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--text-subtle)}
+.footer__legal-links{display:flex;gap:1.5rem;flex-wrap:wrap}
+.footer__legal-link{font-size:12px;color:var(--text-subtle);transition:color .2s ease;text-decoration:none;padding-block:4px;min-height:24px;display:flex;align-items:center}
+.footer__legal-link:hover{color:var(--text-secondary)}
+@media(max-width:760px){.footer__main{grid-template-columns:1fr;gap:2.5rem} .footer__nav{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress" role="progressbar" aria-label="Reading progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav__inner">
+    <a href="/" class="nav__brand" aria-label="André Daus — home">
+      <span class="nav__brand-name">André Daus</span>
+      <span class="nav__brand-sub">Strategic Opposition</span>
+    </a>
+    <div class="nav__links" role="list">
+      <a href="/service"    class="nav__link" role="listitem">Services</a>
+      <a href="/use-case"   class="nav__link" role="listitem">Use Cases</a>
+      <a href="/insight"    class="nav__link is-active" role="listitem">Insights</a>
+      <a href="/podcast"    class="nav__link" role="listitem">Podcast</a>
+      <a href="/opposition" class="nav__link" role="listitem">Opposition</a>
+    </div>
+    <a href="/contact" class="nav__cta">Find Your Blind Spots</a>
+    <button class="nav__toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
+      <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+        <rect y="0"  width="22" height="2" rx="1" fill="currentColor"/>
+        <rect y="7"  width="16" height="2" rx="1" fill="currentColor"/>
+        <rect y="14" width="22" height="2" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+<div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
+  <a href="/service"    class="nav__drawer-link">Services</a>
+  <a href="/use-case"   class="nav__drawer-link">Use Cases</a>
+  <a href="/insight"    class="nav__drawer-link">Insights</a>
+  <a href="/podcast"    class="nav__drawer-link">Podcast</a>
+  <a href="/opposition" class="nav__drawer-link">The Opposition Method</a>
+  <a href="/contact" class="btn btn--primary" style="margin-top:.5rem;justify-content:center">Find Your Blind Spots</a>
+</div>
+
+<main id="main-content">
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container">
+    <ol class="breadcrumb__inner">
+      <li><a href="/" class="breadcrumb__link">Home</a></li>
+      <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+      <li><a href="/insight" class="breadcrumb__link">Insights</a></li>
+      <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+      <li><span class="breadcrumb__current" aria-current="page">You're Not Gathering Evidence. You're Building a Case.</span></li>
+    </ol>
+  </div>
+</nav>
+
+<!-- ARTICLE HERO -->
+<header class="article-hero" aria-labelledby="article-title">
+  <div class="article-hero__grid" aria-hidden="true"></div>
+  <div class="container">
+    <div class="article-hero__inner">
+      <div class="article-hero__cats" role="list" aria-label="Article categories">
+        <span class="cat-tag" role="listitem">Thinking &amp; Cognition</span>
+        <span class="cat-tag" role="listitem">Assumption Traps</span>
+      </div>
+      <h1 class="article-hero__title" id="article-title">
+        You're Not Gathering Evidence.<br>
+        <em>You're Building a Case.</em>
+      </h1>
+      <p class="article-hero__deck">
+        Confirmation bias isn't a flaw in irrational people. It's a structural feature of how intelligent minds protect themselves from being wrong. Understanding its mechanics is more useful than pretending you can escape it.
+      </p>
+      <div class="article-hero__meta" role="list" aria-label="Article metadata">
+        <span role="listitem">André Daus</span>
+        <span class="article-hero__meta-sep" aria-hidden="true">·</span>
+        <span role="listitem">12 min read</span>
+        <span class="article-hero__meta-sep" aria-hidden="true">·</span>
+        <span role="listitem">Thinking &amp; Cognition</span>
+      </div>
+    </div>
+
+    <div
+      class="article-hero__image"
+      role="img"
+      aria-label="A figure looking through a single keyhole in a vast wall — seeing only what the opening allows"
+    >
+      <!--
+        IMAGE BRIEF — Article hero banner
+        Concept: Selective perception — seeing only what the aperture allows.
+
+        Option A: A figure standing before a vast, featureless wall, eye pressed to a single small keyhole.
+          The light through the keyhole is warm amber. The wall and figure are near-black.
+        Option B: Close-up of a human eye. The reflection in the iris is distorted — a funhouse-mirror
+          version of reality where some parts are stretched and others are missing.
+        Option C: A chess board shot from low angle. Half the pieces are in sharp focus;
+          the other half are blurred out of existence.
+
+        Style: Dark, editorial, conceptual. Amber/gold grade. NOT stock photo energy.
+        Dimensions: 1160×443px minimum (21:8 ratio). Horizontal banner.
+        Treatment: Shallow depth of field, slight grain, dark edges.
+      -->
+      <div class="img-ph">
+        <span class="img-ph__icon" aria-hidden="true">◎</span>
+        <span class="img-ph__label">Article hero — confirmation bias</span>
+        <p class="img-ph__desc">Figure at keyhole / funhouse-mirror eye / selective chess board. Dark, editorial. 1160×443px, 21:8 ratio.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ARTICLE CONTENT -->
+<div class="container">
+  <div class="article-layout">
+
+    <article class="article-body" aria-label="Article content">
+
+      <!-- SECTION 1 -->
+      <h2 id="sec-definition">The Bias That Runs Silently Underneath Everything</h2>
+
+      <p>
+        <strong>Confirmation bias is the tendency to search for, interpret, and remember information that supports what we already believe — while filtering out, dismissing, or forgetting anything that doesn't.</strong> It operates before conscious reasoning begins. By the time you're aware you're evaluating something, the filter has already been applied.
+      </p>
+
+      <p>
+        This isn't a failure of intelligence. It's not what happens when people are lazy or uneducated. Confirmation bias is especially pronounced in people who are smart, motivated, and certain — which is to say, it runs hardest in exactly the people making the most consequential decisions.
+      </p>
+
+      <blockquote class="pull-quote">
+        "The bias doesn't weaken your arguments. It strengthens them — selectively, invisibly, in ways that feel like clarity."
+      </blockquote>
+
+      <p>
+        It operates through three distinct mechanisms, all running below the threshold of awareness. Recognising which one is active at any given moment is the beginning of being able to do something about it.
+      </p>
+
+      <div class="data-table-wrap" role="region" aria-label="Three mechanisms of confirmation bias">
+        <table class="data-table">
+          <caption class="sr-only">Three mechanisms through which confirmation bias operates</caption>
+          <thead>
+            <tr>
+              <th scope="col">Mechanism</th>
+              <th scope="col">What it does</th>
+              <th scope="col">What it looks like</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Selective Exposure</td>
+              <td>Seeks only confirming sources</td>
+              <td>Reading the analyst reports that validate your investment thesis while avoiding the ones that don't</td>
+            </tr>
+            <tr>
+              <td>Biased Interpretation</td>
+              <td>Reads neutral information as supportive</td>
+              <td>Interpreting mixed performance data as proof that the strategy is working</td>
+            </tr>
+            <tr>
+              <td>Selective Recall</td>
+              <td>Remembers confirming evidence; forgets disconfirming</td>
+              <td>Recalling the decisions that worked and explaining away the ones that didn't</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Neuroscience adds a detail that should concern anyone who's ever felt certain: confidence amplifies the bias. When you're sure about a decision, your brain processes supporting evidence more strongly and suppresses the signal from contradicting evidence. The more convinced you are, the less accurately you're reading the room.
+      </p>
+
+      <!-- SECTION 2 -->
+      <h2 id="sec-mechanism">How It Compounds</h2>
+
+      <p>
+        What makes confirmation bias particularly difficult to manage is that it's self-reinforcing. Each piece of confirming evidence doesn't just feel like validation — it increases confidence, which increases the bias, which increases the selectivity of what gets through. The cycle runs until something external breaks it.
+      </p>
+
+      <p>
+        The sequence:
+      </p>
+
+      <div class="data-table-wrap" role="region" aria-label="Confirmation bias cycle">
+        <table class="data-table">
+          <caption class="sr-only">The self-reinforcing cycle of confirmation bias</caption>
+          <thead>
+            <tr>
+              <th scope="col">Stage</th>
+              <th scope="col">Mechanism</th>
+              <th scope="col">Effect</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Information seeking</td>
+              <td>Selective exposure</td>
+              <td>Biased input to the decision</td>
+            </tr>
+            <tr>
+              <td>Processing</td>
+              <td>Biased interpretation</td>
+              <td>Distorted analysis of what the information means</td>
+            </tr>
+            <tr>
+              <td>Storage</td>
+              <td>Selective recall</td>
+              <td>Reinforced belief, increased confidence</td>
+            </tr>
+            <tr>
+              <td>Next decision</td>
+              <td>Stronger prior</td>
+              <td>More extreme bias in the next cycle</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Organisations are particularly vulnerable to this cycle because they create structural conditions that accelerate it. Hierarchies filter information upward — uncomfortable truths get softened at each level. Teams self-select for agreement. Success gets attributed to the strategy; failure gets attributed to execution. The feedback loop closes, and the belief strengthens regardless of what the evidence would actually say if it were allowed through.
+      </p>
+
+      <div class="insight-box" role="note" aria-label="Strategic implication">
+        <p class="insight-box__label">The Strategic Opposition implication</p>
+        <p class="insight-box__heading">This is why the organisation can't fix itself.</p>
+        <p class="insight-box__body">The people most capable of challenging the dominant belief are the ones most subject to social pressure not to. The confirmation bias of the leadership team becomes the epistemic culture of the entire organisation. Internal challenge gets filtered before it reaches the decision-maker — not out of malice, but because every filter in the chain is running the same bias.</p>
+      </div>
+
+      <!-- SECTION 3 -->
+      <h2 id="sec-examples">Where It Shows Up</h2>
+
+      <p>
+        Confirmation bias isn't confined to bad thinking. It shows up precisely in the domains where careful thinking is most expected.
+      </p>
+
+      <h3>In professional decision-making</h3>
+      <p>
+        Investigators develop a working theory early in a case and then unconsciously collect evidence that fits it — while discounting or not looking for evidence that doesn't. The same pattern appears in medicine, where an early diagnostic impression causes subsequent symptoms to be interpreted through that frame rather than evaluated independently.
+      </p>
+
+      <h3>In investment</h3>
+      <p>
+        Investors seek out research that validates their positions. They attribute gains to their analytical skill and losses to external circumstances. Pre-mortems — asking "what would have to be true for this to fail?" — are almost never run before a position is taken, because the question feels like a threat to a decision that's already been made.
+      </p>
+
+      <h3>In research and strategy</h3>
+      <p>
+        Survey questions get worded in ways that produce confirming answers. Strategy processes start with a conclusion and work backward. Data gets analysed until it says what it needs to say. None of this is dishonest — it happens below the level where people can see it operating.
+      </p>
+
+      <h3>In hiring</h3>
+      <p>
+        We select candidates who feel familiar. The interview confirms what the CV already implied. The people who challenge our assumptions in the room feel like a risk; the people who validate them feel like a fit. Over time, teams become monocultures — not by design, but by a thousand small confirmation events.
+      </p>
+
+      <!-- SECTION 4 -->
+      <h2 id="sec-strategy">The Strategic Implications: What This Actually Costs</h2>
+
+      <p>
+        The cost of confirmation bias isn't primarily in individual bad decisions. It's in the systematic inability to update — to revise beliefs when the environment changes, when the strategy stops working, when the market says something the organisation isn't structured to hear.
+      </p>
+
+      <p>
+        The most dangerous version of this isn't the dramatic failure. It's the slow degradation — the strategy that used to work continuing to receive investment and commitment long after the conditions that made it work have changed. The organisation keeps getting confirming evidence because it keeps looking in the same places. The disconfirming signal exists; it just never gets through.
+      </p>
+
+      <blockquote class="pull-quote">
+        "The belief your organisation holds most confidently is the one that has received the least genuine challenge. Confidence and correctness are not the same variable."
+      </blockquote>
+
+      <p>
+        This is the domain where Strategic Opposition operates. The question isn't how to make better decisions within the existing belief system. It's how to create the conditions under which the belief system can be examined, tested, and revised — before external pressure forces an examination that happens too late, under conditions you don't control.
+      </p>
+
+      <!-- SECTION 5 -->
+      <h2 id="sec-countering">Why Conventional Defences Don't Work</h2>
+
+      <p>
+        The standard advice for countering confirmation bias runs roughly as follows: seek out opposing views; read things you disagree with; use structured decision frameworks; practice intellectual humility. This advice is not wrong. It's insufficient.
+      </p>
+
+      <p>
+        The problem is that people subject to confirmation bias don't know they're subject to it. The bias doesn't announce itself. You don't feel like you're selectively filtering — you feel like you're correctly evaluating. Telling someone to seek out opposing views assumes they can identify which views are actually opposing, which requires stepping outside the frame the bias has constructed. That's precisely what the bias prevents.
+      </p>
+
+      <div class="insight-box" role="note" aria-label="What actually works">
+        <p class="insight-box__label">What actually works</p>
+        <p class="insight-box__heading">You can't think your way out of a thinking bias. You need structural opposition.</p>
+        <p class="insight-box__body">Adversarial review processes — where someone is explicitly tasked with finding what's wrong with an idea before it's committed to — work not because they make people more rational, but because they make the disconfirming case regardless of whether the decision-maker wants to hear it. Pre-mortems work for the same reason. Red team thinking works for the same reason. The common thread is externalising the challenge so it doesn't have to get past the internal filter.</p>
+      </div>
+
+      <p>
+        Practically: the most effective approach isn't asking people to think differently. It's building processes where the challenge happens independently of whether anyone in the room wants it to. The organisation doesn't need to be more intellectually humble — it needs mechanisms that produce challenge whether or not the people involved feel humble on a given day.
+      </p>
+
+      <!-- SECTION 6 -->
+      <h2 id="sec-related">Related Concepts</h2>
+
+      <p>
+        Confirmation bias doesn't operate alone. It connects to and reinforces a cluster of related patterns, each of which amplifies the others.
+      </p>
+
+      <div class="related-concepts" role="list" aria-label="Related cognitive biases">
+        <div class="concept-item" role="listitem">
+          <span class="concept-name">Selective Exposure</span>
+          <p class="concept-body">The upstream condition: gravitating toward sources that already agree. Confirmation bias then processes what selective exposure has let through.</p>
+        </div>
+        <div class="concept-item" role="listitem">
+          <span class="concept-name">Motivated Reasoning</span>
+          <p class="concept-body">If confirmation bias is about filtering evidence, motivated reasoning is about constructing the logical framework that makes the conclusion feel inevitable. Both serve the same outcome; motivated reasoning supplies the justification.</p>
+        </div>
+        <div class="concept-item" role="listitem">
+          <span class="concept-name">Cognitive Dissonance</span>
+          <p class="concept-body">The discomfort created when contradicting information gets through. Confirmation bias is partly a mechanism for preventing cognitive dissonance from triggering — it filters the contradicting information before the discomfort can form.</p>
+        </div>
+        <div class="concept-item" role="listitem">
+          <span class="concept-name">Anchoring Bias</span>
+          <p class="concept-body">First impressions create the target the confirmation bias then defends. Once anchored, subsequent information gets reinterpreted to fit the anchor rather than evaluated on its own terms.</p>
+        </div>
+        <div class="concept-item" role="listitem">
+          <span class="concept-name">Availability Heuristic</span>
+          <p class="concept-body">Vivid, recent examples feel more representative than they are — and confirmation bias treats them as proof. The examples that come to mind easily are disproportionately the confirming ones.</p>
+        </div>
+      </div>
+
+      <!-- SECTION 7 -->
+      <h2 id="sec-reading">Further Reading</h2>
+
+      <p>
+        The literature on confirmation bias is extensive. These are the sources worth spending time with.
+      </p>
+
+      <div class="reading-list" role="list" aria-label="Recommended reading">
+        <div class="reading-item" role="listitem">
+          <p class="reading-item__title">Thinking, Fast and Slow</p>
+          <p class="reading-item__author">Daniel Kahneman</p>
+          <p class="reading-item__note">The clearest framework for understanding why System 1 thinking — fast, automatic, pattern-matching — is the primary driver of confirmation bias. Essential context for why structural interventions work better than individual willpower.</p>
+        </div>
+        <div class="reading-item" role="listitem">
+          <p class="reading-item__title">Confirmation Bias: A Ubiquitous Phenomenon in Many Guises</p>
+          <p class="reading-item__author">Raymond Nickerson, Psychological Review, 1998</p>
+          <p class="reading-item__note">The foundational academic survey. Dense, but the breadth of domains covered makes the universality of the bias undeniable. Useful for anyone who thinks their field is different.</p>
+        </div>
+        <div class="reading-item" role="listitem">
+          <p class="reading-item__title">The 2-4-6 Task (experimental study)</p>
+          <p class="reading-item__author">Peter Wason, 1960</p>
+          <p class="reading-item__note">The classic demonstration: subjects given a number sequence and asked to discover the rule. They generate confirming examples almost exclusively, rarely testing hypotheses that could disprove them. The original evidence that confirmation bias is the default mode, not the exception.</p>
+        </div>
+        <div class="reading-item" role="listitem">
+          <p class="reading-item__title">Thinking and Deciding</p>
+          <p class="reading-item__author">Jonathan Baron</p>
+          <p class="reading-item__note">Comprehensive treatment of how confirmation bias distorts hypothesis testing — in scientific research, in business, and in individual reasoning. The sections on myside bias are directly applicable to strategic decision-making.</p>
+        </div>
+      </div>
+
+    </article>
+
+    <!-- STICKY SIDEBAR -->
+    <aside class="article-sidebar" aria-label="Article navigation and related content">
+
+      <!-- TOC -->
+      <nav class="toc" aria-label="Table of contents">
+        <p class="toc__heading" id="toc-label">In this article</p>
+        <ul class="toc__list" aria-labelledby="toc-label">
+          <li><a href="#sec-definition"  class="toc__link is-active">The Bias That Runs Underneath</a></li>
+          <li><a href="#sec-mechanism"   class="toc__link">How It Compounds</a></li>
+          <li><a href="#sec-examples"    class="toc__link">Where It Shows Up</a></li>
+          <li><a href="#sec-strategy"    class="toc__link">Strategic Implications</a></li>
+          <li><a href="#sec-countering"  class="toc__link">Why Defences Fail</a></li>
+          <li><a href="#sec-related"     class="toc__link">Related Concepts</a></li>
+          <li><a href="#sec-reading"     class="toc__link">Further Reading</a></li>
+        </ul>
+      </nav>
+
+      <!-- Author card -->
+      <div class="author-card">
+        <div class="author-card__top">
+          <div class="author-card__avatar" role="img" aria-label="André Daus">
+            <!--
+              Replace with:
+              <img src="/images/andredaus-headshot.jpg" alt="" width="96" height="96" loading="lazy">
+              alt="" — decorative, name provided by text above
+            -->
+            <div style="width:100%;height:100%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;border-radius:50%;font-family:var(--mono);font-size:12px;color:var(--gold)">AD</div>
+          </div>
+          <div>
+            <p class="author-card__name">André Daus</p>
+            <p class="author-card__role">Strategic Opposition</p>
+          </div>
+        </div>
+        <p class="author-card__bio">André works with leaders and organisations to surface the assumptions their strategies depend on — before the market does it for them.</p>
+        <a href="/contact" class="btn btn--primary btn-arrow">Book a Discovery Call</a>
+        <a href="/service"  class="btn btn--ghost">View Services</a>
+      </div>
+
+      <!-- Share -->
+      <div>
+        <p class="share-label" style="margin-bottom:.75rem">Share</p>
+        <div class="share-row">
+          <button
+            class="share-btn"
+            id="copy-link-btn"
+            aria-label="Copy article link to clipboard"
+            title="Copy link"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+          <a
+            href="https://twitter.com/intent/tweet?text=You%E2%80%99re+Not+Gathering+Evidence.+You%E2%80%99re+Building+a+Case.&url="
+            class="share-btn"
+            aria-label="Share on X (Twitter)"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true"><path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/></svg>
+          </a>
+          <a
+            href="https://www.linkedin.com/sharing/share-offsite/?url="
+            class="share-btn"
+            aria-label="Share on LinkedIn"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+</div>
+
+<!-- Mobile CTA strip -->
+<div class="mobile-cta" aria-label="Book a discovery call">
+  <a href="/contact" class="btn btn--primary btn-arrow" style="flex:1;justify-content:center;max-width:320px">Book a Discovery Call</a>
+</div>
+
+<!-- RELATED ARTICLES -->
+<section class="related" aria-labelledby="related-heading">
+  <div class="container">
+    <p class="label" style="margin-bottom:1.25rem">Continue reading</p>
+    <h2 class="related__heading" id="related-heading">More on thinking and strategy</h2>
+    <ul class="related__grid">
+      <li>
+        <a href="/insight/[slug]" class="related-card">
+          <span class="related-card__tag">Strategy</span>
+          <h3 class="related-card__title">[Related article title — Strategy &amp; Assumption Traps]</h3>
+          <span class="related-card__read">Read</span>
+        </a>
+      </li>
+      <li>
+        <a href="/insight/[slug]" class="related-card">
+          <span class="related-card__tag">Leadership</span>
+          <h3 class="related-card__title">[Related article title — Leadership &amp; Blind Spots]</h3>
+          <span class="related-card__read">Read</span>
+        </a>
+      </li>
+      <li>
+        <a href="/use-case/cybersecurity-human-problem" class="related-card">
+          <span class="related-card__tag">Use Case</span>
+          <h3 class="related-card__title">The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem</h3>
+          <span class="related-card__read">Read case</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="cta-band" aria-labelledby="cta-heading">
+  <div class="container cta-band__inner">
+    <p class="label cta-band__label">Next step</p>
+    <h2 class="cta-band__heading" id="cta-heading">
+      The belief your organisation<br>holds most confidently is the one that <em>needs the most scrutiny.</em>
+    </h2>
+    <p class="cta-band__sub">A 30-minute discovery call is where we surface what it is. Come with your best strategic position. I'll challenge it.</p>
+    <div class="cta-band__actions">
+      <a href="/contact" class="btn btn--primary btn-arrow">Book a Discovery Call</a>
+      <a href="/insight"  class="btn btn--outline">All Insights</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__main">
+      <div>
+        <p class="footer__brand-name">André Daus</p>
+        <p class="footer__brand-sub">Strategic Opposition</p>
+        <p class="footer__tagline">Your thinking creates your limits.</p>
+        <nav class="footer__social" aria-label="Social media">
+          <a href="#" class="footer__social-link" aria-label="X (Twitter)"><svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true"><path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/></svg></a>
+          <a href="#" class="footer__social-link" aria-label="LinkedIn"><svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg></a>
+        </nav>
+      </div>
+      <nav class="footer__nav" aria-label="Site navigation">
+        <div><h3 class="footer__nav-heading">Services</h3><ul class="footer__nav-list"><li><a href="/service/assumption-hunting" class="footer__nav-link">Assumption Hunting</a></li><li><a href="/service/1-on-1-coaching" class="footer__nav-link">1:1 Coaching</a></li><li><a href="/service/burn-the-box" class="footer__nav-link">Burn the Box</a></li><li><a href="/service/workshop" class="footer__nav-link">Workshop</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Explore</h3><ul class="footer__nav-list"><li><a href="/use-case" class="footer__nav-link">Use Cases</a></li><li><a href="/opposition" class="footer__nav-link">The Opposition Method</a></li><li><a href="/insight" class="footer__nav-link">Insights</a></li><li><a href="/podcast" class="footer__nav-link">Iconoclast Insights</a></li></ul></div>
+        <div><h3 class="footer__nav-heading">Also by André</h3><ul class="footer__nav-list"><li><a href="https://littlebig.co" class="footer__nav-link" target="_blank" rel="noopener">LittleBig.Co <span style="color:#7ab648" aria-hidden="true">↗</span><span class="sr-only">(opens in new tab)</span></a></li><li><a href="/contact" class="footer__nav-link">Contact</a></li><li><a href="/question" class="footer__nav-link">FAQ</a></li></ul></div>
+      </nav>
+    </div>
+    <div class="footer__legal">
+      <p class="footer__copyright">Copyright 2025 © André Daus</p>
+      <nav class="footer__legal-links" aria-label="Legal"><a href="/policy/privacy" class="footer__legal-link">Privacy Policy</a><a href="/policy/legal-notice" class="footer__legal-link">Legal Notice</a><a href="/legal/terms" class="footer__legal-link">Terms</a><a href="/policy/ai-use" class="footer__legal-link">AI Policy</a></nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  // Mobile nav
+  var t=document.querySelector('.nav__toggle'),d=document.getElementById('nav-drawer');
+  if(t&&d){
+    t.addEventListener('click',function(){var o=d.classList.toggle('is-open');t.setAttribute('aria-expanded',String(o));t.setAttribute('aria-label',o?'Close navigation menu':'Open navigation menu');});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&d.classList.contains('is-open')){d.classList.remove('is-open');t.setAttribute('aria-expanded','false');t.focus();}});
+  }
+
+  // Reading progress
+  var bar=document.getElementById('progress');
+  if(bar&&!window.matchMedia('(prefers-reduced-motion:reduce)').matches){
+    function upd(){var s=document.documentElement.scrollTop,h=document.documentElement.scrollHeight-document.documentElement.clientHeight,p=h>0?Math.round(s/h*100):0;bar.style.width=p+'%';bar.setAttribute('aria-valuenow',p);}
+    window.addEventListener('scroll',upd,{passive:true});upd();
+  }
+
+  // TOC active state
+  var tocLinks=Array.from(document.querySelectorAll('.toc__link'));
+  var sections=tocLinks.map(function(l){return document.querySelector(l.getAttribute('href'));}).filter(Boolean);
+  function setToc(){
+    var y=window.scrollY+90;var active=0;
+    sections.forEach(function(s,i){if(s&&s.offsetTop<=y)active=i;});
+    tocLinks.forEach(function(l,i){l.classList.toggle('is-active',i===active);});
+  }
+  window.addEventListener('scroll',setToc,{passive:true});setToc();
+
+  // Copy link
+  var copyBtn=document.getElementById('copy-link-btn');
+  if(copyBtn){
+    copyBtn.addEventListener('click',function(){
+      navigator.clipboard.writeText(window.location.href).then(function(){
+        copyBtn.setAttribute('aria-label','Link copied!');
+        setTimeout(function(){copyBtn.setAttribute('aria-label','Copy article link to clipboard');},2000);
+      });
+    });
+  }
+
+  // Nav scroll border
+  var nav=document.querySelector('.nav');
+  if(nav)window.addEventListener('scroll',function(){nav.style.borderBottomColor=scrollY>40?'rgba(196,154,60,.15)':'rgba(255,255,255,.06)';},{passive:true});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About André Daus — Strategic Opposition</title>
+  <meta name="description"
+    content="I'm André Daus. I make it professionally uncomfortable to keep avoiding the questions that matter. Strategic Opposition coach and consultant based in Germany.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── TOKENS ──────────────────────────────────────────────── */
+    :root {
+      --serif: 'Instrument Serif', Georgia, serif;
+      --sans: 'Work Sans', system-ui, sans-serif;
+      --mono: 'DM Mono', 'SF Mono', monospace;
+      --bg-base: #090c14;
+      --bg-surface: #0d1120;
+      --bg-elevated: #111828;
+      --bg-card: #141c2c;
+      --bg-card-alt: #0f1520;
+      --gold: #c49a3c;
+      --gold-light: #d4aa52;
+      --gold-dim: #8a6a24;
+      --gold-trans: rgba(196, 154, 60, .06);
+      --gold-glow: rgba(196, 154, 60, .10);
+      --navy: #1d2d44;
+      --text-primary: #ede8dc;
+      --text-secondary: #96a0b0;
+      --text-subtle: #7d8799;
+      --border: rgba(196, 154, 60, .12);
+      --border-light: rgba(255, 255, 255, .06);
+      --max-w: 1160px;
+      --gutter: clamp(1.25rem, 4vw, 2.5rem);
+      --section: clamp(4.5rem, 9vw, 8rem);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    img {
+      max-width: 100%;
+      display: block
+    }
+
+    ul,
+    ol {
+      list-style: none
+    }
+
+    /* ── WCAG 2.2 AA ─────────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      z-index: 9999;
+      padding: .75rem 1.5rem;
+      background: var(--gold);
+      color: #080a10;
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      border-radius: 0 0 3px 3px;
+      transition: top .15s ease
+    }
+
+    .skip-link:focus {
+      top: 0
+    }
+
+    *:focus {
+      outline: none
+    }
+
+    *:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 2px
+    }
+
+    .btn:focus-visible,
+    .nav__cta:focus-visible,
+    .nav__link:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .fade-up {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important
+      }
+
+      html {
+        scroll-behavior: auto
+      }
+    }
+
+    /* ── LAYOUT ──────────────────────────────────────────────── */
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter)
+    }
+
+    .label {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 12px
+    }
+
+    .label::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--gold);
+      flex-shrink: 0
+    }
+
+    /* ── BUTTONS ─────────────────────────────────────────────── */
+    .btn {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      min-height: 44px;
+      border-radius: 3px;
+      transition: all .2s ease;
+      cursor: pointer;
+      border: none;
+      white-space: nowrap;
+      text-decoration: none
+    }
+
+    .btn--primary {
+      background: var(--gold);
+      color: #080a10;
+      font-weight: 600
+    }
+
+    .btn--primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-1px)
+    }
+
+    .btn--outline {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid rgba(196, 154, 60, .35)
+    }
+
+    .btn--outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-1px)
+    }
+
+    .btn-arrow::after {
+      content: '→';
+      font-family: var(--sans);
+      font-size: 14px;
+      transition: transform .2s ease;
+      display: inline-block
+    }
+
+    .btn-arrow:hover::after {
+      transform: translateX(3px)
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 var(--gutter);
+      height: 68px;
+      display: flex;
+      align-items: center;
+      background: rgba(9, 12, 20, .92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-light);
+      transition: border-color .3s ease
+    }
+
+    .nav__inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem
+    }
+
+    .nav__brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex-shrink: 0;
+      text-decoration: none
+    }
+
+    .nav__brand-name {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: .04em;
+      color: var(--text-primary);
+      text-transform: uppercase
+    }
+
+    .nav__brand-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold)
+    }
+
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: clamp(1rem, 2vw, 1.75rem)
+    }
+
+    .nav__link {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: var(--text-secondary);
+      letter-spacing: .03em;
+      transition: color .2s ease;
+      position: relative;
+      padding-block: 4px;
+      text-decoration: none
+    }
+
+    .nav__link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width .25s ease
+    }
+
+    .nav__link:hover {
+      color: var(--text-primary)
+    }
+
+    .nav__link:hover::after,
+    .nav__link.is-active::after {
+      width: 100%
+    }
+
+    .nav__link.is-active {
+      color: var(--gold)
+    }
+
+    .nav__cta {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(196, 154, 60, .35);
+      padding: 10px 18px;
+      min-height: 44px;
+      border-radius: 3px;
+      transition: all .2s ease;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      text-decoration: none
+    }
+
+    .nav__cta:hover {
+      background: var(--gold-trans);
+      border-color: var(--gold)
+    }
+
+    .nav__toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-primary);
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      transition: color .2s ease;
+      flex-shrink: 0
+    }
+
+    .nav__toggle:hover {
+      color: var(--gold)
+    }
+
+    .nav__drawer {
+      display: none;
+      position: fixed;
+      top: 68px;
+      left: 0;
+      right: 0;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-light);
+      padding: 1.5rem var(--gutter);
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 99
+    }
+
+    .nav__drawer.is-open {
+      display: flex
+    }
+
+    .nav__drawer-link {
+      font-size: 15px;
+      color: var(--text-secondary);
+      padding-block: 8px;
+      border-bottom: 1px solid var(--border-light);
+      transition: color .2s ease;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      text-decoration: none
+    }
+
+    .nav__drawer-link:hover {
+      color: var(--gold)
+    }
+
+    @media(max-width:820px) {
+      .nav__links {
+        display: none
+      }
+
+      .nav__cta {
+        display: none
+      }
+
+      .nav__toggle {
+        display: flex
+      }
+    }
+
+    /* ── ABOUT HERO ──────────────────────────────────────────── */
+    .about-hero {
+      padding-top: 68px;
+      background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+      border-bottom: 1px solid var(--border-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-hero__grid {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(196, 154, 60, .03) 1px, transparent 1px), linear-gradient(90deg, rgba(196, 154, 60, .03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+      pointer-events: none;
+    }
+
+    .about-hero__inner {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 4rem;
+      align-items: end;
+      padding-block: clamp(4rem, 8vw, 6.5rem) 0;
+    }
+
+    /* Left: text */
+    .about-hero__label {
+      margin-bottom: 1.5rem
+    }
+
+    .about-hero__name {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 400;
+      line-height: .95;
+      letter-spacing: -.03em;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+    }
+
+    .about-hero__name em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .about-hero__title {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+      margin-bottom: 2rem;
+    }
+
+    .about-hero__lede {
+      font-size: clamp(1.05rem, 1.4vw, 1.2rem);
+      line-height: 1.8;
+      color: var(--text-secondary);
+      max-width: 52ch;
+      margin-bottom: 2.5rem;
+    }
+
+    .about-hero__lede strong {
+      color: var(--text-primary)
+    }
+
+    /* Identity pills */
+    .identity-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      padding-top: 1.75rem;
+      padding-bottom: 3rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .identity-pill {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      transition: all .2s ease;
+    }
+
+    .identity-pill:hover {
+      border-color: rgba(196, 154, 60, .3);
+      color: var(--gold)
+    }
+
+    .identity-pill--accent {
+      background: var(--gold-trans);
+      border-color: var(--border);
+      color: var(--gold)
+    }
+
+    /* Right: portrait */
+    .about-portrait {
+      align-self: end;
+      position: relative;
+    }
+
+    .about-portrait__img {
+      width: 100%;
+      max-width: 320px;
+      border-radius: 3px 3px 0 0;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      filter: grayscale(8%);
+      /* Subtle vignette at bottom to blend into page */
+      -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+    }
+
+    /* Decorative accent */
+    .about-portrait::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: calc(100% + 2px);
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      border-radius: 3px;
+    }
+
+    /* Photo placeholder */
+    .portrait-ph {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 3/4;
+      background: var(--bg-elevated);
+      border-radius: 3px 3px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .75rem;
+      padding: 2rem;
+      text-align: center;
+      -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
+    }
+
+    .portrait-ph__icon {
+      font-size: 2.5rem;
+      opacity: .1;
+      display: block
+    }
+
+    .portrait-ph__label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold)
+    }
+
+    .portrait-ph__desc {
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--text-subtle);
+      max-width: 18ch
+    }
+
+    @media(max-width:820px) {
+      .about-hero__inner {
+        grid-template-columns: 1fr
+      }
+
+      .about-portrait {
+        display: none
+      }
+    }
+
+    /* ── IDENTITY GRID ───────────────────────────────────────── */
+    .identity {
+      padding-block: var(--section);
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-light)
+    }
+
+    .identity__heading {
+      font-family: var(--serif);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text-primary);
+      max-width: 32ch;
+      margin-bottom: 3rem;
+    }
+
+    .identity__heading em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .identity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .identity-card {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: border-color .2s ease;
+    }
+
+    .identity-card:hover {
+      border-color: rgba(196, 154, 60, .2)
+    }
+
+    .identity-card__n {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 2.5rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .identity-card__label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    .identity-card__body {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-secondary)
+    }
+
+    @media(max-width:760px) {
+      .identity-grid {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:480px) {
+      .identity-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── PHILOSOPHY SECTION ──────────────────────────────────── */
+    .philosophy {
+      padding-block: var(--section)
+    }
+
+    .philosophy__inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .philosophy__body {}
+
+    .philosophy__body h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .philosophy__body h2 em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .philosophy__body p {
+      font-size: clamp(15px, 1.15vw, 16.5px);
+      line-height: 1.9;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    .philosophy__body p:last-child {
+      margin-bottom: 0
+    }
+
+    .philosophy__body strong {
+      color: var(--text-primary);
+      font-weight: 600
+    }
+
+    .philosophy-quote {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 3px 3px 0;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: sticky;
+      top: calc(68px + 2rem);
+      align-self: start;
+    }
+
+    .philosophy-quote__text {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+      line-height: 1.5;
+      color: var(--gold-light);
+    }
+
+    .philosophy-quote__attribution {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .philosophy-quote__note {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text-secondary);
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    @media(max-width:820px) {
+      .philosophy__inner {
+        grid-template-columns: 1fr
+      }
+
+      .philosophy-quote {
+        position: static
+      }
+    }
+
+    /* ── WORK CONTEXT ────────────────────────────────────────── */
+    .work {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      padding-block: var(--section);
+    }
+
+    .work__inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start
+    }
+
+    .work__label {
+      margin-bottom: 1.5rem
+    }
+
+    .work__heading {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .work__heading em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .work__body p {
+      font-size: clamp(15px, 1.15vw, 16.5px);
+      line-height: 1.9;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    .work__body p:last-child {
+      margin-bottom: 0
+    }
+
+    .work__body strong {
+      color: var(--text-primary);
+      font-weight: 600
+    }
+
+    .work-brands {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem
+    }
+
+    .brand-card {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: .875rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .2s ease, transform .15s ease;
+    }
+
+    .brand-card:hover {
+      border-color: rgba(196, 154, 60, .25);
+      transform: translateY(-2px)
+    }
+
+    .brand-card__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem
+    }
+
+    .brand-card__name {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-primary)
+    }
+
+    .brand-card__arrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--gold);
+      transition: transform .2s ease
+    }
+
+    .brand-card:hover .brand-card__arrow {
+      transform: translateX(4px)
+    }
+
+    .brand-card__label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      border: 1px solid;
+      width: fit-content
+    }
+
+    .brand-card__label--thinking {
+      color: var(--gold);
+      background: var(--gold-trans);
+      border-color: var(--border)
+    }
+
+    .brand-card__label--building {
+      color: #7ab648;
+      background: rgba(106, 168, 100, .08);
+      border-color: rgba(106, 168, 100, .15)
+    }
+
+    .brand-card__desc {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary)
+    }
+
+    @media(max-width:820px) {
+      .work__inner {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── FAST FACTS STRIP ────────────────────────────────────── */
+    .facts {
+      padding-block: 3.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .facts__inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      overflow: hidden;
+      background: var(--bg-card-alt);
+    }
+
+    .fact {
+      padding: 1.75rem;
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: .375rem;
+    }
+
+    .fact:last-child {
+      border-right: none
+    }
+
+    .fact__n {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 2.2rem;
+      color: var(--gold);
+      line-height: 1
+    }
+
+    .fact__label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--text-subtle)
+    }
+
+    .fact__note {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5
+    }
+
+    @media(max-width:760px) {
+      .facts__inner {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    @media(max-width:480px) {
+      .facts__inner {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:480px) {
+      .fact:nth-child(even) {
+        border-right: none
+      }
+
+      .fact:nth-child(odd) {
+        border-right: 1px solid var(--border-light)
+      }
+    }
+
+    @media(max-width:760px) {
+      .facts__inner {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .fact:nth-child(2n) {
+        border-right: none
+      }
+
+      .fact {
+        border-bottom: 1px solid var(--border-light)
+      }
+
+      .fact:nth-last-child(-n+2) {
+        border-bottom: none
+      }
+    }
+
+    /* ── OUTSIDE WORK ────────────────────────────────────────── */
+    .outside {
+      padding-block: var(--section);
+      background: var(--navy)
+    }
+
+    .outside__inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start
+    }
+
+    .outside__heading {
+      font-family: var(--serif);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .outside__heading em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .outside__body p {
+      font-size: clamp(15px, 1.15vw, 16.5px);
+      line-height: 1.9;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+    }
+
+    .outside__body p:last-child {
+      margin-bottom: 0
+    }
+
+    .outside__body strong {
+      color: var(--text-primary)
+    }
+
+    .outside-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem
+    }
+
+    .outside-item {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 1.25rem;
+      padding: 1.25rem;
+      background: rgba(0, 0, 0, .2);
+      border: 1px solid rgba(255, 255, 255, .05);
+      border-radius: 3px;
+      align-items: start;
+    }
+
+    .outside-item__icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 3px;
+      background: var(--gold-trans);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .outside-item__label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .375rem
+    }
+
+    .outside-item__body {
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text-secondary)
+    }
+
+    @media(max-width:820px) {
+      .outside__inner {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── NEWSLETTER STRIP ────────────────────────────────────── */
+    .newsletter {
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-light);
+      padding-block: 4.5rem;
+    }
+
+    .newsletter__inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .newsletter__heading {
+      font-family: var(--serif);
+      font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+      font-weight: 400;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: .875rem;
+    }
+
+    .newsletter__heading em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .newsletter__body {
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text-secondary)
+    }
+
+    .newsletter-form {
+      display: flex;
+      flex-direction: column;
+      gap: .875rem
+    }
+
+    .newsletter-fields {
+      display: flex;
+      gap: .75rem
+    }
+
+    .newsletter-input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      padding: .875rem 1.25rem;
+      font-family: var(--sans);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color .2s ease;
+      min-height: 44px;
+    }
+
+    .newsletter-input::placeholder {
+      color: var(--text-subtle)
+    }
+
+    .newsletter-input:focus {
+      border-color: var(--gold)
+    }
+
+    .newsletter-input:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px
+    }
+
+    .newsletter-submit {
+      background: var(--gold);
+      color: #080a10;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 3px;
+      padding: 0 1.5rem;
+      cursor: pointer;
+      min-height: 44px;
+      transition: background .2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .newsletter-submit:hover {
+      background: var(--gold-light)
+    }
+
+    .newsletter-note {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .06em;
+      color: var(--text-subtle)
+    }
+
+    .newsletter-note a {
+      color: var(--text-subtle);
+      text-decoration: underline;
+      text-underline-offset: 3px
+    }
+
+    .newsletter-note a:hover {
+      color: var(--text-secondary)
+    }
+
+    @media(max-width:760px) {
+      .newsletter__inner {
+        grid-template-columns: 1fr
+      }
+
+      .newsletter-fields {
+        flex-direction: column
+      }
+    }
+
+    /* ── CTA BAND ────────────────────────────────────────────── */
+    .cta-band {
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding-block: 5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden
+    }
+
+    .cta-band::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196, 154, 60, .06), transparent 70%);
+      pointer-events: none
+    }
+
+    .cta-band__inner {
+      position: relative;
+      z-index: 1
+    }
+
+    .cta-band__label {
+      margin-bottom: 1.5rem;
+      justify-content: center
+    }
+
+    .cta-band__label::before {
+      display: none
+    }
+
+    .cta-band__heading {
+      font-family: var(--serif);
+      font-size: clamp(1.9rem, 3.5vw, 3rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--text-primary);
+      max-width: 22ch;
+      margin-inline: auto;
+      margin-bottom: 1.25rem
+    }
+
+    .cta-band__heading em {
+      font-style: italic;
+      color: var(--gold)
+    }
+
+    .cta-band__sub {
+      font-size: 15px;
+      color: var(--text-secondary);
+      max-width: 46ch;
+      margin-inline: auto;
+      line-height: 1.8;
+      margin-bottom: 2.5rem
+    }
+
+    .cta-band__actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    .footer {
+      background: var(--bg-surface);
+      padding-block: 4rem 2rem;
+      border-top: 1px solid var(--border-light)
+    }
+
+    .footer__main {
+      display: grid;
+      grid-template-columns: 1.2fr 2fr;
+      gap: 4rem;
+      margin-bottom: 3rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid var(--border-light)
+    }
+
+    .footer__brand-name {
+      font-family: var(--sans);
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 4px
+    }
+
+    .footer__brand-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem
+    }
+
+    .footer__tagline {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 28ch;
+      margin-bottom: 1.5rem
+    }
+
+    .footer__social {
+      display: flex;
+      gap: 1rem
+    }
+
+    .footer__social-link {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border-light);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all .2s ease;
+      text-decoration: none
+    }
+
+    .footer__social-link:hover {
+      border-color: var(--gold-dim);
+      color: var(--gold)
+    }
+
+    .footer__nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem
+    }
+
+    .footer__nav-heading {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem
+    }
+
+    .footer__nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: .375rem
+    }
+
+    .footer__nav-link {
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: color .2s ease;
+      padding-block: 4px;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      text-decoration: none
+    }
+
+    .footer__nav-link:hover {
+      color: var(--text-primary)
+    }
+
+    .footer__legal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem
+    }
+
+    .footer__copyright {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: var(--text-subtle)
+    }
+
+    .footer__legal-links {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap
+    }
+
+    .footer__legal-link {
+      font-size: 12px;
+      color: var(--text-subtle);
+      transition: color .2s ease;
+      text-decoration: none;
+      padding-block: 4px;
+      min-height: 24px;
+      display: flex;
+      align-items: center
+    }
+
+    .footer__legal-link:hover {
+      color: var(--text-secondary)
+    }
+
+    @media(max-width:760px) {
+      .footer__main {
+        grid-template-columns: 1fr;
+        gap: 2.5rem
+      }
+
+      .footer__nav {
+        grid-template-columns: 1fr 1fr
+      }
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .6s ease, transform .6s ease
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0)
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="nav__inner">
+      <a href="/" class="nav__brand" aria-label="André Daus — home">
+        <span class="nav__brand-name">André Daus</span>
+        <span class="nav__brand-sub">Strategic Opposition</span>
+      </a>
+      <div class="nav__links" role="list">
+        <a href="/service" class="nav__link" role="listitem">Services</a>
+        <a href="/use-case" class="nav__link" role="listitem">Use Cases</a>
+        <a href="/insight" class="nav__link" role="listitem">Insights</a>
+        <a href="/library" class="nav__link" role="listitem">Library</a>
+        <a href="/podcast" class="nav__link" role="listitem">Podcast</a>
+      </div>
+      <a href="/contact" class="nav__cta">Find Your Blind Spots</a>
+      <button class="nav__toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-drawer">
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+          <rect y="0" width="22" height="2" rx="1" fill="currentColor" />
+          <rect y="7" width="16" height="2" rx="1" fill="currentColor" />
+          <rect y="14" width="22" height="2" rx="1" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+  <div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
+    <a href="/service" class="nav__drawer-link">Services</a>
+    <a href="/use-case" class="nav__drawer-link">Use Cases</a>
+    <a href="/insight" class="nav__drawer-link">Insights</a>
+    <a href="/library" class="nav__drawer-link">Library</a>
+    <a href="/podcast" class="nav__drawer-link">Podcast</a>
+    <a href="/opposition" class="nav__drawer-link">The Opposition Method</a>
+    <a href="/contact" class="btn btn--primary" style="margin-top:.5rem;justify-content:center">Find Your Blind
+      Spots</a>
+  </div>
+
+  <main id="main-content">
+
+    <!-- ABOUT HERO -->
+    <header class="about-hero" aria-labelledby="about-name">
+      <div class="about-hero__grid" aria-hidden="true"></div>
+      <div class="container">
+        <div class="about-hero__inner">
+
+          <div>
+            <p class="label about-hero__label">About</p>
+            <h1 class="about-hero__name" id="about-name">
+              André<br><em>Daus.</em>
+            </h1>
+            <p class="about-hero__title">Strategic Opposition · Cologne, Germany</p>
+            <p class="about-hero__lede">
+              I make it professionally uncomfortable to keep avoiding the questions that matter. Not because provocation
+              is a style, but because <strong>most organisations already know what they're not asking — they just need
+                someone with a mandate to ask it anyway.</strong>
+            </p>
+
+            <nav class="identity-pills" aria-label="Facets of André Daus">
+              <span class="identity-pill identity-pill--accent">Thinker</span>
+              <span class="identity-pill">Father</span>
+              <span class="identity-pill">Entrepreneur</span>
+              <span class="identity-pill">Athlete</span>
+              <span class="identity-pill">Tech Nerd</span>
+              <span class="identity-pill">Maverick</span>
+            </nav>
+          </div>
+
+          <div class="about-portrait" role="img" aria-label="Portrait of André Daus">
+            <!--
+          REAL PHOTO — use existing asset:
+          /wp-content/uploads/2025/03/MG_6115-760x1024.png
+          Display at max 320px wide, 3:4 ratio, object-position top center.
+        -->
+            <img src="/wp-content/uploads/2025/03/MG_6115-760x1024.png" alt="" class="about-portrait__img" width="320"
+              height="427" loading="eager">
+            <!-- Remove portrait-ph once real image is confirmed loading -->
+            <!--
+        <div class="portrait-ph">
+          <span class="portrait-ph__icon" aria-hidden="true">◎</span>
+          <span class="portrait-ph__label">Portrait</span>
+          <p class="portrait-ph__desc">MG_6115-760x1024.png · 320×427px</p>
+        </div>
+        -->
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- FAST FACTS -->
+    <section class="facts" aria-label="Quick facts about André Daus">
+      <div class="container">
+        <div class="facts__inner" role="list">
+          <div class="fact" role="listitem">
+            <strong class="fact__n">15+</strong>
+            <span class="fact__label">Years in business</span>
+            <p class="fact__note">Solo, independent, client-funded from day one.</p>
+          </div>
+          <div class="fact" role="listitem">
+            <strong class="fact__n">50+</strong>
+            <span class="fact__label">Podcast episodes</span>
+            <p class="fact__note">Iconoclast Insights — solo commentary, no guests.</p>
+          </div>
+          <div class="fact" role="listitem">
+            <strong class="fact__n">2</strong>
+            <span class="fact__label">Brands</span>
+            <p class="fact__note">Thinking (andredaus.com) and Building (LittleBig.Co).</p>
+          </div>
+          <div class="fact" role="listitem">
+            <strong class="fact__n">Cross</strong>
+            <span class="fact__label">Triathlete</span>
+            <p class="fact__note">The hardest routes lead to the most useful information.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHILOSOPHY -->
+    <section class="philosophy" aria-labelledby="philosophy-heading">
+      <div class="container">
+        <div class="philosophy__inner">
+
+          <div class="philosophy__body fade-up">
+            <h2 id="philosophy-heading">
+              I've always been the one<br>who asks <em>why.</em>
+            </h2>
+            <p>
+              Not as a rhetorical move. As a reflex. From the time I was old enough to get into trouble for it, I found
+              it genuinely difficult to accept "that's how we do things" as an answer to anything. That discomfort has
+              been professionally useful. It turns out that most organisations — and most of the people running them —
+              are in exactly the same position: there are questions they're not asking, assumptions they haven't
+              examined, and conclusions they've committed to before the evidence was in.
+            </p>
+            <p>
+              The difference is that I've built a methodology around making that visible. <strong>Strategic
+                Opposition</strong> isn't contrarianism for its own sake. It's a structured process for identifying the
+              assumptions that are running unchallenged — and then challenging them, systematically, before the market
+              does it for you.
+            </p>
+            <p>
+              My formative experience was noticing, repeatedly, that the smartest people in a room were also the most
+              confident in conclusions that hadn't been seriously tested. Intelligence doesn't protect you from
+              confirmation bias. It just makes your rationalisations more convincing. The only thing that actually works
+              is structural challenge — someone with a mandate to find what's wrong, who is explicitly not part of the
+              belief system being examined.
+            </p>
+            <p>
+              That's the role I play. Not consultant. Not coach in the conventional sense. <strong>Professional
+                opposition.</strong> I'm here to make it impossible to keep avoiding the real question.
+            </p>
+          </div>
+
+          <aside class="philosophy-quote fade-up" aria-label="André's guiding philosophy">
+            <p class="philosophy-quote__text">
+              "Everyone said it wouldn't work. Then someone came along who didn't know that — and just did it."
+            </p>
+            <p class="philosophy-quote__attribution">A principle, not a quote</p>
+            <p class="philosophy-quote__note">
+              This isn't about ignoring expertise. It's about recognising that accumulated consensus often contains
+              assumptions no one has checked recently. The person who doesn't inherit those assumptions has a structural
+              advantage — and it can be engineered deliberately.
+            </p>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- IDENTITY DEEP-DIVE -->
+    <section class="identity" aria-labelledby="identity-heading">
+      <div class="container">
+        <p class="label" style="margin-bottom:1.25rem">Beyond the methodology</p>
+        <h2 class="identity__heading" id="identity-heading">
+          What else shapes<br>how I <em>think.</em>
+        </h2>
+        <div class="identity-grid" role="list">
+
+          <article class="identity-card fade-up" role="listitem" aria-label="Father">
+            <span class="identity-card__n" aria-hidden="true">01</span>
+            <p class="identity-card__label">Father</p>
+            <p class="identity-card__body">Single father of two. The most consistently assumption-challenging context I
+              operate in. Children are professionally provocative — they have no investment in your current beliefs and
+              will say so directly.</p>
+          </article>
+
+          <article class="identity-card fade-up" role="listitem" aria-label="Thinker">
+            <span class="identity-card__n" aria-hidden="true">02</span>
+            <p class="identity-card__label">Thinker</p>
+            <p class="identity-card__body">My work IS my mindset. Contrarian, unconventional, and permanently suspicious
+              of anything that hasn't been stress-tested. I document what I find at the intersection of cognitive
+              science and practical decision-making.</p>
+          </article>
+
+          <article class="identity-card fade-up" role="listitem" aria-label="Entrepreneur">
+            <span class="identity-card__n" aria-hidden="true">03</span>
+            <p class="identity-card__label">Entrepreneur</p>
+            <p class="identity-card__body">Over 15 years building and running an independent solo business. No
+              investors, no co-founders, no safety net. Independence is not an accident — it's the condition that allows
+              genuine opposition, because I'm not inside any of the systems I challenge.</p>
+          </article>
+
+          <article class="identity-card fade-up" role="listitem" aria-label="Tech Nerd">
+            <span class="identity-card__n" aria-hidden="true">04</span>
+            <p class="identity-card__label">Tech Nerd</p>
+            <p class="identity-card__body">I build the infrastructure I need rather than accepting what exists. Running
+              my own server stack, self-hosted tooling, and 20+ WordPress sites in production. Technology that creates
+              dependency is technology that undermines independence.</p>
+          </article>
+
+          <article class="identity-card fade-up" role="listitem" aria-label="Athlete">
+            <span class="identity-card__n" aria-hidden="true">05</span>
+            <p class="identity-card__label">Athlete</p>
+            <p class="identity-card__body">Cross triathlon — deliberately. The discipline takes the hardest version of
+              each leg: off-road bike, open water, mountain terrain. The easy path is always available. Choosing it
+              tells you something you should know about yourself.</p>
+          </article>
+
+          <article class="identity-card fade-up" role="listitem" aria-label="Maverick">
+            <span class="identity-card__n" aria-hidden="true">06</span>
+            <p class="identity-card__label">Maverick</p>
+            <p class="identity-card__body">Iconoclast Insights — 50+ episodes of solo commentary on the thinking errors
+              and lazy consensus that quietly run organisations. No guests. No balance. No polite agreement with things
+              that deserve to be challenged.</p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- THE TWO BRANDS -->
+    <section class="work" aria-labelledby="work-heading">
+      <div class="container">
+        <div class="work__inner">
+
+          <div class="fade-up">
+            <p class="label work__label">How I work</p>
+            <h2 class="work__heading" id="work-heading">
+              Two brands.<br><em>One approach.</em>
+            </h2>
+            <div class="work__body">
+              <p>
+                I deliberately separated my work into two distinct brands. Not for organisational tidiness — because
+                conflating them would undermine both.
+              </p>
+              <p>
+                <strong>andredaus.com</strong> is the Thinking Brand. Strategic Opposition coaching and consulting — for
+                leaders and organisations who need someone outside the belief system, with a mandate to find what's
+                wrong before it finds them.
+              </p>
+              <p>
+                <strong>LittleBig.Co</strong> is the Building Brand. Technical consulting, WordPress infrastructure, and
+                IT implementation — for organisations that need things built properly, not just advised on. The
+                separation matters: a client who comes to me for technical implementation shouldn't default to seeing me
+                as just another IT consultant when the real problem is a strategic assumption that needs challenging.
+              </p>
+            </div>
+          </div>
+
+          <div class="work-brands fade-up" role="list">
+            <a href="/" class="brand-card" role="listitem" aria-label="andredaus.com — the thinking brand">
+              <div class="brand-card__top">
+                <span class="brand-card__name">andredaus.com</span>
+                <span class="brand-card__arrow" aria-hidden="true">→</span>
+              </div>
+              <span class="brand-card__label brand-card__label--thinking">Thinking Brand</span>
+              <p class="brand-card__desc">Strategic Opposition coaching and consulting. Challenging assumptions,
+                identifying root causes, and making it impossible to keep avoiding the real question.</p>
+            </a>
+            <a href="https://littlebig.co" class="brand-card" role="listitem" target="_blank" rel="noopener"
+              aria-label="LittleBig.Co — the building brand (opens in new tab)">
+              <div class="brand-card__top">
+                <span class="brand-card__name">LittleBig.Co</span>
+                <span class="brand-card__arrow" aria-hidden="true">↗</span>
+              </div>
+              <span class="brand-card__label brand-card__label--building">Building Brand</span>
+              <p class="brand-card__desc">Technical consulting and IT implementation. WordPress infrastructure,
+                security, and digital architecture — built to last, not to create dependency.</p>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- OUTSIDE WORK -->
+    <section class="outside" aria-labelledby="outside-heading">
+      <div class="container">
+        <div class="outside__inner">
+          <div class="fade-up">
+            <h2 class="outside__heading" id="outside-heading">
+              Outside the<br><em>work.</em>
+            </h2>
+            <div class="outside__body">
+              <p>The things that don't appear on a services page but shape how I think about everything that does.
+                Raising two children as a single father gives you a particular kind of clarity about what matters and
+                what doesn't. Cross triathlon gives you a particular relationship with discomfort.</p>
+              <p>Both are useful in client work. The ability to hold a position under pressure without flinching, to
+                distinguish between discomfort that signals something important and discomfort that's just unfamiliar —
+                these aren't soft skills. They're structural capacities that either exist or don't.</p>
+            </div>
+          </div>
+          <div class="outside-items fade-up" role="list">
+            <div class="outside-item" role="listitem">
+              <div class="outside-item__icon" aria-hidden="true">⛰️</div>
+              <div>
+                <p class="outside-item__label">Cross Triathlon</p>
+                <p class="outside-item__body">Off-road cycling, open water swimming, mountain running. The hardest
+                  version of each leg — because the easy option is always available, and choosing it tells you
+                  something.</p>
+              </div>
+            </div>
+            <div class="outside-item" role="listitem">
+              <div class="outside-item__icon" aria-hidden="true">👨‍👧‍👦</div>
+              <div>
+                <p class="outside-item__label">Single Father of Two</p>
+                <p class="outside-item__body">The most assumption-challenging context I operate in daily. Children are
+                  natural contrarians — they have no investment in your current beliefs and will say so without
+                  strategy.</p>
+              </div>
+            </div>
+            <div class="outside-item" role="listitem">
+              <div class="outside-item__icon" aria-hidden="true">🎙️</div>
+              <div>
+                <p class="outside-item__label">Iconoclast Insights</p>
+                <p class="outside-item__body">50+ episodes of solo commentary. No guests, no balance, no polite
+                  agreement. Commentary on the thinking errors that quietly run organisations — published when there's
+                  something worth saying.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER -->
+    <section class="newsletter" aria-labelledby="newsletter-heading">
+      <div class="container">
+        <div class="newsletter__inner">
+          <div>
+            <h2 class="newsletter__heading" id="newsletter-heading">
+              Get the thinking<br><em>before it's a podcast.</em>
+            </h2>
+            <p class="newsletter__body">Occasional writing on Strategic Opposition, assumption-challenging, and the
+              cognitive patterns that quietly determine how organisations make decisions. No schedule. Only when there's
+              something worth your attention.</p>
+          </div>
+          <form class="newsletter-form" action="#" method="POST" aria-label="Newsletter subscription">
+            <div class="newsletter-fields">
+              <label for="nl-email" class="sr-only">Email address</label>
+              <input type="email" id="nl-email" name="email" class="newsletter-input" placeholder="your@email.com"
+                required autocomplete="email">
+              <button type="submit" class="newsletter-submit">Subscribe</button>
+            </div>
+            <p class="newsletter-note">No spam. Read the <a href="/policy/privacy">Privacy Policy</a>.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA BAND -->
+    <section class="cta-band" aria-labelledby="cta-heading">
+      <div class="container cta-band__inner">
+        <p class="label cta-band__label">Ready to work</p>
+        <h2 class="cta-band__heading" id="cta-heading">
+          If you've been avoiding<br>a question, <em>that's the one we start with.</em>
+        </h2>
+        <p class="cta-band__sub">A discovery call is where we find out which assumptions are running unchallenged in
+          your strategy right now — and what it would cost to keep ignoring them.</p>
+        <div class="cta-band__actions">
+          <a href="/contact" class="btn btn--primary btn-arrow">Book a Discovery Call</a>
+          <a href="/opposition" class="btn btn--outline">The Opposition Method</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer__main">
+        <div>
+          <p class="footer__brand-name">André Daus</p>
+          <p class="footer__brand-sub">Strategic Opposition</p>
+          <p class="footer__tagline">Your thinking creates your limits.</p>
+          <nav class="footer__social" aria-label="Social media">
+            <a href="https://linkedin.com/in/andredaus" class="footer__social-link" aria-label="André Daus on LinkedIn"
+              target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor"
+                aria-hidden="true">
+                <path
+                  d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z" />
+              </svg></a>
+            <a href="https://www.instagram.com/andredaus/" class="footer__social-link"
+              aria-label="André Daus on Instagram" target="_blank" rel="noopener"><svg width="16" height="16"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r=".5" fill="currentColor" />
+              </svg></a>
+            <a href="#" class="footer__social-link" aria-label="André Daus on X (Twitter)" target="_blank"
+              rel="noopener"><svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor"
+                aria-hidden="true">
+                <path
+                  d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z" />
+              </svg></a>
+          </nav>
+        </div>
+        <nav class="footer__nav" aria-label="Site navigation">
+          <div>
+            <h3 class="footer__nav-heading">Services</h3>
+            <ul class="footer__nav-list">
+              <li><a href="/service/assumption-hunting" class="footer__nav-link">Assumption Hunting</a></li>
+              <li><a href="/service/1-on-1-coaching" class="footer__nav-link">1:1 Coaching</a></li>
+              <li><a href="/service/burn-the-box" class="footer__nav-link">Burn the Box</a></li>
+              <li><a href="/service/workshop" class="footer__nav-link">Workshop</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="footer__nav-heading">Explore</h3>
+            <ul class="footer__nav-list">
+              <li><a href="/use-case" class="footer__nav-link">Use Cases</a></li>
+              <li><a href="/library" class="footer__nav-link">Library</a></li>
+              <li><a href="/opposition" class="footer__nav-link">The Opposition Method</a></li>
+              <li><a href="/podcast" class="footer__nav-link">Podcast</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="footer__nav-heading">Also by André</h3>
+            <ul class="footer__nav-list">
+              <li><a href="https://littlebig.co" class="footer__nav-link" target="_blank" rel="noopener">LittleBig.Co
+                  ↗</a></li>
+              <li><a href="/about" class="footer__nav-link">About</a></li>
+              <li><a href="/contact" class="footer__nav-link">Contact</a></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+      <div class="footer__legal">
+        <p class="footer__copyright">Copyright 2025 © André Daus</p>
+        <nav class="footer__legal-links" aria-label="Legal"><a href="/policy/privacy" class="footer__legal-link">Privacy
+            Policy</a><a href="/policy/legal-notice" class="footer__legal-link">Legal Notice</a><a href="/legal/terms"
+            class="footer__legal-link">Terms</a><a href="/policy/ai-use" class="footer__legal-link">AI Policy</a></nav>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+      var t = document.querySelector('.nav__toggle'), d = document.getElementById('nav-drawer');
+      if (t && d) {
+        t.addEventListener('click', function () { var o = d.classList.toggle('is-open'); t.setAttribute('aria-expanded', String(o)); t.setAttribute('aria-label', o ? 'Close navigation menu' : 'Open navigation menu'); });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && d.classList.contains('is-open')) { d.classList.remove('is-open'); t.setAttribute('aria-expanded', 'false'); t.focus(); } });
+      }
+      if (!window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+        var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }); }, { threshold: .1, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.fade-up').forEach(function (el) { io.observe(el); });
+      } else {
+        document.querySelectorAll('.fade-up').forEach(function (el) { el.classList.add('visible'); });
+      }
+      var nav = document.querySelector('.nav');
+      if (nav) window.addEventListener('scroll', function () { nav.style.borderBottomColor = scrollY > 40 ? 'rgba(196,154,60,.15)' : 'rgba(255,255,255,.06)'; }, { passive: true });
+    })();
+  </script>
+</body>
+
+</html>

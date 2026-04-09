@@ -1,0 +1,1876 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>André Daus — Strategic Opposition</title>
+<meta name="description" content="Strategic Opposition consulting and coaching. André Daus challenges the assumptions your strategy depends on — before the market does it for you.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans:  'Work Sans', system-ui, sans-serif;
+  --mono:  'DM Mono', 'SF Mono', monospace;
+
+  /* Backgrounds */
+  --bg-base:     #090c14;
+  --bg-surface:  #0d1120;
+  --bg-elevated: #111828;
+  --bg-card:     #141c2c;
+  --bg-card-alt: #0f1520;
+
+  /* Accent — amber/gold */
+  --gold:       #c49a3c;
+  --gold-light: #d4aa52;
+  --gold-dim:   #8a6a24;   /* decorative only — fails AA for small text */
+  --gold-glow:  rgba(196,154,60,.10);
+  --gold-trans: rgba(196,154,60,.06);
+
+  /* Navy atmospheric */
+  --navy:       #1d2d44;
+
+  /* Text — all values verified ≥ 4.5:1 on relevant backgrounds */
+  --text-primary:   #ede8dc;  /* 14.8:1 on bg-base */
+  --text-secondary: #96a0b0;  /* 7.9:1 on bg-base, 6.7:1 on bg-surface */
+  --text-subtle:    #7d8799;  /* 4.6:1 on bg-base — AA minimum for small text */
+  --text-muted:     #5a6475;  /* decorative only — fails AA for small text */
+
+  /* Borders */
+  --border:       rgba(196,154,60,.12);
+  --border-light: rgba(255,255,255,.06);
+
+  /* Layout */
+  --max-w:   1160px;
+  --gutter:  clamp(1.25rem, 4vw, 2.5rem);
+  --section: clamp(5rem, 10vw, 9rem);
+}
+
+/* ═══════════════════════════════════════════════════════
+   RESET
+   ═══════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a  { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+ul, ol { list-style: none; }
+
+/* ═══════════════════════════════════════════════════════
+   ACCESSIBILITY — WCAG 2.2 AA
+   ═══════════════════════════════════════════════════════ */
+
+/* 2.4.1 Bypass Blocks — skip link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: .75rem 1.5rem;
+  background: var(--gold);
+  color: #080a10;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  border-radius: 0 0 3px 3px;
+  transition: top .15s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* 2.4.7 / 2.4.11 Focus Appearance — 3px ring, ≥3:1 contrast with adjacent colours */
+*:focus { outline: none; }
+*:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+/* Buttons / links that have their own bg get inset ring */
+.btn:focus-visible,
+.nav__cta:focus-visible,
+.nav__link:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Screen-reader only utility */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LAYOUT UTILITIES
+   ═══════════════════════════════════════════════════════ */
+.container { max-width: var(--max-w); margin: 0 auto; padding: 0 var(--gutter); }
+.section   { padding-block: var(--section); }
+
+/* ═══════════════════════════════════════════════════════
+   LABEL COMPONENT
+   ═══════════════════════════════════════════════════════ */
+.label {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.label::before {
+  content: '';
+  display: block;
+  width: 28px; height: 1px;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS — min 44×44px touch target (2.5.8 satisfied via padding)
+   ═══════════════════════════════════════════════════════ */
+.btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  min-height: 44px;
+  border-radius: 3px;
+  transition: all .2s ease;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn--primary {
+  background: var(--gold);
+  color: #080a10;
+  font-weight: 600;
+}
+.btn--primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn--outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid rgba(196,154,60,.35);
+}
+.btn--outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-1px); }
+.btn-arrow::after {
+  content: '→';
+  font-family: var(--sans);
+  font-size: 14px;
+  transition: transform .2s ease;
+  display: inline-block;
+}
+.btn-arrow:hover::after { transform: translateX(3px); }
+
+/* ═══════════════════════════════════════════════════════
+   IMAGE PLACEHOLDER COMPONENT
+   ═══════════════════════════════════════════════════════ */
+.img-ph {
+  width: 100%; height: 100%;
+  background: var(--bg-elevated);
+  border: 1px dashed rgba(196,154,60,.22);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 2rem;
+  text-align: center;
+}
+.img-ph__icon  { font-size: 2rem; opacity: .25; display: block; }
+.img-ph__label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold);   /* --gold passes 7:1 on bg-elevated */
+}
+.img-ph__desc {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--text-secondary); /* passes 6.7:1 */
+  max-width: 28ch;
+}
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 var(--gutter);
+  height: 68px;
+  display: flex; align-items: center;
+  background: rgba(9,12,20,.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-light);
+  transition: border-color .3s ease;
+}
+.nav__inner {
+  max-width: var(--max-w); margin: 0 auto; width: 100%;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem;
+}
+.nav__brand { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
+.nav__brand-name {
+  font-family: var(--sans);
+  font-weight: 600; font-size: 15px;
+  letter-spacing: .04em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+.nav__brand-sub {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--gold); /* 7:1 passes */
+}
+.nav__links {
+  display: flex; align-items: center;
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+.nav__link {
+  font-family: var(--sans);
+  font-size: 13px; font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: .03em;
+  transition: color .2s ease;
+  position: relative;
+  padding-block: 4px; /* helps 2.5.8 target size */
+}
+.nav__link::after {
+  content: '';
+  position: absolute; bottom: -2px; left: 0;
+  width: 0; height: 1px;
+  background: var(--gold);
+  transition: width .25s ease;
+}
+.nav__link:hover { color: var(--text-primary); }
+.nav__link:hover::after, .nav__link.is-active::after { width: 100%; }
+.nav__link.is-active { color: var(--gold); }
+
+.nav__cta {
+  font-family: var(--mono);
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(196,154,60,.35);
+  padding: 10px 18px;
+  min-height: 44px;
+  border-radius: 3px;
+  transition: all .2s ease;
+  display: inline-flex; align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+.nav__cta:hover { background: var(--gold-trans); border-color: var(--gold); }
+
+/* Mobile menu toggle — 2.5.8: 44×44 min */
+.nav__toggle {
+  display: none;
+  width: 44px; height: 44px;
+  background: none; border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  align-items: center; justify-content: center;
+  border-radius: 3px;
+  transition: color .2s ease;
+  flex-shrink: 0;
+}
+.nav__toggle:hover { color: var(--gold); }
+.nav__toggle-icon { pointer-events: none; }
+
+/* Mobile nav drawer */
+.nav__drawer {
+  display: none;
+  position: fixed; top: 68px; left: 0; right: 0;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 1.5rem var(--gutter);
+  flex-direction: column; gap: 1rem;
+  z-index: 99;
+}
+.nav__drawer.is-open { display: flex; }
+.nav__drawer-link {
+  font-size: 15px; color: var(--text-secondary);
+  padding-block: 8px;
+  border-bottom: 1px solid var(--border-light);
+  transition: color .2s ease;
+  min-height: 44px;
+  display: flex; align-items: center;
+  text-decoration: none;
+}
+.nav__drawer-link:hover { color: var(--gold); }
+.nav__drawer-cta {
+  margin-top: .5rem;
+  text-align: center;
+}
+
+@media (max-width: 820px) {
+  .nav__links { display: none; }
+  .nav__cta   { display: none; }
+  .nav__toggle { display: flex; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HERO
+   ═══════════════════════════════════════════════════════ */
+.hero {
+  padding-top: 68px;
+  min-height: 100svh;
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-base) 60%);
+}
+.hero__bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 40%, rgba(29,45,68,.5), transparent 70%),
+    radial-gradient(ellipse 40% 60% at 20% 80%, rgba(196,154,60,.04), transparent 60%);
+  pointer-events: none;
+}
+.hero__grid-overlay {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black, transparent);
+  pointer-events: none;
+}
+.hero__inner {
+  position: relative; z-index: 1;
+  max-width: var(--max-w); margin: 0 auto;
+  width: 100%; padding: clamp(4rem,8vw,6rem) var(--gutter);
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: clamp(3rem, 6vw, 5rem);
+  align-items: center;
+}
+.hero__label { margin-bottom: 1.5rem; }
+.hero__headline {
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 400; line-height: 1.05;
+  letter-spacing: -.025em;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+.hero__headline em { font-style: italic; color: var(--gold); display: block; }
+.hero__lede {
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  color: var(--text-secondary);
+  line-height: 1.85;
+  max-width: 52ch;
+  margin-bottom: 2.5rem;
+}
+.hero__ctas { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+
+/* Hero aside — stats panel */
+.hero__aside {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--border-light);
+  border-radius: 4px; overflow: hidden;
+}
+.hero__aside-stat {
+  padding: 1.75rem;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-elevated);
+}
+.hero__aside-stat:last-child { border-bottom: none; }
+.hero__aside-number {
+  font-family: var(--serif);
+  font-size: 2.5rem; font-style: italic;
+  color: var(--gold);
+  line-height: 1;
+  display: block;
+  margin-bottom: .25rem;
+}
+.hero__aside-label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-secondary); /* 7.9:1 — passes */
+}
+
+/* Hero image */
+.hero__image-wrap {
+  grid-column: 2; grid-row: 1 / 3;
+  align-self: stretch;
+}
+/* Refactored: image beside stats, not stats as aside */
+
+/* ── Alternate hero layout with portrait ── */
+.hero__portrait {
+  position: relative;
+  border-radius: 4px; overflow: hidden;
+  aspect-ratio: 3/4;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+}
+.hero__portrait img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 15%;
+}
+
+/* Hero scroll hint */
+.hero__scroll {
+  position: absolute; bottom: 2rem; left: var(--gutter);
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--text-subtle);
+  display: flex; align-items: center; gap: .75rem;
+}
+.hero__scroll::before {
+  content: '';
+  display: block; width: 1px; height: 40px;
+  background: linear-gradient(var(--gold), transparent);
+}
+
+@media (max-width: 860px) {
+  .hero__inner { grid-template-columns: 1fr; }
+  .hero__portrait { aspect-ratio: 16/9; max-height: 320px; }
+  .hero__scroll { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROBLEM SECTION
+   ═══════════════════════════════════════════════════════ */
+.problem { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+.problem__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 400; line-height: 1.25;
+  color: var(--text-primary);
+  max-width: 52ch;
+  margin-bottom: 3rem;
+}
+.problem__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border-light);
+  border: 1px solid var(--border-light);
+  border-radius: 3px; overflow: hidden;
+}
+.problem__card {
+  background: var(--bg-card-alt);
+  padding: 2.5rem 2rem;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.problem__card-number {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: .16em;
+  color: var(--gold);
+}
+.problem__card-title {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-weight: 400; line-height: 1.3;
+  color: var(--text-primary);
+}
+.problem__card-body {
+  font-size: 14px; line-height: 1.8;
+  color: var(--text-secondary);
+  flex: 1;
+}
+@media (max-width: 760px) { .problem__grid { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════════════════
+   METHODOLOGY SECTION
+   ═══════════════════════════════════════════════════════ */
+.method__intro {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3rem; align-items: end;
+  margin-bottom: 3rem;
+}
+.method__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 400; line-height: 1.25;
+  color: var(--text-primary);
+  max-width: 44ch;
+}
+.method__heading em { font-style: italic; color: var(--gold); }
+
+.method__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.method__card {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-light);
+  border-top: 2px solid var(--gold-dim);
+  padding: 2rem;
+  border-radius: 3px;
+  display: flex; flex-direction: column; gap: 1rem;
+  transition: border-top-color .2s ease;
+}
+.method__card:hover { border-top-color: var(--gold); }
+.method__card-title {
+  font-family: var(--serif);
+  font-size: 1.2rem; font-weight: 400; line-height: 1.3;
+  color: var(--text-primary);
+}
+.method__card-body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); flex: 1; }
+.method__card-link {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 24px; /* WCAG 2.5.8 */
+  transition: gap .2s ease;
+  text-decoration: none;
+  width: fit-content;
+}
+.method__card-link:hover { gap: 14px; }
+.method__card-link::after { content: '→'; }
+
+/* Method image */
+.method__image-wrap {
+  margin-top: 3rem;
+  border-radius: 4px; overflow: hidden;
+  aspect-ratio: 16/7;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+}
+.method__image-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+@media (max-width: 760px) {
+  .method__intro { grid-template-columns: 1fr; }
+  .method__cards { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SERVICES SECTION
+   ═══════════════════════════════════════════════════════ */
+.services { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+.services__intro { margin-bottom: 3rem; }
+.services__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 400; line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.services__lede { font-size: 15px; color: var(--text-secondary); max-width: 60ch; line-height: 1.8; }
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+.service-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-left: 3px solid var(--gold-dim);
+  padding: 2rem 2rem 2rem 1.75rem;
+  border-radius: 0 3px 3px 0;
+  display: flex; flex-direction: column; gap: 1rem;
+  transition: border-left-color .2s ease;
+}
+.service-card:hover { border-left-color: var(--gold); }
+.service-card__label {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold);
+}
+.service-card__title {
+  font-family: var(--serif);
+  font-size: 1.25rem; font-weight: 400; line-height: 1.3;
+  color: var(--text-primary);
+}
+.service-card__body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); flex: 1; }
+.service-card__link {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--gold);
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 24px; /* WCAG 2.5.8 */
+  transition: gap .2s ease;
+  text-decoration: none;
+  width: fit-content;
+  margin-top: auto;
+}
+.service-card__link:hover { gap: 14px; }
+.service-card__link::after { content: '→'; }
+.services__footer {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-light);
+  display: flex; justify-content: flex-end;
+}
+@media (max-width: 640px) { .services__grid { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════════════════
+   PROCESS SECTION
+   ═══════════════════════════════════════════════════════ */
+.process__inner {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 5rem; align-items: start;
+}
+.process__sidebar { position: sticky; top: calc(68px + 2rem); }
+.process__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: 400; line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.process__sub {
+  font-size: 14px; line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+.process__steps { display: flex; flex-direction: column; gap: 0; }
+.process__step {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 1.5rem; align-items: start;
+  padding-block: 2rem;
+  border-bottom: 1px solid var(--border-light);
+}
+.process__step:first-child { border-top: 1px solid var(--border-light); }
+.process__step-number {
+  font-family: var(--serif); font-style: italic;
+  font-size: 2rem; color: var(--gold);
+  line-height: 1.1;
+}
+.process__step-title {
+  font-family: var(--serif);
+  font-size: 1.1rem; font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: .5rem;
+}
+.process__step-body { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+@media (max-width: 820px) {
+  .process__inner { grid-template-columns: 1fr; }
+  .process__sidebar { position: static; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CALLOUT / POSITIONING SECTION
+   ═══════════════════════════════════════════════════════ */
+.callout { background: var(--navy); border-top: 1px solid rgba(29,45,68,.8); }
+.callout__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: start;
+}
+.callout__quote {
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  line-height: 1.3;
+  color: var(--text-primary);
+  border-left: 3px solid var(--gold);
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.callout__body {
+  font-size: 15px; line-height: 1.85;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+}
+.callout__aside { display: flex; flex-direction: column; gap: 1.5rem; }
+.callout__fact {
+  padding: 1.75rem;
+  background: rgba(0,0,0,.2);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 3px;
+}
+.callout__fact-text {
+  font-size: 14px; line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: .875rem;
+}
+.callout__fact-source {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold);
+}
+@media (max-width: 820px) { .callout__inner { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════════════════
+   PODCAST SECTION
+   ═══════════════════════════════════════════════════════ */
+.podcast {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-light);
+}
+.podcast__inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: start;
+}
+.podcast__cover {
+  border-radius: 4px; overflow: hidden;
+  aspect-ratio: 1/1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+.podcast__cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.podcast__label { margin-bottom: 1.5rem; }
+.podcast__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 400; line-height: 1.2;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.podcast__desc {
+  font-size: 15px; line-height: 1.85;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+.podcast__meta {
+  display: flex; gap: 2rem; flex-wrap: wrap;
+  padding: 1rem 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 1.5rem;
+}
+.podcast__meta-item {
+  font-size: 13px; color: var(--text-secondary);
+}
+.podcast__meta-item strong {
+  display: block;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.episodes { display: flex; flex-direction: column; gap: 0; }
+.episode {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  gap: 1rem; align-items: center;
+  padding-block: 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+  text-decoration: none;
+  transition: background .15s ease;
+  border-radius: 2px;
+  padding-inline: .5rem;
+  min-height: 44px; /* WCAG 2.5.8 */
+}
+.episode:first-child { border-top: 1px solid var(--border-light); }
+.episode:hover { background: rgba(196,154,60,.04); }
+.episode__num {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--gold);
+  text-align: right;
+}
+.episode__title {
+  font-size: 14px; font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+.episode__topic {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+.episode__dur {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+@media (max-width: 820px) {
+  .podcast__inner { grid-template-columns: 1fr; }
+  .podcast__cover { max-width: 220px; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   TESTIMONIALS
+   ═══════════════════════════════════════════════════════ */
+.testimonials { background: var(--bg-base); border-top: 1px solid var(--border-light); }
+.testimonials__intro { text-align: center; margin-bottom: 3rem; }
+.testimonials__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-weight: 400; line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: .75rem;
+}
+.testimonials__sub { font-size: 15px; color: var(--text-secondary); max-width: 54ch; margin-inline: auto; line-height: 1.8; }
+.testimonials__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.testimonial {
+  background: var(--bg-card-alt);
+  border: 1px solid var(--border-light);
+  border-top: 2px solid var(--gold-dim);
+  padding: 2rem;
+  border-radius: 3px;
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.testimonial__callout {
+  font-family: var(--serif); font-style: italic;
+  font-size: 1.05rem; line-height: 1.5;
+  color: var(--gold-light);
+}
+.testimonial__quote {
+  font-size: 14px; line-height: 1.8;
+  color: var(--text-secondary);
+  flex: 1;
+}
+/* Note: using <footer> inside <li> is not valid HTML; use <div> instead */
+.testimonial__byline {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+  margin-top: auto;
+}
+.testimonial__name {
+  font-weight: 600; font-size: 14px;
+  color: var(--text-primary);
+}
+.testimonial__title {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+@media (max-width: 760px) { .testimonials__grid { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════════════════
+   FAQ
+   ═══════════════════════════════════════════════════════ */
+.faq { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+.faq__inner {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 5rem; align-items: start;
+}
+.faq__sidebar { position: sticky; top: calc(68px + 2rem); }
+.faq__heading {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+  font-weight: 400; line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+.faq__sub {
+  font-size: 14px; line-height: 1.8;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+.faq__list { display: flex; flex-direction: column; gap: 0; }
+.faq__item { border-bottom: 1px solid var(--border-light); }
+.faq__item:first-child { border-top: 1px solid var(--border-light); }
+
+/* FAQ button — min 44px, full width, accessible */
+.faq__question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 1.25rem 0;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--sans); font-size: 15px; font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  transition: color .2s ease;
+}
+.faq__question:hover { color: var(--gold); }
+.faq__icon {
+  font-family: var(--mono); font-size: 1.25rem;
+  color: var(--gold);
+  transition: transform .25s ease;
+  flex-shrink: 0;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+}
+.faq__item.is-open .faq__icon { transform: rotate(45deg); }
+
+/* Answer panel — hidden until open */
+.faq__answer {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .3s ease, padding .3s ease;
+}
+.faq__item.is-open .faq__answer { max-height: 600px; }
+.faq__answer-text {
+  font-size: 15px; line-height: 1.85;
+  color: var(--text-secondary);
+  padding-bottom: 1.5rem;
+}
+
+@media (max-width: 820px) {
+  .faq__inner { grid-template-columns: 1fr; }
+  .faq__sidebar { position: static; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CTA BAND
+   ═══════════════════════════════════════════════════════ */
+.cta-band {
+  background: var(--bg-elevated);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding-block: 6rem;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.cta-band::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,.07), transparent 70%);
+  pointer-events: none;
+}
+.cta-band__inner { position: relative; z-index: 1; }
+
+/* CTA avatar */
+.cta-band__avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--gold-dim);
+  margin: 0 auto 1.5rem;
+  background: var(--bg-elevated);
+}
+.cta-band__avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 20%;
+}
+
+.cta-band__label { margin-bottom: 1.5rem; justify-content: center; }
+.cta-band__label::before { display: none; }
+.cta-band__heading {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 400; line-height: 1.12;
+  color: var(--text-primary);
+  max-width: 22ch; margin-inline: auto;
+  margin-bottom: 1.25rem;
+}
+.cta-band__heading em { font-style: italic; color: var(--gold); }
+.cta-band__sub {
+  font-size: 15px; color: var(--text-secondary);
+  max-width: 48ch; margin-inline: auto;
+  line-height: 1.85; margin-bottom: 2.5rem;
+}
+.cta-band__actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════ */
+.footer {
+  background: var(--bg-surface);
+  padding-block: 4rem 2.5rem;
+  border-top: 1px solid var(--border-light);
+}
+.footer__main {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 4rem;
+  margin-bottom: 3rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--border-light);
+}
+.footer__brand-name {
+  font-family: var(--sans); font-weight: 600;
+  font-size: 16px; letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.footer__brand-sub {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+}
+.footer__tagline {
+  font-family: var(--serif); font-style: italic;
+  font-size: 15px; color: var(--text-secondary);
+  line-height: 1.6; max-width: 28ch;
+  margin-bottom: 1.5rem;
+}
+.footer__social { display: flex; gap: 1rem; }
+.footer__social-link {
+  width: 44px; height: 44px; /* WCAG 2.5.8 */
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary);
+  transition: all .2s ease;
+  text-decoration: none;
+}
+.footer__social-link:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+.footer__nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+.footer__nav-heading {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--gold); /* changed from gold-dim — passes 7:1 */
+  margin-bottom: 1rem;
+}
+.footer__nav-list { display: flex; flex-direction: column; gap: .375rem; }
+.footer__nav-link {
+  font-size: 13px;
+  color: var(--text-secondary); /* 6.7:1 on bg-surface — passes */
+  transition: color .2s ease;
+  padding-block: 4px; /* helps 2.5.8 */
+  min-height: 24px;
+  display: flex; align-items: center;
+  text-decoration: none;
+}
+.footer__nav-link:hover { color: var(--text-primary); }
+
+.footer__legal {
+  display: flex;
+  justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer__copyright {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: .08em;
+  color: var(--text-subtle); /* #7d8799 — 4.6:1 on bg-surface — passes AA */
+}
+.footer__legal-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.footer__legal-link {
+  font-size: 12px;
+  color: var(--text-subtle); /* passes AA */
+  transition: color .2s ease;
+  text-decoration: none;
+  padding-block: 4px;
+  min-height: 24px;
+  display: flex; align-items: center;
+}
+.footer__legal-link:hover { color: var(--text-secondary); }
+
+@media (max-width: 760px) {
+  .footer__main { grid-template-columns: 1fr; gap: 2.5rem; }
+  .footer__nav  { grid-template-columns: 1fr 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   SCROLL REVEAL
+   ═══════════════════════════════════════════════════════ */
+.fade-up {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+.fade-up:nth-child(2) { transition-delay: .1s; }
+.fade-up:nth-child(3) { transition-delay: .2s; }
+.fade-up:nth-child(4) { transition-delay: .3s; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
+  .faq__answer { transition: none; }
+  .faq__icon   { transition: none; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- 2.4.1 Skip link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ═══════════════════════ NAV ═══════════════════════ -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav__inner">
+    <a href="/" class="nav__brand" aria-label="André Daus — Strategic Opposition, home">
+      <span class="nav__brand-name">André Daus</span>
+      <span class="nav__brand-sub">Strategic Opposition</span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="nav__links" role="list">
+      <a href="/service"    class="nav__link" role="listitem">Services</a>
+      <a href="/use-case"   class="nav__link" role="listitem">Use Cases</a>
+      <a href="/insight"    class="nav__link" role="listitem">Insights</a>
+      <a href="/podcast"    class="nav__link" role="listitem">Podcast</a>
+      <a href="/opposition" class="nav__link" role="listitem">Opposition</a>
+    </div>
+
+    <a href="/contact" class="nav__cta">Find Your Blind Spots</a>
+
+    <!-- Mobile toggle — WCAG 2.5.8 44×44 -->
+    <button
+      class="nav__toggle"
+      aria-label="Open navigation menu"
+      aria-expanded="false"
+      aria-controls="nav-drawer"
+    >
+      <svg class="nav__toggle-icon" width="22" height="16" viewBox="0 0 22 16" fill="none" aria-hidden="true">
+        <rect y="0"  width="22" height="2" rx="1" fill="currentColor"/>
+        <rect y="7"  width="16" height="2" rx="1" fill="currentColor"/>
+        <rect y="14" width="22" height="2" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
+  <a href="/service"    class="nav__drawer-link">Services</a>
+  <a href="/use-case"   class="nav__drawer-link">Use Cases</a>
+  <a href="/insight"    class="nav__drawer-link">Insights</a>
+  <a href="/podcast"    class="nav__drawer-link">Podcast</a>
+  <a href="/opposition" class="nav__drawer-link">The Opposition Method</a>
+  <div class="nav__drawer-cta">
+    <a href="/contact" class="btn btn--primary" style="width:100%;justify-content:center;">Find Your Blind Spots</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main id="main-content">
+
+<!-- ── HERO ─────────────────────────────────────────── -->
+<section class="hero" aria-labelledby="hero-heading">
+  <div class="hero__bg"          aria-hidden="true"></div>
+  <div class="hero__grid-overlay" aria-hidden="true"></div>
+
+  <div class="hero__inner">
+    <div class="hero__content">
+      <p class="label hero__label">Strategic Opposition Consulting</p>
+      <h1 class="hero__headline" id="hero-heading">
+        Give your strategy
+        <em>a worthy adversary</em>
+      </h1>
+      <p class="hero__lede">
+        Every strategic assumption carries the mechanism of its own failure.
+        Surface the contradictions embedded in yours —
+        while you still control the outcome.
+        Find them before the market does.
+      </p>
+      <div class="hero__ctas">
+        <a href="/contact"    class="btn btn--primary  btn-arrow">Stress-Test Your Strategy</a>
+        <a href="/opposition" class="btn btn--outline">See How I Think</a>
+      </div>
+    </div>
+
+    <!-- Hero portrait -->
+    <div class="hero__portrait" role="img" aria-label="André Daus, Strategic Opposition consultant">
+      <!--
+        REPLACE THIS PLACEHOLDER WITH:
+        <img src="/images/andredaus-portrait.jpg"
+             alt="André Daus — Strategic Opposition consultant"
+             width="760" height="1024"
+             loading="eager"
+             fetchpriority="high">
+
+        Suggested file: AndreDaus-760x1024.png (already in use on staging site)
+        Crop: head and shoulders, upper body. Object-position: 50% 15%
+        Style: natural/candid preferred over posed corporate headshot
+        Size: 760×1024px min (3:4 ratio)
+      -->
+      <div class="img-ph" style="min-height:400px">
+        <span class="img-ph__icon" aria-hidden="true">◎</span>
+        <span class="img-ph__label">Hero Portrait</span>
+        <p class="img-ph__desc">
+          André Daus — head and shoulders, candid/editorial.
+          Replace with AndreDaus-760x1024.png.
+          760×1024px, 3:4 ratio.
+        </p>
+      </div>
+    </div>
+
+  </div><!-- /.hero__inner -->
+
+  <span class="hero__scroll" aria-hidden="true">Scroll</span>
+</section>
+
+<!-- ── PROBLEM ───────────────────────────────────────── -->
+<section class="problem section" aria-labelledby="problem-heading">
+  <div class="container">
+    <p class="label" style="margin-bottom:1.5rem">The root cause</p>
+    <h2 class="problem__heading" id="problem-heading">
+      Breakthrough growth rarely fails because of talent.
+      It fails because of blind spots in three critical areas.
+    </h2>
+
+    <ul class="problem__grid">
+      <li class="problem__card fade-up">
+        <span class="problem__card-number" aria-hidden="true">01</span>
+        <h3 class="problem__card-title">Every room agrees. Nobody's right.</h3>
+        <p class="problem__card-body">Teams prioritize harmony over honest debate — trading real agility for the comfort of alignment. Critical dissent gets filtered before it reaches the decision. The result is a strategy that feels solid and hasn't been tested.</p>
+      </li>
+      <li class="problem__card fade-up">
+        <span class="problem__card-number" aria-hidden="true">02</span>
+        <h3 class="problem__card-title">The truth that matters never reaches you.</h3>
+        <p class="problem__card-body">Most advisors confirm what you already believe. The insight that changes the decision gets neutralized before it reaches you. Not because it's wrong — because it's threatening to someone in the room.</p>
+      </li>
+      <li class="problem__card fade-up">
+        <span class="problem__card-number" aria-hidden="true">03</span>
+        <h3 class="problem__card-title">External help that creates dependency.</h3>
+        <p class="problem__card-body">External help that creates dependency is a consulting trap. Real change means your team internalizes the methodology — and keeps questioning long after the engagement ends.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── METHODOLOGY ───────────────────────────────────── -->
+<section class="method section" aria-labelledby="method-heading">
+  <div class="container">
+    <div class="method__intro">
+      <div>
+        <p class="label" style="margin-bottom:1.25rem">The way forward</p>
+        <h2 class="method__heading" id="method-heading">
+          Most advisors reinforce your existing thinking.
+          I <em>make it impossible</em> to keep avoiding the real question.
+        </h2>
+      </div>
+      <a href="/insight" class="btn btn--outline" style="flex-shrink:0;align-self:flex-end">View Articles</a>
+    </div>
+
+    <ul class="method__cards">
+      <li class="method__card fade-up">
+        <h3 class="method__card-title">Structured Intellectual Opposition</h3>
+        <p class="method__card-body">Your team naturally gravitates toward agreement. I introduce systematic methods for challenging your organization's fundamental assumptions before external pressure forces recognition. You gain access to perspectives that internal consensus structurally excludes.</p>
+        <a href="/service" class="method__card-link">Explore this approach</a>
+      </li>
+      <li class="method__card fade-up">
+        <h3 class="method__card-title">Uncomfortable Truths, Delivered Precisely</h3>
+        <p class="method__card-body">Most advisors tell you what maintains organizational harmony. I identify the beliefs that feel essential but create strategic vulnerability. You get clarity about blind spots that internal voices are structurally unable to surface.</p>
+        <a href="/service" class="method__card-link">Explore this approach</a>
+      </li>
+      <li class="method__card fade-up">
+        <h3 class="method__card-title">Self-Sustaining Critical Capacity</h3>
+        <p class="method__card-body">I transfer methodology, not dependency. Your people learn reproducible techniques for exposing their own cognitive constraints. When the engagement ends, your organization retains systematic ability to question its most cherished operational assumptions.</p>
+        <a href="/service" class="method__card-link">Explore this approach</a>
+      </li>
+    </ul>
+
+    <!-- Methodology working image -->
+    <div
+      class="method__image-wrap"
+      role="img"
+      aria-label="André Daus in a working session with a client"
+    >
+      <!--
+        REPLACE THIS PLACEHOLDER WITH:
+        <img src="/images/andredaus-working.jpg"
+             alt="André Daus in a working session, whiteboard or table, candid"
+             width="1160" height="506"
+             loading="lazy">
+
+        Style: candid, editorial — André at a whiteboard or table, mid-thought.
+        NOT: posed, stock-feeling, or facing the camera directly.
+        Ratio: 16:7 (1160×506px minimum)
+      -->
+      <div class="img-ph" style="min-height:280px">
+        <span class="img-ph__icon" aria-hidden="true">◈</span>
+        <span class="img-ph__label">Working Context Image</span>
+        <p class="img-ph__desc">
+          André at a whiteboard or table, mid-session.
+          Candid, editorial — NOT posed.
+          1160×506px, 16:7 ratio.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── SERVICES ──────────────────────────────────────── -->
+<section class="services section" aria-labelledby="services-heading">
+  <div class="container">
+    <div class="services__intro">
+      <p class="label" style="margin-bottom:1.25rem">How I work</p>
+      <h2 class="services__heading" id="services-heading">
+        How I challenge what you can't question
+      </h2>
+      <p class="services__lede">Most organizations fail not from external threats, but from internal certainties. They mistake consensus for clarity, confuse comfort with competence, and call their blind spots "culture."</p>
+    </div>
+
+    <ul class="services__grid">
+      <li class="service-card fade-up">
+        <span class="service-card__label">Discovery engagement</span>
+        <h3 class="service-card__title">Assumption Hunting</h3>
+        <p class="service-card__body">A structured audit of the assumptions your strategy is built on. Not the ones you worry about — the ones you've stopped noticing. Every strategic plan has load-bearing beliefs that have never been tested. I find them before the market does.</p>
+        <a href="/service/assumption-hunting" class="service-card__link">View service</a>
+      </li>
+      <li class="service-card fade-up">
+        <span class="service-card__label">1:1 engagement</span>
+        <h3 class="service-card__title">1:1 Coaching</h3>
+        <p class="service-card__body">For leaders who need a thinking partner without an agenda. I challenge your reasoning, expose your cognitive patterns, and help you make better decisions by making the invisible visible. Not therapy. Not cheerleading. Rigorous intellectual opposition.</p>
+        <a href="/service/1-on-1-coaching" class="service-card__link">View service</a>
+      </li>
+      <li class="service-card fade-up">
+        <span class="service-card__label">Team engagement</span>
+        <h3 class="service-card__title">Burn the Box</h3>
+        <p class="service-card__body">Complete deconstruction of the conceptual frameworks that define what your organization believes is possible. Not reframing. Not ideation. Systematic elimination of the boundaries you've mistaken for facts about the world.</p>
+        <a href="/service/burn-the-box" class="service-card__link">View service</a>
+      </li>
+      <li class="service-card fade-up">
+        <span class="service-card__label">Workshop</span>
+        <h3 class="service-card__title">Strategic Opposition Workshop</h3>
+        <p class="service-card__body">Not a training on solutions. A confrontation with your team's own thinking. Your people learn to identify and dismantle the assumptions embedded in their decisions — so they can keep doing it after I'm gone. Methodology transfer, not dependency creation.</p>
+        <a href="/service/workshop" class="service-card__link">View service</a>
+      </li>
+    </ul>
+
+    <div class="services__footer">
+      <a href="/service" class="btn btn--outline btn-arrow">View all services</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ───────────────────────────────────────── -->
+<section class="process section" aria-labelledby="process-heading">
+  <div class="container">
+    <div class="process__inner">
+      <div class="process__sidebar">
+        <p class="label" style="margin-bottom:1.25rem">How it starts</p>
+        <h2 class="process__heading" id="process-heading">
+          No preamble.<br>No dependency.<br>No return visits unless you want them.
+        </h2>
+        <p class="process__sub">Most consulting processes exist to justify fees. This process exists to transfer capability.</p>
+        <a href="/contact" class="btn btn--primary btn-arrow">Schedule a Call</a>
+      </div>
+
+      <ol class="process__steps" aria-label="Engagement process steps">
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">1</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">Discovery Call</h3>
+            <p class="process__step-body">I expose which assumptions are killing your competitive edge. Thirty minutes of systematic questioning reveals the blind spots your team has never examined — and surfaces the real problem underneath the one you came with.</p>
+          </div>
+        </li>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">2</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">Custom Opposition Design</h3>
+            <p class="process__step-body">I build adversarial methodology for your specific situation — structured resistance to the thinking patterns that trap your organization. Not a generic framework. A targeted intervention for the exact constraints you're operating inside.</p>
+          </div>
+        </li>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">3</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">Direct Capability Transfer</h3>
+            <p class="process__step-body">Your people learn to attack their own assumptions while I guide the process. No observation. No delegation. You participate in dismantling what doesn't work — so the capacity stays when I leave.</p>
+          </div>
+        </li>
+        <li class="process__step">
+          <span class="process__step-number" aria-hidden="true">4</span>
+          <div class="process__step-content">
+            <h3 class="process__step-title">On-Demand Reality Checks</h3>
+            <p class="process__step-body">Periodic access prevents consensus from rebuilding. Your team gets systematic opposition whenever comfortable thinking starts calcifying into strategic weakness — before it becomes a crisis.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ── CALLOUT / POSITIONING ─────────────────────────── -->
+<section class="callout section" aria-labelledby="callout-heading">
+  <div class="container">
+    <div class="callout__inner">
+      <div class="callout__content">
+        <p class="label" style="margin-bottom:1.5rem">The methodology</p>
+        <blockquote class="callout__quote" id="callout-heading">
+          <p>Old tactics can't fix what they helped to create.</p>
+        </blockquote>
+        <p class="callout__body">Every breakthrough begins with someone willing to abandon what everyone else accepts as wisdom. Your competitors optimize existing approaches while you build systematic opposition to the thinking that created current limitations.</p>
+        <p class="callout__body">The methodology isn't new — Red Team thinking has protected military operations for decades. What's new is applying intellectual warfare to civilian strategic problems before crisis forces recognition.</p>
+        <a href="/use-case" class="btn btn--outline btn-arrow" style="margin-top:.5rem">View Use Cases</a>
+      </div>
+
+      <div class="callout__aside">
+        <div class="callout__fact">
+          <p class="callout__fact-text">Organizations that institutionalize structured dissent make significantly better strategic decisions — not because they argue more, but because they test assumptions before committing to them.</p>
+          <span class="callout__fact-source">Red Team Thinking — Applied</span>
+        </div>
+        <div class="callout__fact">
+          <p class="callout__fact-text">The most dangerous belief any leadership team holds is the one they've stopped noticing. Strategic Opposition is the discipline of making invisible assumptions visible — on purpose, before they surface as crises.</p>
+          <span class="callout__fact-source">Iconoclast Insights — Podcast</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PODCAST ───────────────────────────────────────── -->
+<section class="podcast section" aria-labelledby="podcast-heading">
+  <div class="container">
+    <div class="podcast__inner">
+
+      <!-- Podcast cover art -->
+      <div
+        class="podcast__cover"
+        role="img"
+        aria-label="Iconoclast Insights — podcast cover art"
+      >
+        <!--
+          REPLACE THIS PLACEHOLDER WITH:
+          <img src="/images/iconoclast-insights-cover.jpg"
+               alt="Iconoclast Insights podcast — André Daus"
+               width="600" height="600"
+               loading="lazy">
+
+          Style: Your existing podcast artwork — square format
+          Size: 600×600px minimum (1:1 ratio)
+          Note: Use the same art as your podcast hosting platform
+        -->
+        <div class="img-ph" style="min-height:240px">
+          <span class="img-ph__icon" aria-hidden="true">◎</span>
+          <span class="img-ph__label">Podcast Cover Art</span>
+          <p class="img-ph__desc">
+            Iconoclast Insights cover art.
+            Replace with existing podcast artwork.
+            600×600px, 1:1 ratio.
+          </p>
+        </div>
+      </div>
+
+      <div class="podcast__main">
+        <p class="label podcast__label">Also listen</p>
+        <h2 class="podcast__heading" id="podcast-heading">Iconoclast Insights</h2>
+        <p class="podcast__desc">
+          No guests selling frameworks. No polite agreement.
+          Just the uncomfortable questions your industry needs to hear.
+          Solo episodes, 10–15 minutes. Business and technology, questioned.
+        </p>
+        <div class="podcast__meta">
+          <div class="podcast__meta-item">
+            <strong>Format</strong>
+            10–15 min episodes
+          </div>
+          <div class="podcast__meta-item">
+            <strong>Focus</strong>
+            Business &amp; Technology
+          </div>
+          <div class="podcast__meta-item">
+            <strong>Episodes</strong>
+            50+
+          </div>
+        </div>
+
+        <!-- Recent episodes -->
+        <ol class="episodes" aria-label="Recent Iconoclast Insights episodes">
+          <li>
+            <a href="/podcast/ep-[N]" class="episode" aria-label="Episode [N]: [Title] — [X] minutes">
+              <span class="episode__num" aria-hidden="true">[N]</span>
+              <div>
+                <p class="episode__title">[Latest episode title — e.g. Your "Best Practice" Is Someone Else's Leftovers]</p>
+                <p class="episode__topic">[Topic — e.g. Strategy]</p>
+              </div>
+              <span class="episode__dur">[X] min</span>
+            </a>
+          </li>
+          <li>
+            <a href="/podcast/ep-[N]" class="episode" aria-label="Episode [N]: [Title] — [X] minutes">
+              <span class="episode__num" aria-hidden="true">[N]</span>
+              <div>
+                <p class="episode__title">[Episode title]</p>
+                <p class="episode__topic">[Topic]</p>
+              </div>
+              <span class="episode__dur">[X] min</span>
+            </a>
+          </li>
+          <li>
+            <a href="/podcast/ep-[N]" class="episode" aria-label="Episode [N]: [Title] — [X] minutes">
+              <span class="episode__num" aria-hidden="true">[N]</span>
+              <div>
+                <p class="episode__title">[Episode title]</p>
+                <p class="episode__topic">[Topic]</p>
+              </div>
+              <span class="episode__dur">[X] min</span>
+            </a>
+          </li>
+          <li>
+            <a href="/podcast/ep-[N]" class="episode" aria-label="Episode [N]: [Title] — [X] minutes">
+              <span class="episode__num" aria-hidden="true">[N]</span>
+              <div>
+                <p class="episode__title">[Episode title]</p>
+                <p class="episode__topic">[Topic]</p>
+              </div>
+              <span class="episode__dur">[X] min</span>
+            </a>
+          </li>
+        </ol>
+
+        <a href="/podcast" class="btn btn--outline btn-arrow" style="margin-top:1.5rem">All Episodes</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ──────────────────────────────────── -->
+<section class="testimonials section" aria-labelledby="testimonials-heading">
+  <div class="container">
+    <div class="testimonials__intro">
+      <p class="label" style="justify-content:center;margin-bottom:1.25rem">Social proof</p>
+      <h2 class="testimonials__heading" id="testimonials-heading">
+        Trusted by leaders who think differently.
+      </h2>
+      <p class="testimonials__sub">When leaders step away from conventional playbooks and confront the root of their challenges, these are the outcomes.</p>
+    </div>
+
+    <ul class="testimonials__grid">
+      <li class="testimonial fade-up">
+        <p class="testimonial__callout">
+          "Clear communication, innovative solutions, never satisfied with 'can't.'"
+        </p>
+        <blockquote class="testimonial__quote">
+          <p>André Daus stands for clear communication. There are few people who get to the heart of a matter with clear words — one could even say unsparingly — as André does. The problem analysis and the resulting solution proposals often appear surprising or innovative at first glance. In his analysis, he works purposefully with great perseverance and is never satisfied with "can't."</p>
+        </blockquote>
+        <div class="testimonial__byline">
+          <p class="testimonial__name">Wolfram Himpel</p>
+          <p class="testimonial__title">Managing Director, Helioceraptor GmbH &amp; Co KG</p>
+        </div>
+      </li>
+      <li class="testimonial fade-up">
+        <p class="testimonial__callout">
+          "Excellent didactic skills, a pleasant and communicative manner."
+        </p>
+        <blockquote class="testimonial__quote">
+          <p>With André Daus, we were able to gain a trainer who has extensive specialist and IT know-how. He knew how to prepare the topics in the best possible way, both in scope and time frame. Thanks to his excellent didactic skills, he was able to convey the material in an understandable and practical way at all times. His pleasant and communicative manner fostered a trusting learning environment.</p>
+        </blockquote>
+        <div class="testimonial__byline">
+          <p class="testimonial__name">Ulrich Keitel</p>
+          <p class="testimonial__title">Managing Director, Setis GmbH</p>
+        </div>
+      </li>
+      <li class="testimonial fade-up">
+        <p class="testimonial__callout">
+          "The perfect link between IT and business."
+        </p>
+        <blockquote class="testimonial__quote">
+          <p>André brings with him a wealth of knowledge and experience in both IT and business, making him the perfect link between the two increasingly merging worlds.</p>
+        </blockquote>
+        <div class="testimonial__byline">
+          <p class="testimonial__name">Kai Dünges</p>
+          <p class="testimonial__title">Director, Commerzbank AG</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────── -->
+<section class="faq section" aria-labelledby="faq-heading">
+  <div class="container">
+    <div class="faq__inner">
+      <div class="faq__sidebar">
+        <p class="label" style="margin-bottom:1.25rem">Questions</p>
+        <h2 class="faq__heading" id="faq-heading">Frequently Asked Questions</h2>
+        <p class="faq__sub">What you're really asking is whether thinking differently is worth the discomfort. These answers will create new questions. That's the point.</p>
+        <a href="/question" class="btn btn--outline">See all questions</a>
+      </div>
+
+      <ul class="faq__list">
+        <li class="faq__item">
+          <button
+            class="faq__question"
+            aria-expanded="false"
+            aria-controls="faq-answer-1"
+            id="faq-q-1"
+          >
+            What exactly is Strategic Opposition — is this just red team thinking?
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div
+            class="faq__answer"
+            id="faq-answer-1"
+            role="region"
+            aria-labelledby="faq-q-1"
+          >
+            <p class="faq__answer-text">Red Team thinking is the foundation — a military methodology for stress-testing plans through structured adversarial challenge. Strategic Opposition applies that framework to business, leadership, and organizational decision-making. The core discipline is the same: systematic, structured challenge of the assumptions your strategy depends on. What's different is how that methodology is transferred to you so you can keep doing it independently.</p>
+          </div>
+        </li>
+        <li class="faq__item">
+          <button
+            class="faq__question"
+            aria-expanded="false"
+            aria-controls="faq-answer-2"
+            id="faq-q-2"
+          >
+            How does 1:1 coaching differ from consulting?
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div
+            class="faq__answer"
+            id="faq-answer-2"
+            role="region"
+            aria-labelledby="faq-q-2"
+          >
+            <p class="faq__answer-text">Consulting addresses organizational problems. Coaching addresses how the individual thinks about problems. In practice, the two overlap — most strategic failures originate in the unchallenged assumptions of a single decision-maker. The 1:1 engagement focuses on your reasoning patterns, your blind spots, and the beliefs you've stopped noticing. The goal is that you make better decisions even when I'm not in the room.</p>
+          </div>
+        </li>
+        <li class="faq__item">
+          <button
+            class="faq__question"
+            aria-expanded="false"
+            aria-controls="faq-answer-3"
+            id="faq-q-3"
+          >
+            You say you teach thinking, not solutions. What does that actually mean in a room?
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div
+            class="faq__answer"
+            id="faq-answer-3"
+            role="region"
+            aria-labelledby="faq-q-3"
+          >
+            <p class="faq__answer-text">Most strategy workshops produce outputs: plans, frameworks, roadmaps. Mine produce a different kind of output — the ability to see the assumptions inside your thinking. We don't work on your strategy. We work on how your team thinks about your strategy. The deliverable is a capability your team retains, not a document that ages the moment it's printed.</p>
+          </div>
+        </li>
+        <li class="faq__item">
+          <button
+            class="faq__question"
+            aria-expanded="false"
+            aria-controls="faq-answer-4"
+            id="faq-q-4"
+          >
+            How can critical thinking be applied across different industries?
+            <span class="faq__icon" aria-hidden="true">+</span>
+          </button>
+          <div
+            class="faq__answer"
+            id="faq-answer-4"
+            role="region"
+            aria-labelledby="faq-q-4"
+          >
+            <p class="faq__answer-text">The specific assumptions differ. The methodology for surfacing and challenging them doesn't. Strategic Opposition is industry-agnostic because cognitive bias and groupthink are industry-agnostic. The same mechanism that creates blind spots in a manufacturing firm creates them in a fintech startup. What changes is where you look — not how you look.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA BAND ──────────────────────────────────────── -->
+<section class="cta-band" aria-labelledby="cta-heading">
+  <div class="container cta-band__inner">
+
+    <!-- Small portrait — personalizes the ask -->
+    <div class="cta-band__avatar" role="img" aria-label="André Daus">
+      <!--
+        REPLACE THIS PLACEHOLDER WITH:
+        <img src="/images/andredaus-headshot-circle.jpg"
+             alt=""
+             width="144" height="144"
+             loading="lazy">
+
+        Use same photo as hero, tighter crop.
+        Size: 144×144px minimum (displayed at 72×72 via CSS)
+        alt="" — decorative here since heading provides context
+      -->
+      <div class="img-ph" style="min-height:72px;border-radius:50%;border:none;background:var(--bg-elevated)">
+        <span class="img-ph__icon" style="font-size:1.25rem" aria-hidden="true">◎</span>
+      </div>
+    </div>
+
+    <p class="label cta-band__label">Next step</p>
+    <h2 class="cta-band__heading" id="cta-heading">
+      Your assumptions are not<br>your <em>strategy.</em>
+    </h2>
+    <p class="cta-band__sub">A 30-minute discovery call is enough to surface the assumptions your current strategy depends on — and decide whether they deserve to survive scrutiny.</p>
+    <div class="cta-band__actions">
+      <a href="/contact"    class="btn btn--primary  btn-arrow">Book a Discovery Call</a>
+      <a href="/opposition" class="btn btn--outline">The Opposition Methodology</a>
+    </div>
+  </div>
+</section>
+
+</main><!-- /#main-content -->
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__main">
+      <div>
+        <p class="footer__brand-name">André Daus</p>
+        <p class="footer__brand-sub">Strategic Opposition</p>
+        <p class="footer__tagline">Your thinking creates your limits.</p>
+        <nav class="footer__social" aria-label="Social media links">
+          <a href="https://twitter.com/andredaus" class="footer__social-link" aria-label="André Daus on X (Twitter)" target="_blank" rel="noopener noreferrer">
+            <svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true"><path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/></svg>
+          </a>
+          <a href="https://linkedin.com/in/andredaus" class="footer__social-link" aria-label="André Daus on LinkedIn" target="_blank" rel="noopener noreferrer">
+            <svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true"><path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <nav class="footer__nav" aria-label="Site navigation">
+        <div>
+          <h3 class="footer__nav-heading">Services</h3>
+          <ul class="footer__nav-list">
+            <li><a href="/service/assumption-hunting" class="footer__nav-link">Assumption Hunting</a></li>
+            <li><a href="/service/1-on-1-coaching"    class="footer__nav-link">1:1 Coaching</a></li>
+            <li><a href="/service/burn-the-box"       class="footer__nav-link">Burn the Box</a></li>
+            <li><a href="/service/workshop"           class="footer__nav-link">Strategic Opposition Workshop</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="footer__nav-heading">Explore</h3>
+          <ul class="footer__nav-list">
+            <li><a href="/use-case"   class="footer__nav-link">Use Cases</a></li>
+            <li><a href="/opposition" class="footer__nav-link">The Opposition Method</a></li>
+            <li><a href="/insight"    class="footer__nav-link">Insights</a></li>
+            <li><a href="/podcast"    class="footer__nav-link">Iconoclast Insights</a></li>
+            <li><a href="/question"   class="footer__nav-link">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="footer__nav-heading">Also by André</h3>
+          <ul class="footer__nav-list">
+            <li>
+              <a href="https://littlebig.co" class="footer__nav-link" target="_blank" rel="noopener noreferrer">
+                LittleBig.Co
+                <span style="color:#7ab648;margin-left:4px" aria-hidden="true">↗</span>
+                <span class="sr-only">(opens in new tab)</span>
+              </a>
+            </li>
+            <li><a href="/about"   class="footer__nav-link">About André</a></li>
+            <li><a href="/contact" class="footer__nav-link">Contact</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer__legal">
+      <p class="footer__copyright">Copyright 2025 © André Daus</p>
+      <nav class="footer__legal-links" aria-label="Legal pages">
+        <a href="/policy/privacy"      class="footer__legal-link">Privacy Policy</a>
+        <a href="/policy/legal-notice" class="footer__legal-link">Legal Notice</a>
+        <a href="/legal/terms"         class="footer__legal-link">Terms</a>
+        <a href="/policy/ai-use"       class="footer__legal-link">AI Policy</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+<script>
+(function () {
+  'use strict';
+
+  // ── FAQ accordion (WCAG aria-expanded, aria-controls, role=region) ──
+  document.querySelectorAll('.faq__question').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item    = btn.closest('.faq__item');
+      var isOpen  = item.classList.contains('is-open');
+
+      // Close all
+      document.querySelectorAll('.faq__item.is-open').forEach(function(el) {
+        el.classList.remove('is-open');
+        el.querySelector('.faq__question').setAttribute('aria-expanded', 'false');
+      });
+
+      // Open clicked if it was closed
+      if (!isOpen) {
+        item.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  // ── Mobile nav toggle ──
+  var toggle = document.querySelector('.nav__toggle');
+  var drawer = document.getElementById('nav-drawer');
+  if (toggle && drawer) {
+    toggle.addEventListener('click', function() {
+      var open = drawer.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+
+      // Swap hamburger → X icon
+      var icon = toggle.querySelector('.nav__toggle-icon');
+      if (open) {
+        icon.innerHTML = '<line x1="3" y1="3" x2="19" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="19" y1="3" x2="3" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+        icon.setAttribute('viewBox', '0 0 22 22');
+        icon.setAttribute('width', '22'); icon.setAttribute('height', '22');
+      } else {
+        icon.setAttribute('viewBox', '0 0 22 16');
+        icon.setAttribute('width', '22'); icon.setAttribute('height', '16');
+        icon.innerHTML = '<rect y="0" width="22" height="2" rx="1" fill="currentColor"/><rect y="7" width="16" height="2" rx="1" fill="currentColor"/><rect y="14" width="22" height="2" rx="1" fill="currentColor"/>';
+      }
+    });
+
+    // Close drawer on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+        drawer.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'Open navigation menu');
+        toggle.focus();
+      }
+    });
+  }
+
+  // ── Scroll reveal — respects prefers-reduced-motion ──
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(function(el) { io.observe(el); });
+  } else {
+    // If reduced motion, make all visible immediately
+    document.querySelectorAll('.fade-up').forEach(function(el) { el.classList.add('visible'); });
+  }
+
+  // ── Nav border on scroll ──
+  var nav = document.querySelector('.nav');
+  if (nav) {
+    window.addEventListener('scroll', function() {
+      nav.style.borderBottomColor = window.scrollY > 40
+        ? 'rgba(196,154,60,0.15)'
+        : 'rgba(255,255,255,0.06)';
+    }, { passive: true });
+  }
+
+})();
+</script>
+
+</body>
+</html>
