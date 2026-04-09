@@ -1,9 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
 
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
+
+const allFaqs = await getCollection('faqs');
+const enContactFaqs = allFaqs
+  .filter(f => f.id.startsWith('en/') && f.data.category === 'Working Together')
+  .sort((a, b) => a.data.order - b.data.order);
+const deContactFaqs = allFaqs
+  .filter(f => f.id.startsWith('de/') && f.data.category === 'Working Together')
+  .sort((a, b) => a.data.order - b.data.order);
+const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
 ---
 
 <Base
@@ -294,90 +304,23 @@ const prefix = isDE ? '/de' : '';
         </div>
 
         <div class="faq-list" role="list">
-          <div class="faq-item" role="listitem">
-            <button class="faq-btn" aria-expanded="false" aria-controls="faq1" id="faq1-btn">
-              {isDE ? 'Muss ich mich auf das Gespräch vorbereiten?' : 'Do I need to prepare anything before the call?'}
-              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
-                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-panel" id="faq1" role="region" aria-labelledby="faq1-btn">
-              <p>
-                {isDE
-                  ? 'Nein. Kommen Sie mit dem Problem, wie Sie es derzeit verstehen — die Entscheidung, bei der Sie feststecken, die Situation, die sich nicht verbessert. Vorbereitung produziert in der Regel einstudierte Antworten, und genau das versuche ich zu umgehen.'
-                  : 'No. Come with the problem as you currently understand it — the decision you\'re stuck on, the situation that isn\'t improving, the strategy you\'re questioning. Preparation tends to produce rehearsed answers, which is exactly what I\'m trying to get past.'
-                }
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item" role="listitem">
-            <button class="faq-btn" aria-expanded="false" aria-controls="faq2" id="faq2-btn">
-              {isDE ? 'Was, wenn ich nicht sicher bin, welche Leistung passt?' : 'What if I\'m not sure which service fits?'}
-              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
-                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-panel" id="faq2" role="region" aria-labelledby="faq2-btn">
-              <p>
-                {isDE
-                  ? 'Das klärt das Entdeckungsgespräch. Ich habe kein Standardangebot für jede Situation. Was das richtige Engagement bedeutet, hängt davon ab, was wirklich los ist — und das werde ich erst wissen, nachdem wir gesprochen haben. Versuchen Sie nicht, sich vorher in eine Leistungskategorie einzuordnen.'
-                  : 'The discovery call determines that. I don\'t have a standard offer applied to every situation. What the right engagement looks like depends on what\'s actually going on — and I won\'t know that until we\'ve talked. Don\'t try to pre-fit yourself into a service category before we speak.'
-                }
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item" role="listitem">
-            <button class="faq-btn" aria-expanded="false" aria-controls="faq3" id="faq3-btn">
-              {isDE ? 'Arbeiten Sie auf Deutsch oder Englisch?' : 'Do you work in German or English?'}
-              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
-                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-panel" id="faq3" role="region" aria-labelledby="faq3-btn">
-              <p>
-                {isDE
-                  ? 'Beides. Engagements finden in der Sprache statt, die der Arbeit besser dient. Teams, die auf Deutsch arbeiten, arbeiten mit mir auf Deutsch; internationale Kunden auf Englisch. Nuancen reisen besser in der Sprache, in der Menschen wirklich denken.'
-                  : 'Both. Engagements happen in whichever language serves the work better. Teams operating in German work with me in German; international clients in English. Nuance travels better in the language people actually think in.'
-                }
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item" role="listitem">
-            <button class="faq-btn" aria-expanded="false" aria-controls="faq4" id="faq4-btn">
-              {isDE ? 'Arbeiten Sie remote oder vor Ort?' : 'Do you work remotely or in person?'}
-              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
-                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-panel" id="faq4" role="region" aria-labelledby="faq4-btn">
-              <p>
-                {isDE
-                  ? 'Coaching und Beratung finden remote statt. Team-Engagements und Workshops sind überwiegend vor Ort — die Dynamik, die Gruppen-Annahmenarbeit produktiv macht, überlebt Video nicht vollständig. Ich bin in Deutschland ansässig und reise für das richtige Engagement innerhalb Europas.'
-                  : 'Coaching and advisory work happens remotely. Team engagements and workshops are predominantly in person — the dynamics that make group assumption-work productive don\'t fully survive video. I\'m based in Germany and travel within Europe for the right engagement.'
-                }
-              </p>
-            </div>
-          </div>
-
-          <div class="faq-item" role="listitem">
-            <button class="faq-btn" aria-expanded="false" aria-controls="faq5" id="faq5-btn">
-              {isDE ? 'Was kostet das?' : 'What does this cost?'}
-              <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
-                <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <div class="faq-panel" id="faq5" role="region" aria-labelledby="faq5-btn">
-              <p>
-                {isDE
-                  ? 'Die Preisgestaltung hängt von Umfang und Format ab und wird nach dem Entdeckungsgespräch besprochen. Ich veröffentliche keine Festpreise, weil die richtige Engagement-Größe erheblich variiert. Das Entdeckungsgespräch selbst ist kostenlos.'
-                  : 'Pricing depends on scope and format and is discussed after the discovery call. I don\'t publish fixed rates because the right engagement size varies considerably. The discovery call itself is free.'
-                }
-              </p>
-            </div>
-          </div>
+          {contactFaqs.map((faq, i) => {
+            const btnId = `cfaq${i + 1}-btn`;
+            const panelId = `cfaq${i + 1}`;
+            return (
+              <div class="faq-item" role="listitem">
+                <button class="faq-btn" aria-expanded="false" aria-controls={panelId} id={btnId}>
+                  {faq.data.question}
+                  <svg class="faq-chevron" width="14" height="8" viewBox="0 0 14 8" fill="none" aria-hidden="true">
+                    <path d="M1 1l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <div class="faq-panel" id={panelId} role="region" aria-labelledby={btnId}>
+                  <p>{faq.data.answer}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

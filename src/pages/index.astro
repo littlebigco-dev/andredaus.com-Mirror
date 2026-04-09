@@ -1,9 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
 
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
+
+const allFaqs = await getCollection('faqs');
+const enFaqs = allFaqs
+  .filter(f => f.id.startsWith('en/') && f.data.category === 'Methodology')
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+const deFaqs = allFaqs
+  .filter(f => f.id.startsWith('de/') && f.data.category === 'Methodology')
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
+const homeFaqs = isDE ? deFaqs : enFaqs;
 ---
 
 <Base
@@ -423,50 +435,21 @@ const prefix = isDE ? '/de' : '';
       </div>
 
       <ul class="faq__list">
-        <li class="faq__item">
-          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-1" id="faq-q-1">
-            {isDE ? 'Was genau ist Strategic Opposition — ist das nur Red-Team-Denken?' : 'What exactly is Strategic Opposition — is this just red team thinking?'}
-            <span class="faq__icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq__answer" id="faq-answer-1" role="region" aria-labelledby="faq-q-1">
-            <p class="faq__answer-text">{isDE
-              ? 'Red-Team-Denken ist die Grundlage — eine militärische Methodik zur Stresserprobung von Plänen durch strukturierte adversarielle Herausforderung. Strategic Opposition wendet diesen Rahmen auf Business, Führung und organisatorische Entscheidungsfindung an. Die Kerndisziplin ist dieselbe: systematische, strukturierte Herausforderung der Annahmen, auf die Ihre Strategie angewiesen ist. Was anders ist, ist, wie diese Methodik an Sie übertragen wird, damit Sie sie unabhängig weiter anwenden können.'
-              : 'Red Team thinking is the foundation — a military methodology for stress-testing plans through structured adversarial challenge. Strategic Opposition applies that framework to business, leadership, and organizational decision-making. The core discipline is the same: systematic, structured challenge of the assumptions your strategy depends on. What\'s different is how that methodology is transferred to you so you can keep doing it independently.'}</p>
-          </div>
-        </li>
-        <li class="faq__item">
-          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-2" id="faq-q-2">
-            {isDE ? 'Wie unterscheidet sich 1:1 Coaching von Beratung?' : 'How does 1:1 coaching differ from consulting?'}
-            <span class="faq__icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq__answer" id="faq-answer-2" role="region" aria-labelledby="faq-q-2">
-            <p class="faq__answer-text">{isDE
-              ? 'Beratung befasst sich mit organisatorischen Problemen. Coaching befasst sich damit, wie der Einzelne über Probleme denkt. In der Praxis überschneiden sich beide — die meisten strategischen Misserfolge haben ihren Ursprung in den unbestrittenen Annahmen eines einzigen Entscheidungsträgers. Das 1:1 Engagement konzentriert sich auf Ihre Denkmuster, Ihre blinden Flecken und die Überzeugungen, die Sie aufgehört haben zu bemerken. Das Ziel ist, dass Sie bessere Entscheidungen treffen, auch wenn ich nicht im Raum bin.'
-              : 'Consulting addresses organizational problems. Coaching addresses how the individual thinks about problems. In practice, the two overlap — most strategic failures originate in the unchallenged assumptions of a single decision-maker. The 1:1 engagement focuses on your reasoning patterns, your blind spots, and the beliefs you\'ve stopped noticing. The goal is that you make better decisions even when I\'m not in the room.'}</p>
-          </div>
-        </li>
-        <li class="faq__item">
-          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-3" id="faq-q-3">
-            {isDE ? 'Sie sagen, Sie lehren Denken, keine Lösungen. Was bedeutet das konkret im Raum?' : 'You say you teach thinking, not solutions. What does that actually mean in a room?'}
-            <span class="faq__icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq__answer" id="faq-answer-3" role="region" aria-labelledby="faq-q-3">
-            <p class="faq__answer-text">{isDE
-              ? 'Die meisten Strategie-Workshops produzieren Outputs: Pläne, Frameworks, Roadmaps. Meine produzieren eine andere Art von Output — die Fähigkeit, die Annahmen in Ihrem eigenen Denken zu sehen. Wir arbeiten nicht an Ihrer Strategie. Wir arbeiten daran, wie Ihr Team über Ihre Strategie denkt. Das Ergebnis ist eine Fähigkeit, die Ihr Team behält, nicht ein Dokument, das in dem Moment, in dem es gedruckt wird, veraltet.'
-              : 'Most strategy workshops produce outputs: plans, frameworks, roadmaps. Mine produce a different kind of output — the ability to see the assumptions inside your thinking. We don\'t work on your strategy. We work on how your team thinks about your strategy. The deliverable is a capability your team retains, not a document that ages the moment it\'s printed.'}</p>
-          </div>
-        </li>
-        <li class="faq__item">
-          <button class="faq__question" aria-expanded="false" aria-controls="faq-answer-4" id="faq-q-4">
-            {isDE ? 'Wie kann kritisches Denken branchenübergreifend angewendet werden?' : 'How can critical thinking be applied across different industries?'}
-            <span class="faq__icon" aria-hidden="true">+</span>
-          </button>
-          <div class="faq__answer" id="faq-answer-4" role="region" aria-labelledby="faq-q-4">
-            <p class="faq__answer-text">{isDE
-              ? 'Die spezifischen Annahmen unterscheiden sich. Die Methodik, sie aufzudecken und zu hinterfragen, nicht. Strategic Opposition ist branchenunabhängig, weil kognitive Verzerrung und Gruppendenken branchenunabhängig sind. Derselbe Mechanismus, der blinde Flecken in einem Fertigungsunternehmen erzeugt, erzeugt sie in einem Fintech-Startup. Was sich ändert, ist, wo Sie suchen — nicht wie Sie suchen.'
-              : 'The specific assumptions differ. The methodology for surfacing and challenging them doesn\'t. Strategic Opposition is industry-agnostic because cognitive bias and groupthink are industry-agnostic. The same mechanism that creates blind spots in a manufacturing firm creates them in a fintech startup. What changes is where you look — not how you look.'}</p>
-          </div>
-        </li>
+        {homeFaqs.map((faq, i) => {
+          const qId = `faq-q-${i + 1}`;
+          const aId = `faq-answer-${i + 1}`;
+          return (
+            <li class="faq__item">
+              <button class="faq__question" aria-expanded="false" aria-controls={aId} id={qId}>
+                {faq.data.question}
+                <span class="faq__icon" aria-hidden="true">+</span>
+              </button>
+              <div class="faq__answer" id={aId} role="region" aria-labelledby={qId}>
+                <p class="faq__answer-text">{faq.data.answer}</p>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   </div>
