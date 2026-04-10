@@ -52,12 +52,15 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
       </div>
     </div>
 
-    <div class="hero__portrait" role="img" aria-label={isDE ? 'André Daus, Strategic Opposition Berater' : 'André Daus, Strategic Opposition consultant'}>
-      <div class="img-ph" style="min-height:400px">
-        <span class="img-ph__icon" aria-hidden="true">◎</span>
-        <span class="img-ph__label">Hero Portrait</span>
-        <p class="img-ph__desc">André Daus — head and shoulders, candid/editorial. Replace with AndreDaus-760x1024.png. 760×1024px, 3:4 ratio.</p>
-      </div>
+    <div class="hero__portrait">
+      <img
+        src="/AndreDaus-760x1024.png"
+        alt={isDE ? 'André Daus, Strategic Opposition Berater' : 'André Daus, Strategic Opposition consultant'}
+        width="760"
+        height="1024"
+        loading="eager"
+        decoding="async"
+      />
     </div>
   </div>
 
@@ -458,10 +461,15 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
 <!-- ── CTA BAND ──────────────────────────────────────── -->
 <section class="cta-band" aria-labelledby="cta-heading">
   <div class="container cta-band__inner">
-    <div class="cta-band__avatar" role="img" aria-label="André Daus">
-      <div class="img-ph" style="min-height:72px;border-radius:50%;border:none;background:var(--bg-elevated)">
-        <span class="img-ph__icon" style="font-size:1.25rem" aria-hidden="true">◎</span>
-      </div>
+    <div class="cta-band__avatar">
+      <img
+        src="/andredaus-headshot-circle.jpg"
+        alt="André Daus"
+        width="72"
+        height="72"
+        loading="lazy"
+        decoding="async"
+      />
     </div>
     <p class="label cta-band__label">{isDE ? 'Nächster Schritt' : 'Next step'}</p>
     <h2 class="cta-band__heading" id="cta-heading">
