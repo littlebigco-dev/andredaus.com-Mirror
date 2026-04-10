@@ -372,6 +372,29 @@ The Library archive is the most complex page on the site. It requires:
 
 ---
 
+## Environment Variables
+
+All variables must be set in Cloudflare Pages dashboard (Settings → Environment Variables).
+Variables prefixed `PUBLIC_` are inlined at build time and visible in client-side code.
+Variables without the prefix are server-side only (Cloudflare Pages Functions / build scripts).
+
+| Variable | Required | Used by | Description |
+|---|---|---|---|
+| `PUBLIC_POSTHOG_KEY` | Prod only | `Base.astro` | PostHog project API key. Analytics snippet only renders when this is set. EU project — get from posthog.com dashboard. |
+| `ZOHO_CLIENT_ID` | Prod only | `src/pages/api/contact.ts` | Zoho CRM OAuth2 client ID. Required for contact form → CRM lead creation. |
+| `ZOHO_CLIENT_SECRET` | Prod only | `src/pages/api/contact.ts` | Zoho CRM OAuth2 client secret. |
+| `ZOHO_REFRESH_TOKEN` | Prod only | `src/pages/api/contact.ts` | Zoho CRM OAuth2 refresh token. Exchanged for access token at runtime. |
+| `OG_WORKER_URL` | Prod only | `scripts/og-images.mjs` | Base URL of the Cloudflare Worker that generates OG images. e.g. `https://og.andredaus.com`. No-op if unset. |
+| `PUBLIC_CALCOM_USERNAME` | Prod only | `src/pages/contact.astro` | Cal.com username (slug). Used to build the embed URL for the discovery-call event type. Shows mailto fallback if unset. |
+| `PODCAST_RSS_URL` | Optional | `scripts/import-podcast.mjs` | Full URL to the podcast RSS feed. Enables automatic episode import at build time. No-op if unset. |
+| `ANTHROPIC_API_KEY` | Optional | `scripts/generate-summaries.mjs` | Anthropic API key (`sk-ant-...`). Enables AI summary generation for content files missing a `summary` field. No-op if unset. |
+
+### Local development (.env)
+Copy `.env.example` → `.env` and fill in values. The `.env` file is gitignored.
+`PUBLIC_*` vars must also be set locally for features that depend on them at build time.
+
+---
+
 ## Build Phases
 Work through these in order, one Claude Code session per phase:
 
@@ -380,7 +403,45 @@ Work through these in order, one Claude Code session per phase:
 3. ~~**Static pages**~~ ✅ — Home, About, Contact, 404, Policies (Privacy, Legal Notice, Terms, AI Use), Opposition/Methodology
 4. ~~**Collection templates**~~ ✅ — Archive + single pages for all 6 collections; FAQs wired to home + contact; Library with category filter, alpha index, search scaffold
 5. ~~**Integrations**~~ ✅ — Pagefind library search, contact form API (Zoho CRM), Cal.com booking embed, OG image generation hook
-6. **Pipeline** — GitLab CI, Cloudflare Pages deployment, RSS podcast import, AI summary generation
+6. ~~**Pipeline**~~ ✅ — GitLab CI, env var documentation, RSS podcast import, AI summary generation, portrait images wired
+
+---
+
+## Project Status (Session 6 complete)
+
+### What is complete
+- **All code** — every page, component, collection template, and integration is built
+- **CI** — `.gitlab-ci.yml` builds on `main` push; Cloudflare Pages auto-deploys from git
+- **Build scripts** — `import-podcast.mjs`, `generate-summaries.mjs`, `og-images.mjs` all run pre-build
+- **Home page portraits** — hero (`AndreDaus-760x1024.png`) and CTA avatar (`andredaus-headshot-circle.jpg`) are wired up
+
+### What still needs real content
+- **Insights articles** — `src/content/insights/en/` and `de/` — currently empty or has placeholder entries
+- **Use Cases** — `src/content/use-cases/en/` and `de/` — needs real PAS-framework articles
+- **Library entries** — `src/content/library/en/` and `de/` — needs cognitive biases, mental models, liberating structures
+- **Services** — `src/content/services/en/` and `de/` — needs real service definitions
+- **FAQs** — `src/content/faqs/en/` and `de/` — needs real questions/answers for all categories
+- **Podcast episodes** — will be auto-imported from RSS once `PODCAST_RSS_URL` is set; transcripts added manually after import
+- **Working context image** — `src/pages/index.astro` line ~145 — placeholder remains, needs a candid editorial photo (1160×506px, 16:7)
+- **Podcast cover art** — `src/pages/index.astro` line ~307 — placeholder remains, needs existing podcast artwork (600×600px, 1:1)
+- **DE content** — all `de/` subdirectories need German-language content paralleling the EN entries
+
+### Requires manual configuration in Cloudflare Pages dashboard
+1. **Connect GitLab repo** — Settings → Git integration → connect `andredaus-com` repo, branch `main`
+2. **Build command** — `npm run build`
+3. **Build output directory** — `dist`
+4. **Node.js version** — set `NODE_VERSION=22` in environment variables (or use `.node-version` file)
+5. **Environment variables** — add all variables from the table above (see Environment Variables section)
+6. **Zoho CRM OAuth** — complete the OAuth consent flow to obtain a refresh token; set the three Zoho env vars
+7. **OG Worker** — deploy the Cloudflare Worker for OG image generation; set `OG_WORKER_URL`
+8. **Cal.com** — create the `discovery-call` event type in Cal.com; set `PUBLIC_CALCOM_USERNAME`
+
+### Pipeline decisions (Session 6)
+- GitLab CI runs `npm ci && npm run build` on `main`; Cloudflare Pages deploys from git — no wrangler upload
+- Build script order: `import-podcast` → `generate-summaries` → `og-images` → `astro build` → `pagefind`
+- RSS podcast import: slug derived from `itunes:episode` number (e.g. `e012.md`) — stable even if title changes
+- AI summaries: use `claude-haiku-4-5-20251001` (fast/cheap); skips drafts with no body; 500 ms rate limit between calls
+- Podcast import preserves existing transcript body and manually-set frontmatter fields on update
 
 End each session by asking Claude Code to:
 1. Update this CLAUDE.md with any new decisions or conventions
