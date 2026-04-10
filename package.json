@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -15,5 +15,8 @@
     "@astrojs/cloudflare": "^13.1.8",
     "astro": "^6.1.5",
     "posthog-js": "^1.365.5"
+  },
+  "devDependencies": {
+    "pagefind": "^1.5.0"
   }
 }

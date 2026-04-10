@@ -42,7 +42,7 @@ function formatDate(d: Date) {
   lang="de"
 >
 
-  <header class="lib-entry-hero">
+  <header class="lib-entry-hero" data-pagefind-ignore>
     <div class="hero-grid" aria-hidden="true"></div>
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -69,11 +69,12 @@ function formatDate(d: Date) {
   </header>
 
   <div class="article-layout container">
-    <article class="article-body prose">
+    <article class="article-body prose" data-pagefind-body>
+      <h1 data-pagefind-meta="title" hidden>{entry.data.title}</h1>
       <Content />
     </article>
 
-    <aside class="article-aside">
+    <aside class="article-aside" data-pagefind-ignore>
       {relatedConcepts.filter(Boolean).length > 0 && (
         <div class="aside-card">
           <p class="label" style="margin-bottom:1rem">Verwandte Konzepte</p>

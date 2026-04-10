@@ -163,9 +163,23 @@ const categoryLabels: Record<string, { en: string; de: string }> = {
   const noResults = document.getElementById('no-results');
 
   let activeCat = 'all';
-  let searchTerm = '';
+  // Pagefind: null = no search active (show all), Set = show only matched slugs
+  let pagefindSlugs = null;
+  let pagefind = null;
 
-  // Sync URL param on category change
+  // Load Pagefind lazily on first keypress
+  async function loadPagefind() {
+    if (pagefind) return pagefind;
+    try {
+      pagefind = await import('/_pagefind/pagefind.js');
+      await pagefind.options({ baseUrl: '/' });
+    } catch {
+      // Pagefind not available in dev mode — fall back to client-side matching
+      pagefind = null;
+    }
+    return pagefind;
+  }
+
   function pushCategoryParam(cat) {
     const url = new URL(window.location.href);
     if (cat === 'all') {
@@ -177,16 +191,20 @@ const categoryLabels: Record<string, { en: string; de: string }> = {
   }
 
   function applyFilters() {
+    const rawTerm = searchInput?.value.toLowerCase().trim() ?? '';
+
     const filtered = entries.filter(e => {
       const catMatch = activeCat === 'all' || e.category === activeCat;
-      const searchMatch = !searchTerm || e.title.toLowerCase().includes(searchTerm) || e.summary.toLowerCase().includes(searchTerm);
+      // If Pagefind returned a result set, use it; otherwise match client-side
+      const searchMatch = pagefindSlugs !== null
+        ? pagefindSlugs.has(e.slug)
+        : (!rawTerm || e.title.toLowerCase().includes(rawTerm) || e.summary.toLowerCase().includes(rawTerm));
       return catMatch && searchMatch;
     });
 
     const filteredSlugs = new Set(filtered.map(e => e.slug));
     const filteredLetters = new Set(filtered.map(e => e.letter));
 
-    // Show/hide entries
     document.querySelectorAll('.lib-entry').forEach(el => {
       const link = el.querySelector('a');
       const href = link?.getAttribute('href') || '';
@@ -194,7 +212,6 @@ const categoryLabels: Record<string, { en: string; de: string }> = {
       el.hidden = !filteredSlugs.has(slug);
     });
 
-    // Show/hide alpha groups; update alpha nav
     document.querySelectorAll('.alpha-group').forEach(group => {
       const letter = group.dataset.letter;
       group.hidden = !filteredLetters.has(letter);
@@ -205,7 +222,6 @@ const categoryLabels: Record<string, { en: string; de: string }> = {
       link.classList.toggle('is-dimmed', !filteredLetters.has(letter));
     });
 
-    // No results
     noResults.hidden = filtered.length > 0;
   }
 
@@ -222,10 +238,33 @@ const categoryLabels: Record<string, { en: string; de: string }> = {
     });
   });
 
-  // Search (client-side title/summary match; Pagefind wired in Phase 5)
-  searchInput?.addEventListener('input', () => {
-    searchTerm = searchInput.value.toLowerCase().trim();
-    applyFilters();
+  // Search — Pagefind with client-side fallback
+  let searchDebounce;
+  searchInput?.addEventListener('input', async () => {
+    clearTimeout(searchDebounce);
+    const term = searchInput.value.trim();
+
+    if (!term) {
+      pagefindSlugs = null;
+      applyFilters();
+      return;
+    }
+
+    searchDebounce = setTimeout(async () => {
+      const pf = await loadPagefind();
+      if (pf) {
+        const search = await pf.search(term);
+        const results = await Promise.all(search.results.map(r => r.data()));
+        // Extract slug from Pagefind result URL: /library/slug or /de/library/slug
+        pagefindSlugs = new Set(
+          results.map(r => r.url.replace(/\/$/, '').split('/').pop())
+        );
+      } else {
+        // No Pagefind (dev mode) — rely on client-side matching in applyFilters
+        pagefindSlugs = null;
+      }
+      applyFilters();
+    }, 200);
   });
 
   // Initialise from URL param
