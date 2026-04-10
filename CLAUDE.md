@@ -252,7 +252,7 @@ The Library archive is the most complex page on the site. It requires:
 
 ### Output mode
 - `output: 'static'` — site is fully static
-- When the contact form API route is added (Phase 5), add `export const prerender = false` to `src/pages/api/contact.ts`; the static adapter handles this via Cloudflare Pages Functions
+- `src/pages/api/contact.ts` has `export const prerender = false` — handled by Cloudflare Pages Functions via the Cloudflare adapter
 
 ### PostHog
 - Loaded via inline script in `Base.astro` — only renders when `PUBLIC_POSTHOG_KEY` env var is set
@@ -338,13 +338,37 @@ The Library archive is the most complex page on the site. It requires:
 ### Library archive specifics
 - Category filter tabs update `?category=bias` URL param via `history.replaceState` for shareability
 - Client-side filter also dims alpha-index letters not present in active filtered set
-- Search input is scaffolded (title + summary match); Pagefind full-text integration is Phase 5
+- Search uses Pagefind JS API (lazy-loaded, 200 ms debounce); falls back to client-side title/summary match in dev mode (Pagefind not available without a build)
 - `define:vars` passes serialised entries JSON to the client script
+- `data-pagefind-body` on `<article class="article-body">` in library single pages; `data-pagefind-ignore` on hero and aside
+- Pagefind indexes 2 languages (en/de) from library entry pages only — other collections not indexed
 
 ### FAQ collection wiring
 - Home page (index.astro): loads Methodology category FAQs, sorted by `order`, slice 0–4
 - Contact page (contact.astro): loads Working Together category FAQs, sorted by `order`
 - Both load EN + DE sets and select with `isDE`; accordion IDs use index to avoid collisions
+
+### Contact form API
+- `src/pages/api/contact.ts` — POST endpoint, `prerender = false`
+- Validates name/email/message; honeypot field `_trap` silently discards bot submissions
+- Calls Zoho CRM EU endpoint to create a Lead: OAuth refresh token flow using `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` env vars
+- Returns `{ ok: true }` on success; JSON error messages on validation/server failure
+- Reads Cloudflare env from `locals.runtime.env` (Cloudflare adapter pattern)
+
+### Cal.com booking embed
+- Inline embed in `contact.astro` using Cal.com embed.js
+- Activated only when `PUBLIC_CALCOM_USERNAME` env var is set at build time
+- Event type: `discovery-call`; brand colour: `#c49a3c` (gold)
+- Shows placeholder with mailto fallback when env var is unset (dev or misconfigured prod)
+
+### OG image generation
+- `scripts/og-images.mjs` — Node script, runs before `astro build` in package.json
+- Scans `insights`, `library`, `use-cases`, `services`, `podcast` content directories
+- For entries with `og_title` but no `og_image`: calls Cloudflare Worker (`OG_WORKER_URL` env var) and writes returned URL into frontmatter as `og_image`
+- Worker expected interface: `GET /?title=<encoded-title>` → `{ "url": "https://..." }`
+- No-op if `OG_WORKER_URL` is not set
+- `og_image` added as `z.string().url().optional()` to insights/use-cases/library/podcast schemas
+- All 8 collection single-entry pages pass `ogImage={entry.data.og_image}` to `<Base>`
 
 ---
 
@@ -355,7 +379,7 @@ Work through these in order, one Claude Code session per phase:
 2. ~~**Components**~~ ✅ — Fonts self-hosted, global.css design tokens expanded, Header/Nav/Footer components built, Base.astro wired up
 3. ~~**Static pages**~~ ✅ — Home, About, Contact, 404, Policies (Privacy, Legal Notice, Terms, AI Use), Opposition/Methodology
 4. ~~**Collection templates**~~ ✅ — Archive + single pages for all 6 collections; FAQs wired to home + contact; Library with category filter, alpha index, search scaffold
-5. **Integrations** — Contact form Worker, OG image hook, Cal.com booking, Pagefind (wire to library search scaffold)
+5. ~~**Integrations**~~ ✅ — Pagefind library search, contact form API (Zoho CRM), Cal.com booking embed, OG image generation hook
 6. **Pipeline** — GitLab CI, Cloudflare Pages deployment, RSS podcast import, AI summary generation
 
 End each session by asking Claude Code to:
