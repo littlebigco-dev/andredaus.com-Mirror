@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
+const calcomUsername = import.meta.env.PUBLIC_CALCOM_USERNAME ?? '';
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
@@ -119,27 +120,31 @@ const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
               <span class="booking-block__title">{isDE ? 'Entdeckungsgespräch — André Daus' : 'Discovery Call — André Daus'}</span>
               <span class="booking-block__duration">{isDE ? '30 Min · Video oder Telefon' : '30 min · Video or phone'}</span>
             </div>
-            <!-- Cal.com embed goes here — replace placeholder once configured -->
-            <div class="booking-placeholder" aria-label={isDE ? 'Kalender-Platzhalter' : 'Calendar placeholder'}>
-              <div class="booking-placeholder__icon" aria-hidden="true">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="4" width="18" height="18" rx="2"/>
-                  <path d="M16 2v4M8 2v4M3 10h18"/>
-                </svg>
+            <!-- Cal.com inline embed — set CALCOM_USERNAME to your Cal.com username to activate -->
+            {import.meta.env.PUBLIC_CALCOM_USERNAME ? (
+              <div id="cal-booking" style="min-height:600px;"></div>
+            ) : (
+              <div class="booking-placeholder" aria-label={isDE ? 'Kalender-Platzhalter' : 'Calendar placeholder'}>
+                <div class="booking-placeholder__icon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2"/>
+                    <path d="M16 2v4M8 2v4M3 10h18"/>
+                  </svg>
+                </div>
+                <p class="booking-placeholder__heading">
+                  {isDE ? 'Cal.com-Widget wird hier geladen' : 'Cal.com widget loads here'}
+                </p>
+                <p class="booking-placeholder__note">
+                  {isDE
+                    ? 'Setzen Sie PUBLIC_CALCOM_USERNAME in den Umgebungsvariablen.'
+                    : 'Set PUBLIC_CALCOM_USERNAME in environment variables to activate.'
+                  }
+                </p>
+                <a href="mailto:hello@andredaus.com?subject=Discovery%20Call%20Request" class="btn btn--outline">
+                  {isDE ? 'Stattdessen per E-Mail anfragen' : 'Request by email instead'}
+                </a>
               </div>
-              <p class="booking-placeholder__heading">
-                {isDE ? 'Cal.com-Widget wird hier geladen' : 'Cal.com widget loads here'}
-              </p>
-              <p class="booking-placeholder__note">
-                {isDE
-                  ? 'Wird durch das Cal.com-Inline-Embed ersetzt.'
-                  : 'Replace with Cal.com inline embed to enable direct booking.'
-                }
-              </p>
-              <a href="mailto:hello@andredaus.com?subject=Discovery%20Call%20Request" class="btn btn--outline">
-                {isDE ? 'Stattdessen per E-Mail anfragen' : 'Request by email instead'}
-              </a>
-            </div>
+            )}
           </div>
 
           <!-- What happens in 30 minutes -->
@@ -327,6 +332,51 @@ const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
   </section>
 
 </Base>
+
+{calcomUsername && (
+  <script define:vars={{ calcomUsername }}>
+    (function (C, A, L) {
+      let p = function (a, ar) { a.q.push(ar); };
+      let d = C.document;
+      C.Cal = C.Cal || function () {
+        let cal = C.Cal;
+        let ar = arguments;
+        if (!cal.loaded) {
+          cal.ns = {};
+          cal.q = cal.q || [];
+          d.head.appendChild(d.createElement('script')).src = A;
+          cal.loaded = true;
+        }
+        if (ar[0] === L) {
+          const api = function () { p(api, arguments); };
+          const namespace = ar[1];
+          api.q = api.q || [];
+          if (typeof namespace === 'string') {
+            cal.ns[namespace] = cal.ns[namespace] || api;
+            p(cal.ns[namespace], ar);
+            p(cal, ['initNamespace', namespace]);
+          } else {
+            p(cal, ar);
+          }
+          return;
+        }
+        p(cal, ar);
+      };
+    })(window, 'https://app.cal.com/embed/embed.js', 'init');
+
+    Cal('init', 'discovery-call', { origin: 'https://cal.com' });
+    Cal.ns['discovery-call']('inline', {
+      elementOrSelector: '#cal-booking',
+      calLink: `${calcomUsername}/discovery-call`,
+      layout: 'month_view',
+    });
+    Cal.ns['discovery-call']('ui', {
+      styles: { branding: { brandColor: '#c49a3c' } },
+      hideEventTypeDetails: false,
+      layout: 'month_view',
+    });
+  </script>
+)}
 
 <style>
   /* ── HERO ─────────────────────────────────────────────── */
