@@ -1,0 +1,628 @@
+---
+/**
+ * SpotifyPlayer.astro
+ * Privacy-first Spotify embed — mirrors YouTubePlayer layout exactly.
+ * Artwork fills the player as a background. Connects to Spotify only on click.
+ *
+ * Props:
+ *   spotifyUrl  — open.spotify.com/episode/... for embed (required)
+ *   title       — display + accessible title (required)
+ *   artworkId   — explicit filename stem in thumbnails/ (use RSS GUID)
+ *                 falls back to Spotify episode ID extracted from spotifyUrl
+ *   type        — auto-detected from URL if omitted
+ *   compact     — true = 80px horizontal bar, false = full artwork player
+ *   aspect      — CSS aspect-ratio for full player, default "1/1"
+ *                 Use "16/9" for video-style, "1/1" for square podcast art
+ */
+
+import { Image } from 'astro:assets';
+
+interface Props {
+  spotifyUrl:  string;
+  title:       string;
+  artworkId?:  string;
+  type?:       'episode' | 'track' | 'album' | 'playlist' | 'show';
+  compact?:    boolean;
+  aspect?:     string;
+}
+
+const {
+  spotifyUrl,
+  title,
+  artworkId,
+  compact = false,
+  aspect  = '1/1',
+} = Astro.props;
+
+// ── URL helpers ───────────────────────────────────────────────────────────────
+
+function toEmbedUrl(url: string): string {
+  if (url.includes('/embed/')) return url;
+  const m = url.match(/open\.spotify\.com\/([a-z]+)\/([a-zA-Z0-9]+)/);
+  return m ? `https://open.spotify.com/embed/${m[1]}/${m[2]}` : '';
+}
+
+function detectType(url: string): string {
+  return url.match(/spotify\.com\/(?:embed\/)?([a-z]+)\//)?.[1] ?? 'episode';
+}
+
+function extractSpotifyId(url: string): string | null {
+  if (!url.includes('open.spotify.com') && !url.includes('embed.spotify.com')) return null;
+  return url.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1] ?? null;
+}
+
+const embedUrl     = toEmbedUrl(spotifyUrl);
+const canEmbed     = embedUrl !== '';
+const detectedType = Astro.props.type ?? detectType(spotifyUrl);
+const spotifyId    = extractSpotifyId(spotifyUrl);
+
+// Compact uses explicit height; full player uses aspect-ratio via ::before
+const [aw, ah]  = aspect.split('/').map(n => parseFloat(n.trim()));
+const padPct    = `${((ah / aw) * 100).toFixed(4)}%`;
+const compactH  = 80;
+
+// ── Local artwork ─────────────────────────────────────────────────────────────
+
+const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
+  { eager: true }
+);
+
+function findArtwork(id: string): ImageMetadata | null {
+  const entry = Object.entries(allArtwork).find(([path]) =>
+    path.split('/').pop()?.replace(/\.[^.]+$/, '') === id
+  );
+  return entry?.[1]?.default ?? null;
+}
+
+const lookupId     = artworkId ?? spotifyId ?? null;
+const localArtwork = lookupId ? findArtwork(lookupId) : null;
+
+// Waveform bars — only used in full player when no artwork
+const waveBars = Array.from({ length: 36 }, (_, i) =>
+  Math.round(20 + Math.sin(i * 0.7) * 15 + Math.cos(i * 1.3) * 10)
+);
+
+const spIcon =
+  'M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z' +
+  'm5.516 17.318c-.214.347-.673.456-1.02.244-2.795-1.706-6.314-2.092-10.458-1.146' +
+  '-.398.09-.8-.157-.89-.555-.09-.4.155-.8.555-.89 4.535-1.035 8.424-.59 11.565 1.326' +
+  '.348.214.456.672.248 1.021z' +
+  'm1.472-3.27c-.27.436-.842.573-1.278.303-3.198-1.965-8.074-2.533-11.858-1.386' +
+  '-.49.149-1.008-.131-1.157-.62-.148-.49.132-1.007.621-1.156 4.325-1.313 9.7-.675' +
+  ' 13.37 1.581.435.27.573.841.302 1.278z' +
+  'm.127-3.405c-3.834-2.277-10.16-2.486-13.824-1.374-.588.178-1.208-.153-1.387-.741' +
+  '-.178-.588.153-1.207.741-1.386 4.204-1.276 11.19-1.03 15.604 1.589.529.315.703' +
+  ' 1.002.389 1.531-.315.529-1.004.703-1.523.381z';
+
+const uid = `sp-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+{compact ? (
+  <!-- ── COMPACT: horizontal bar ── -->
+  <div
+    class="sp-compact"
+    id={uid}
+    data-embed-url={canEmbed ? embedUrl : ''}
+    data-external-url={spotifyUrl}
+    style={`height:${compactH}px;`}
+    role="region"
+    aria-label={`Spotify ${detectedType}: ${title}`}
+  >
+    <div class="sp-compact__placeholder">
+      {localArtwork && (
+        <Image
+          src={localArtwork}
+          alt=""
+          width={52}
+          height={52}
+          class="sp-compact__art"
+          loading="lazy"
+          decoding="async"
+          aria-hidden="true"
+        />
+      )}
+
+      {canEmbed ? (
+        <button class="sp-compact__trigger" aria-label={`Load Spotify ${detectedType}: ${title}`}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d={spIcon}/>
+          </svg>
+          <span class="sp-compact__title">{title}</span>
+          <span class="sp-compact__cta" aria-hidden="true">→ Load</span>
+        </button>
+      ) : (
+        <a
+          href={spotifyUrl}
+          class="sp-compact__trigger"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Listen on Spotify: ${title}`}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d={spIcon}/>
+          </svg>
+          <span class="sp-compact__title">{title}</span>
+          <span class="sp-compact__cta" aria-hidden="true">Open ↗</span>
+        </a>
+      )}
+    </div>
+    <div class="sp-compact__embed" hidden aria-hidden="true"></div>
+  </div>
+) : (
+  <!-- ── FULL: artwork-fill player, mirrors YouTubePlayer ── -->
+  <div
+    class="sp-player"
+    id={uid}
+    data-embed-url={canEmbed ? embedUrl : ''}
+    data-external-url={spotifyUrl}
+    style={`--sp-pad: ${padPct};`}
+    role="region"
+    aria-label={`Spotify ${detectedType}: ${title}`}
+  >
+    <!-- ::before drives height via padding-top trick -->
+
+    <div class="sp-player__placeholder">
+
+      <!-- Artwork fills the box -->
+      {localArtwork ? (
+        <Image
+          src={localArtwork}
+          alt={`Artwork: ${title}`}
+          width={600}
+          height={600}
+          widths={[400, 600, 800]}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 480px"
+          class="sp-player__artwork"
+          loading="eager"
+          decoding="async"
+        />
+      ) : (
+        <div class="sp-player__artwork sp-player__artwork--fallback" aria-hidden="true">
+          <div class="sp-player__noise"></div>
+          <!-- Waveform when no artwork -->
+          <div class="sp-player__waveform" aria-hidden="true">
+            {waveBars.map((h, i) => (
+              <span
+                class="sp-player__bar"
+                style={`--h:${h}px;--d:${(i * 0.05).toFixed(2)}s`}
+              ></span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Scrim — same as YouTube -->
+      <div class="sp-player__scrim" aria-hidden="true"></div>
+
+      <!-- Top meta -->
+      <div class="sp-player__meta">
+        <span class="sp-player__badge" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d={spIcon}/>
+          </svg>
+          Spotify
+        </span>
+        <span class="sp-player__type-label">{detectedType}</span>
+        <span class="sp-player__title-label">{title}</span>
+      </div>
+
+      <!-- Centred play / open button -->
+      {canEmbed ? (
+        <button
+          class="sp-player__trigger"
+          aria-label={`Load and play: ${title}`}
+        >
+          <span class="sp-player__ring" aria-hidden="true"></span>
+          <svg width="26" height="26" viewBox="0 0 28 28" fill="none" class="sp-player__play-icon" aria-hidden="true">
+            <path d="M10 8l12 6-12 6V8Z" fill="currentColor"/>
+          </svg>
+        </button>
+      ) : (
+        <a
+          href={spotifyUrl}
+          class="sp-player__trigger sp-player__trigger--external"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Listen on Spotify: ${title}`}
+        >
+          <span class="sp-player__ring" aria-hidden="true"></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d={spIcon}/>
+          </svg>
+        </a>
+      )}
+
+      <!-- Bottom consent / label -->
+      <p class="sp-player__consent">
+        {canEmbed
+          ? 'No data is sent to Spotify until you click play.'
+          : 'Opens in Spotify.'}
+      </p>
+
+    </div>
+
+    <div class="sp-player__embed" hidden aria-hidden="true"></div>
+  </div>
+)}
+
+<style>
+  /* ══ FULL PLAYER ══════════════════════════════════════════════════════════ */
+
+  .sp-player {
+    --sp-gold:   #c49a3c;
+    --sp-navy:   #090c14;
+    --sp-border: rgba(196, 154, 60, 0.18);
+    --sp-green:  #1db954;
+    --sp-text:   #e8e3d8;
+    --sp-muted:  rgba(122, 116, 104, 0.8);
+
+    position: relative;
+    width: 100%;
+    background: var(--sp-navy);
+    border: 1px solid var(--sp-border);
+    border-radius: 3px;
+    overflow: hidden;
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  /* ::before drives height — same pattern as YouTubePlayer */
+  .sp-player::before {
+    content: '';
+    display: block;
+    padding-top: var(--sp-pad, 100%);
+  }
+
+  .sp-player__placeholder,
+  .sp-player__embed {
+    position: absolute;
+    inset: 0;
+  }
+
+  .sp-player__placeholder {
+    display: grid;
+    place-items: center;
+    transition: opacity 0.35s ease;
+  }
+
+  .sp-player--loaded .sp-player__placeholder { opacity: 0; pointer-events: none; }
+
+  /* Artwork fills the box */
+  .sp-player__artwork {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .sp-player__artwork--fallback {
+    background: #0d1120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sp-player__noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.7;
+  }
+
+  /* Waveform (fallback only) */
+  .sp-player__waveform {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 60px;
+  }
+
+  .sp-player__bar {
+    display: block;
+    width: 3px;
+    height: var(--h, 20px);
+    background: var(--sp-gold);
+    opacity: 0.25;
+    border-radius: 1px;
+    animation: sp-pulse 2.4s ease-in-out infinite alternate;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes sp-pulse {
+    0%   { opacity: 0.15; transform: scaleY(0.7); }
+    100% { opacity: 0.35; transform: scaleY(1);   }
+  }
+
+  /* Scrim — identical to YouTubePlayer */
+  .sp-player__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(9,12,20,0.75) 0%,
+      rgba(9,12,20,0.05) 30%,
+      rgba(9,12,20,0.05) 65%,
+      rgba(9,12,20,0.82) 100%
+    );
+  }
+
+  /* Top meta */
+  .sp-player__meta {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 2;
+  }
+
+  .sp-player__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.18rem 0.5rem;
+    background: rgba(9,12,20,0.6);
+    border: 1px solid rgba(29,185,84,0.3);
+    border-radius: 2px;
+    color: var(--sp-green);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .sp-player__type-label {
+    color: rgba(232,227,216,0.5);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .sp-player__title-label {
+    color: var(--sp-text);
+    font-size: 0.8rem;
+    font-style: italic;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Play button — identical shape to YouTubePlayer but green-tinted */
+  .sp-player__trigger {
+    position: relative;
+    z-index: 2;
+    width: 72px;
+    height: 72px;
+    background: var(--sp-green);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--sp-navy);
+    box-shadow: 0 4px 24px rgba(29,185,84,0.4);
+    text-decoration: none;
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .sp-player__trigger:hover {
+    background: #22d65e;
+    transform: scale(1.08);
+    box-shadow: 0 6px 32px rgba(29,185,84,0.55);
+  }
+
+  .sp-player__trigger:hover .sp-player__ring {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+
+  .sp-player__trigger:focus-visible {
+    outline: 2px solid var(--sp-green);
+    outline-offset: 5px;
+  }
+
+  .sp-player__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(29,185,84,0.5);
+    transform: scale(1);
+    opacity: 0.5;
+    transition: transform 0.55s ease, opacity 0.55s ease;
+    pointer-events: none;
+  }
+
+  .sp-player__play-icon { margin-left: 4px; }
+
+  /* Consent note */
+  .sp-player__consent {
+    position: absolute;
+    bottom: 0.8rem;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+    color: var(--sp-muted);
+    font-size: 0.68rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+    margin: 0;
+    padding: 0 1rem;
+    pointer-events: none;
+  }
+
+  /* Embed layer */
+  .sp-player__embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* ══ COMPACT BAR ══════════════════════════════════════════════════════════ */
+
+  .sp-compact {
+    --sp-gold:   #c49a3c;
+    --sp-navy:   #090c14;
+    --sp-border: rgba(196, 154, 60, 0.18);
+    --sp-green:  #1db954;
+    --sp-text:   #e8e3d8;
+
+    position: relative;
+    width: 100%;
+    background: var(--sp-navy);
+    border: 1px solid var(--sp-border);
+    border-radius: 3px;
+    overflow: hidden;
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  .sp-compact__placeholder,
+  .sp-compact__embed {
+    position: absolute;
+    inset: 0;
+  }
+
+  .sp-compact__placeholder {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 0 0 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .sp-compact--loaded .sp-compact__placeholder { opacity: 0; pointer-events: none; }
+
+  .sp-compact__art {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .sp-compact__trigger {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0 1.25rem 0 0.75rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--sp-green);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .sp-compact__trigger:hover { background: rgba(29,185,84,0.06); }
+  .sp-compact__trigger:focus-visible { outline: 2px solid var(--sp-green); outline-offset: -2px; }
+
+  .sp-compact__title {
+    flex: 1;
+    min-width: 0;
+    color: var(--sp-text);
+    font-size: 0.88rem;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sp-compact__cta {
+    color: var(--sp-gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .sp-compact__embed iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+</style>
+
+<script>
+  // ── Full player ─────────────────────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.sp-player').forEach((player) => {
+    const btn      = player.querySelector<HTMLElement>('.sp-player__trigger');
+    const embedDiv = player.querySelector<HTMLElement>('.sp-player__embed');
+    if (!btn || !embedDiv) return;
+
+    // External link (<a>) — browser handles it, no JS needed
+    if (btn.tagName === 'A') return;
+
+    btn.addEventListener('click', () => {
+      const url = player.dataset.embedUrl;
+      if (!url) return;
+
+      const iframe = document.createElement('iframe');
+      // Inline styles — Astro-scoped CSS doesn't reach dynamically created elements
+      iframe.style.cssText = 'position:absolute;inset:0;top:0;left:0;width:100%;height:100%;border:none;display:block;';
+      iframe.src     = `${url}?utm_source=generator&theme=0`;
+      iframe.title   = player.getAttribute('aria-label') ?? 'Spotify player';
+      iframe.allow   = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+      iframe.loading = 'lazy';
+
+      embedDiv.appendChild(iframe);
+
+      // Show immediately — Spotify's embed does its own internal navigation
+      // after the initial iframe load, making the load event unreliable.
+      player.classList.add('sp-player--loaded');
+      embedDiv.removeAttribute('hidden');
+      embedDiv.setAttribute('aria-hidden', 'false');
+    }, { once: true });
+  });
+
+  // ── Compact bar ─────────────────────────────────────────────────────────────
+  document.querySelectorAll<HTMLElement>('.sp-compact').forEach((player) => {
+    const btn      = player.querySelector<HTMLElement>('.sp-compact__trigger');
+    const embedDiv = player.querySelector<HTMLElement>('.sp-compact__embed');
+    if (!btn || !embedDiv) return;
+
+    if (btn.tagName === 'A') return;
+
+    btn.addEventListener('click', () => {
+      const url = player.dataset.embedUrl;
+      if (!url) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:absolute;inset:0;top:0;left:0;width:100%;height:100%;border:none;display:block;';
+      iframe.src     = `${url}?utm_source=generator&theme=0`;
+      iframe.title   = player.getAttribute('aria-label') ?? 'Spotify player';
+      iframe.allow   = 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture';
+      iframe.loading = 'lazy';
+
+      embedDiv.appendChild(iframe);
+
+      player.classList.add('sp-compact--loaded');
+      embedDiv.removeAttribute('hidden');
+      embedDiv.setAttribute('aria-hidden', 'false');
+    }, { once: true });
+  });
+</script>

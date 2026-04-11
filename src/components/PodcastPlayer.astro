@@ -1,0 +1,819 @@
+---
+/**
+ * PodcastPlayer.astro
+ * Native HTML5 audio player. Streams MP3 directly — no Spotify iframe.
+ *
+ * Props:
+ *   audioUrl    — Direct MP3 URL from RSS <enclosure url> (required)
+ *   title       — Episode title (required)
+ *   artworkId   — Filename stem in src/assets/media/thumbnails/
+ *                 Pass: entry.data.episode_id ?? episodeSlug
+ *   spotifyUrl  — External link only (optional)
+ *   youtubeUrl  — External link only (optional)
+ *   duration    — e.g. "00:47:23" from <itunes:duration> (optional)
+ *   compact     — true = 80px bar, false = full square player
+ *   aspect      — CSS aspect ratio, default "1/1"
+ */
+
+import { Image } from 'astro:assets';
+
+interface Props {
+  audioUrl:    string;
+  title:       string;
+  artworkId?:  string;
+  spotifyUrl?: string;
+  youtubeUrl?: string;
+  duration?:   string;
+  compact?:    boolean;
+  aspect?:     string;
+}
+
+const {
+  audioUrl,
+  title,
+  artworkId,
+  spotifyUrl,
+  youtubeUrl,
+  duration,
+  compact = false,
+  aspect  = '1/1',
+} = Astro.props;
+
+const [aw, ah] = aspect.split('/').map(n => parseFloat(n.trim()));
+const padPct   = `${((ah / aw) * 100).toFixed(4)}%`;
+
+// ── Artwork lookup ────────────────────────────────────────────────────────────
+const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
+  { eager: true }
+);
+
+const artworkEntry = artworkId
+  ? Object.entries(allArtwork).find(([path]) =>
+      path.split('/').pop()?.replace(/\.[^.]+$/, '') === artworkId
+    )
+  : null;
+const localArtwork = artworkEntry?.[1]?.default ?? null;
+
+// Waveform heights — pre-computed at build time
+const waveBars = Array.from({ length: 36 }, (_, i) =>
+  Math.round(20 + Math.sin(i * 0.7) * 15 + Math.cos(i * 1.3) * 10)
+);
+
+const uid = `pp-${Math.random().toString(36).slice(2, 8)}`;
+const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
+---
+
+{compact ? (
+
+  <!-- ── COMPACT BAR ────────────────────────────────────────────────────── -->
+  <div class="pp-compact" id={uid} role="region" aria-label={`Audio: ${title}`}>
+
+    {localArtwork ? (
+      <Image
+        src={localArtwork}
+        alt=""
+        width={80}
+        height={80}
+        class="pp-compact__art"
+        loading="lazy"
+        decoding="async"
+        aria-hidden="true"
+      />
+    ) : (
+      <div class="pp-compact__art-fallback" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+      </div>
+    )}
+
+    <div class="pp-compact__body">
+      <button class="pp-playbtn" data-audio={audioUrl} aria-label={`Play: ${title}`}>
+        <svg class="pp-icon pp-icon--play" width="14" height="14" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <path d="M11 7l11 7-11 7V7Z" fill="currentColor"/>
+        </svg>
+        <svg class="pp-icon pp-icon--pause" width="14" height="14" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect x="6" y="6" width="5" height="16" rx="1" fill="currentColor"/>
+          <rect x="17" y="6" width="5" height="16" rx="1" fill="currentColor"/>
+        </svg>
+      </button>
+
+      <div class="pp-compact__info">
+        <span class="pp-compact__title">{title}</span>
+        <div class="pp-compact__row">
+          <span class="pp-time pp-time--current">0:00</span>
+          <div class="pp-bar" role="progressbar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100}>
+            <div class="pp-bar__fill"></div>
+          </div>
+          <span class="pp-time pp-time--duration">{duration ?? ''}</span>
+          <!-- Speed cycle button -->
+          <button class="pp-speed-cycle" aria-label="Playback speed: 1×">1×</button>
+          <!-- Share -->
+          <button class="pp-share" aria-label="Share episode" data-title={title}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+) : (
+
+  <!-- ── FULL PLAYER ─────────────────────────────────────────────────────── -->
+  <div
+    class="pp-player"
+    id={uid}
+    style={`--pp-pad: ${padPct};`}
+    role="region"
+    aria-label={`Audio: ${title}`}
+  >
+
+    <!-- Artwork or fallback — both use same absolute inset positioning -->
+    {localArtwork ? (
+      <Image
+        src={localArtwork}
+        alt={`Artwork: ${title}`}
+        width={600}
+        height={600}
+        widths={[400, 600, 800]}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 480px"
+        class="pp-player__art"
+        loading="eager"
+        decoding="async"
+      />
+    ) : (
+      <div class="pp-player__art pp-player__art--fallback" aria-hidden="true">
+        <div class="pp-noise"></div>
+        <div class="pp-waveform">
+          {waveBars.map((h, i) => (
+            <span
+              class="pp-waveform__bar"
+              style={`--h:${h}px;--d:${(i * 0.05).toFixed(2)}s`}
+            ></span>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Gradient scrim — heavier at top and bottom -->
+    <div class="pp-player__scrim" aria-hidden="true"></div>
+
+    <!-- Top: badge + title -->
+    <div class="pp-player__top">
+      <span class="pp-badge" aria-hidden="true">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+        Audio
+      </span>
+      <span class="pp-title-label">{title}</span>
+    </div>
+
+    <!-- Centre: play button -->
+    <button
+      class="pp-player__playbtn pp-playbtn"
+      data-audio={audioUrl}
+      aria-label={`Play: ${title}`}
+    >
+      <span class="pp-ring" aria-hidden="true"></span>
+      <svg class="pp-icon pp-icon--play" width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <path d="M11 7l11 7-11 7V7Z" fill="currentColor"/>
+      </svg>
+      <svg class="pp-icon pp-icon--pause" width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect x="6" y="6" width="5" height="16" rx="1" fill="currentColor"/>
+        <rect x="17" y="6" width="5" height="16" rx="1" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <!--
+      Bottom controls — two rows to avoid overflow clipping.
+      Row 1: time | scrubber | time
+      Row 2: speed | share | external links
+      Both rows sit inside pp-player__bottom which is NOT overflow:hidden.
+    -->
+    <div class="pp-player__bottom">
+
+      <!-- Row 1: progress -->
+      <div class="pp-row pp-row--progress">
+        <span class="pp-time pp-time--current">0:00</span>
+        <div class="pp-bar" role="progressbar" aria-valuenow={0} aria-valuemin={0} aria-valuemax={100} aria-label="Playback progress">
+          <div class="pp-bar__fill"></div>
+        </div>
+        <span class="pp-time pp-time--duration">{duration ?? '—'}</span>
+      </div>
+
+      <!-- Row 2: actions -->
+      <div class="pp-row pp-row--actions">
+
+        <!-- Speed: single cycle button, no dropdown, no overflow issue -->
+        <button class="pp-speed-cycle" aria-label="Playback speed: 1×">
+          1×
+        </button>
+
+        <!-- Share -->
+        <button class="pp-share" aria-label="Share episode" data-title={title}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          <span>Share</span>
+        </button>
+
+        <!-- Spacer -->
+        <div style="flex:1"></div>
+
+        <!-- External platform links -->
+        {spotifyUrl && (
+          <a href={spotifyUrl} class="pp-ext pp-ext--spotify" target="_blank" rel="noopener noreferrer" aria-label="Listen on Spotify">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            </svg>
+            Spotify
+          </a>
+        )}
+        {youtubeUrl && (
+          <a href={youtubeUrl} class="pp-ext pp-ext--youtube" target="_blank" rel="noopener noreferrer" aria-label="Watch on YouTube">
+            <svg width="13" height="9" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+              <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
+              <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
+            </svg>
+            YouTube
+          </a>
+        )}
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+
+<style>
+  /* ══ ICON SHOW/HIDE ═══════════════════════════════════════════════════════
+   * Class-based — the hidden attribute is unreliable with Astro's CSS scoping.
+   * Default: show play, hide pause.
+   * When .pp-playing is on the container: swap them.
+   */
+  .pp-icon--pause { display: none; }
+  .pp-playing .pp-icon--play  { display: none; }
+  .pp-playing .pp-icon--pause { display: block; }
+
+  /* ══ SHARED ══════════════════════════════════════════════════════════════ */
+
+  .pp-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(122,116,104,0.85);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pp-bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(196,154,60,0.2);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+    min-width: 40px;
+  }
+
+  .pp-bar__fill {
+    height: 100%;
+    width: 0%;
+    background: #c49a3c;
+    border-radius: 2px;
+    pointer-events: none;
+    transition: width 0.2s linear;
+  }
+
+  /* Speed cycle button */
+  .pp-speed-cycle {
+    background: transparent;
+    border: 1px solid rgba(196,154,60,0.3);
+    border-radius: 2px;
+    padding: 0.15rem 0.45rem;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: #c49a3c;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .pp-speed-cycle:hover {
+    border-color: #c49a3c;
+    background: rgba(196,154,60,0.1);
+  }
+
+  .pp-speed-cycle:focus-visible {
+    outline: 2px solid #c49a3c;
+    outline-offset: 2px;
+  }
+
+  /* Share button */
+  .pp-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: transparent;
+    border: 1px solid rgba(196,154,60,0.25);
+    border-radius: 2px;
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+    color: rgba(122,116,104,0.85);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .pp-share:hover {
+    border-color: #c49a3c;
+    color: #c49a3c;
+    background: rgba(196,154,60,0.08);
+  }
+
+  .pp-share:focus-visible {
+    outline: 2px solid #c49a3c;
+    outline-offset: 2px;
+  }
+
+  /* External platform links */
+  .pp-ext {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid rgba(196,154,60,0.18);
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .pp-ext--spotify { color: #1db954; border-color: rgba(29,185,84,0.25); }
+  .pp-ext--spotify:hover { background: rgba(29,185,84,0.08); border-color: #1db954; }
+  .pp-ext--youtube { color: #c49a3c; border-color: rgba(196,154,60,0.2); }
+  .pp-ext--youtube:hover { background: rgba(196,154,60,0.08); border-color: #c49a3c; }
+
+  /* ══ FULL PLAYER ═════════════════════════════════════════════════════════ */
+
+  .pp-player {
+    position: relative;
+    width: 100%;
+    /* overflow:hidden clips artwork to border-radius but also clips children.
+       Children that need to escape (speed dropdown) must NOT use position:absolute
+       outside the box — we use inline controls instead to avoid this. */
+    overflow: hidden;
+    background: #141c2c;  /* visibly distinct from artwork fallback */
+    border: 1px solid rgba(196,154,60,0.18);
+    border-radius: 3px;
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  /* ::before drives height via padding-top trick */
+  .pp-player::before {
+    content: '';
+    display: block;
+    /* Leave room at the bottom for the controls panel */
+    padding-top: calc(var(--pp-pad, 100%) - 6rem);
+  }
+
+  /* Artwork — fills the top portion */
+  .pp-player__art {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* Stops at the controls area */
+    bottom: 6rem;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+  }
+
+  .pp-player__art--fallback {
+    /* Make fallback clearly visible even with no artwork */
+    background: linear-gradient(135deg, #1a2235 0%, #0d1422 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pp-noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  .pp-waveform {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 60px;
+  }
+
+  .pp-waveform__bar {
+    display: block;
+    width: 3px;
+    height: var(--h, 20px);
+    background: #c49a3c;
+    opacity: 0.4;
+    border-radius: 1px;
+    animation: pp-pulse 2.4s ease-in-out infinite alternate;
+    animation-delay: var(--d, 0s);
+  }
+
+  @keyframes pp-pulse {
+    0%   { opacity: 0.2; transform: scaleY(0.7); }
+    100% { opacity: 0.5; transform: scaleY(1); }
+  }
+
+  /* Scrim over artwork */
+  .pp-player__scrim {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 6rem;
+    background: linear-gradient(
+      to bottom,
+      rgba(9,12,20,0.7) 0%,
+      rgba(9,12,20,0.05) 25%,
+      rgba(9,12,20,0.05) 60%,
+      rgba(9,12,20,0.55) 100%
+    );
+  }
+
+  /* Top meta bar */
+  .pp-player__top {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    z-index: 2;
+  }
+
+  .pp-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.18rem 0.5rem;
+    background: rgba(9,12,20,0.65);
+    border: 1px solid rgba(196,154,60,0.2);
+    border-radius: 2px;
+    color: #c49a3c;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pp-title-label {
+    color: #e8e3d8;
+    font-size: 0.8rem;
+    font-style: italic;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Centre play button */
+  .pp-player__playbtn {
+    position: absolute;
+    /* Centre in the artwork area, which ends at bottom: 6rem */
+    top: calc((100% - 6rem) / 2);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: 72px;
+    height: 72px;
+    background: #c49a3c;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #090c14;
+    box-shadow: 0 4px 24px rgba(196,154,60,0.4);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .pp-player__playbtn:hover {
+    background: #d4aa4a;
+    box-shadow: 0 6px 32px rgba(196,154,60,0.55);
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  .pp-player__playbtn:focus-visible {
+    outline: 2px solid #c49a3c;
+    outline-offset: 5px;
+  }
+
+  .pp-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(196,154,60,0.5);
+    transform: scale(1);
+    opacity: 0.5;
+    transition: transform 0.55s ease, opacity 0.55s ease;
+    pointer-events: none;
+  }
+
+  .pp-player__playbtn:hover .pp-ring {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+
+  /*
+   * Bottom controls panel — sits below the artwork, NOT inside overflow:hidden.
+   * It's part of the normal document flow after the ::before sizer.
+   * Uses position:absolute anchored to the bottom of the player.
+   */
+  .pp-player__bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6rem;
+    background: rgba(9,12,20,0.95);
+    border-top: 1px solid rgba(196,154,60,0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    z-index: 2;
+  }
+
+  .pp-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .pp-row--progress { gap: 0.5rem; }
+  .pp-row--actions  { gap: 0.5rem; }
+
+  /* ══ COMPACT BAR ══════════════════════════════════════════════════════════ */
+
+  .pp-compact {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    height: 80px;
+    background: #090c14;
+    border: 1px solid rgba(196,154,60,0.18);
+    border-radius: 3px;
+    overflow: hidden;
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  .pp-compact__art {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .pp-compact__art-fallback {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    background: #141c2c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(196,154,60,0.4);
+    border-right: 1px solid rgba(196,154,60,0.1);
+  }
+
+  .pp-compact__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0 0.85rem;
+  }
+
+  /* Compact play button */
+  .pp-compact .pp-playbtn {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    background: #c49a3c;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #090c14;
+    transition: background 0.2s, transform 0.15s;
+  }
+
+  .pp-compact .pp-playbtn:hover { background: #d4aa4a; transform: scale(1.08); }
+  .pp-compact .pp-playbtn:focus-visible { outline: 2px solid #c49a3c; outline-offset: 3px; }
+
+  /* Optical centre for compact play triangle */
+  .pp-compact .pp-icon--play { transform: translateX(1px); }
+
+  .pp-compact__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .pp-compact__title {
+    font-size: 0.82rem;
+    font-style: italic;
+    color: #e8e3d8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pp-compact__row {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  /* Compact share: icon only to save space */
+  .pp-compact .pp-share span { display: none; }
+  .pp-compact .pp-share { padding: 0.15rem 0.35rem; }
+</style>
+
+<script>
+  /** Seconds → M:SS or H:MM:SS */
+  function fmt(s: number): string {
+    if (!isFinite(s) || isNaN(s)) return '—';
+    const h   = Math.floor(s / 3600);
+    const m   = Math.floor((s % 3600) / 60);
+    const sec = Math.floor(s % 60);
+    if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    return `${m}:${String(sec).padStart(2,'0')}`;
+  }
+
+  // Speed cycle order
+  const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75];
+
+  // Shared active audio — pauses previous when new one starts
+  let activeAudio: HTMLAudioElement | null = null;
+  let activeContainer: HTMLElement | null  = null;
+
+  function setPlaying(container: HTMLElement, playing: boolean) {
+    container.classList.toggle('pp-playing', playing);
+  }
+
+  function pauseActive() {
+    activeAudio?.pause();
+    if (activeContainer) setPlaying(activeContainer, false);
+    activeAudio = null;
+    activeContainer = null;
+  }
+
+  document.querySelectorAll<HTMLElement>('.pp-player, .pp-compact').forEach((container) => {
+    const playBtn    = container.querySelector<HTMLButtonElement>('.pp-playbtn, .pp-player__playbtn');
+    const barEl      = container.querySelector<HTMLElement>('.pp-bar');
+    const fillEl     = container.querySelector<HTMLElement>('.pp-bar__fill');
+    const currentEl  = container.querySelector<HTMLElement>('.pp-time--current');
+    const durationEl = container.querySelector<HTMLElement>('.pp-time--duration');
+    const speedBtn   = container.querySelector<HTMLButtonElement>('.pp-speed-cycle');
+    const shareBtn   = container.querySelector<HTMLButtonElement>('.pp-share');
+    const audioUrl   = playBtn?.dataset.audio;
+
+    if (!playBtn || !audioUrl) return;
+
+    let audio: HTMLAudioElement | null = null;
+    let speedIndex = 0; // index into SPEEDS array
+
+    // ── Play / pause ─────────────────────────────────────────────────────
+    playBtn.addEventListener('click', () => {
+      if (activeAudio && activeAudio !== audio) pauseActive();
+
+      if (!audio) {
+        audio = new Audio(audioUrl);
+        if (speedBtn) audio.playbackRate = SPEEDS[speedIndex];
+
+        audio.addEventListener('timeupdate', () => {
+          if (!audio?.duration) return;
+          const pct = (audio.currentTime / audio.duration) * 100;
+          if (fillEl)    fillEl.style.width = `${pct}%`;
+          if (barEl)     barEl.setAttribute('aria-valuenow', String(Math.round(pct)));
+          if (currentEl) currentEl.textContent = fmt(audio.currentTime);
+        });
+
+        audio.addEventListener('loadedmetadata', () => {
+          // Only overwrite if the slot doesn't already have a static value
+          if (durationEl && audio && durationEl.textContent === '—' || durationEl?.textContent === '')
+            durationEl!.textContent = fmt(audio!.duration);
+        });
+
+        audio.addEventListener('ended', () => {
+          if (fillEl)    fillEl.style.width = '0%';
+          if (currentEl) currentEl.textContent = '0:00';
+          setPlaying(container, false);
+          activeAudio = null;
+          activeContainer = null;
+        });
+      }
+
+      if (audio.paused) {
+        audio.play();
+        setPlaying(container, true);
+        activeAudio = container === activeContainer ? activeAudio : audio;
+        activeContainer = container;
+        activeAudio = audio;
+      } else {
+        audio.pause();
+        setPlaying(container, false);
+        activeAudio = null;
+        activeContainer = null;
+      }
+    });
+
+    // ── Scrub ────────────────────────────────────────────────────────────
+    barEl?.addEventListener('click', (e: MouseEvent) => {
+      if (!audio?.duration) return;
+      const rect = barEl.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+    });
+
+    // ── Speed cycle ──────────────────────────────────────────────────────
+    speedBtn?.addEventListener('click', () => {
+      speedIndex = (speedIndex + 1) % SPEEDS.length;
+      const speed = SPEEDS[speedIndex];
+      if (audio) audio.playbackRate = speed;
+      speedBtn.textContent = `${speed}×`;
+      speedBtn.setAttribute('aria-label', `Playback speed: ${speed}×`);
+    });
+
+    // ── Share ────────────────────────────────────────────────────────────
+    shareBtn?.addEventListener('click', async () => {
+      const shareTitle = shareBtn.dataset.title ?? document.title;
+      const shareUrl   = window.location.href;
+
+      if (navigator.share) {
+        try { await navigator.share({ title: shareTitle, url: shareUrl }); }
+        catch { /* user cancelled */ }
+      } else {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          const origText = shareBtn.innerHTML;
+          shareBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c49a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Copied</span>`;
+          shareBtn.style.color = '#c49a3c';
+          shareBtn.style.borderColor = '#c49a3c';
+          setTimeout(() => {
+            shareBtn.innerHTML = origText;
+            shareBtn.style.color = '';
+            shareBtn.style.borderColor = '';
+          }, 1800);
+        } catch { /* clipboard denied */ }
+      }
+    });
+  });
+</script>

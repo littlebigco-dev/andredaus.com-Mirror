@@ -1,0 +1,358 @@
+---
+/**
+ * YouTubePlayer.astro
+ * Privacy-first YouTube embed with build-time local thumbnail.
+ *
+ * Props:
+ *   videoId   — YouTube video ID (required)
+ *   title     — Accessible + display title (required)
+ *   aspect    — CSS aspect-ratio string, default "16/9"
+ *   autoplay  — Whether to autoplay after load, default true
+ *   widths    — srcset widths for <Image>, default [640, 960, 1280]
+ *   sizes     — <img sizes> attribute
+ */
+
+import { Image } from 'astro:assets';
+
+interface Props {
+  videoId:   string;
+  title:     string;
+  aspect?:   string;
+  autoplay?: boolean;
+  widths?:   number[];
+  sizes?:    string;
+}
+
+const {
+  videoId,
+  title,
+  aspect   = '16/9',
+  autoplay = true,
+  widths   = [640, 960, 1280],
+  sizes    = '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 720px',
+} = Astro.props;
+
+// Convert "16/9" → "56.25%" for the ::before padding-top height trick
+const [w, h] = aspect.split('/').map(n => parseFloat(n.trim()));
+const padPct  = `${((h / w) * 100).toFixed(4)}%`;
+
+// ── Local thumbnail lookup ─────────────────────────────────────────────────
+const allThumbnails = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
+  { eager: true }
+);
+
+const thumbnailEntry = Object.entries(allThumbnails).find(([path]) =>
+  path.split('/').pop()?.replace(/\.[^.]+$/, '') === videoId
+);
+const localThumbnail = thumbnailEntry?.[1]?.default ?? null;
+
+const uid = `yt-${videoId}-${Math.random().toString(36).slice(2, 7)}`;
+---
+
+<div
+  class="yt-player"
+  id={uid}
+  data-video-id={videoId}
+  data-autoplay={autoplay ? '1' : '0'}
+  style={`--yt-pad: ${padPct};`}
+  role="region"
+  aria-label={`YouTube: ${title}`}
+>
+  <!-- ::before pseudo-element creates height via padding-top trick -->
+
+  <div class="yt-player__placeholder">
+    {localThumbnail ? (
+      <Image
+        src={localThumbnail}
+        alt={`Thumbnail: ${title}`}
+        widths={widths}
+        sizes={sizes}
+        class="yt-player__thumbnail"
+        loading="eager"
+        decoding="async"
+      />
+    ) : (
+      <div class="yt-player__thumbnail yt-player__thumbnail--fallback" aria-hidden="true">
+        <div class="yt-player__noise"></div>
+      </div>
+    )}
+
+    <div class="yt-player__scrim" aria-hidden="true"></div>
+
+    <div class="yt-player__meta">
+      <span class="yt-player__badge" aria-hidden="true">
+        <svg width="18" height="13" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+          <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
+          <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
+        </svg>
+        YouTube
+      </span>
+      <span class="yt-player__title-label">{title}</span>
+    </div>
+
+    <button class="yt-player__trigger" aria-label={`Load and play: ${title}`}>
+      <span class="yt-player__ring" aria-hidden="true"></span>
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" class="yt-player__play-icon" aria-hidden="true">
+        <path d="M10 8l12 6-12 6V8Z" fill="currentColor"/>
+      </svg>
+    </button>
+
+    <p class="yt-player__consent">
+      No data is sent to YouTube until you click play.
+    </p>
+  </div>
+
+  <div class="yt-player__embed" hidden aria-hidden="true"></div>
+</div>
+
+<style>
+  .yt-player {
+    --yt-gold:   #c49a3c;
+    --yt-navy:   #090c14;
+    --yt-border: rgba(196, 154, 60, 0.18);
+    --yt-text:   #e8e3d8;
+    --yt-muted:  rgba(122, 116, 104, 0.8);
+
+    position: relative;
+    width: 100%;
+    background: var(--yt-navy);
+    border: 1px solid var(--yt-border);
+    border-radius: 3px;
+    overflow: hidden;
+    font-family: 'Work Sans', sans-serif;
+  }
+
+  /*
+   * ::before drives the container height.
+   * padding-top % is relative to width → 56.25% = 16:9.
+   * All content children are position:absolute over this sizer.
+   */
+  .yt-player::before {
+    content: '';
+    display: block;
+    padding-top: var(--yt-pad, 56.25%);
+  }
+
+  .yt-player__placeholder,
+  .yt-player__embed {
+    position: absolute;
+    inset: 0;
+  }
+
+  .yt-player__placeholder {
+    display: grid;
+    place-items: center;
+    transition: opacity 0.35s ease;
+  }
+  .yt-player--loaded  .yt-player__placeholder { opacity: 0; pointer-events: none; }
+  .yt-player--loading .yt-player__placeholder { opacity: 0.15; pointer-events: none; }
+
+  /* Thumbnail */
+  .yt-player__thumbnail {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .yt-player__thumbnail--fallback { background: #0d1120; }
+
+  .yt-player__noise {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    opacity: 0.7;
+  }
+
+  /* Scrim */
+  .yt-player__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(9,12,20,0.75) 0%,
+      rgba(9,12,20,0.05) 30%,
+      rgba(9,12,20,0.05) 65%,
+      rgba(9,12,20,0.82) 100%
+    );
+  }
+
+  /* Meta bar */
+  .yt-player__meta {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    z-index: 2;
+  }
+
+  .yt-player__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.18rem 0.5rem;
+    background: rgba(9,12,20,0.6);
+    border: 1px solid var(--yt-border);
+    border-radius: 2px;
+    color: var(--yt-gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .yt-player__title-label {
+    color: var(--yt-text);
+    font-size: 0.8rem;
+    font-style: italic;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Play button */
+  .yt-player__trigger {
+    position: relative;
+    z-index: 2;
+    width: 72px;
+    height: 72px;
+    background: var(--yt-gold);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--yt-navy);
+    box-shadow: 0 4px 24px rgba(196,154,60,0.4);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+  .yt-player__trigger:hover {
+    background: #d4aa4a;
+    transform: scale(1.08);
+    box-shadow: 0 6px 32px rgba(196,154,60,0.55);
+  }
+  .yt-player__trigger:hover .yt-player__ring {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+  .yt-player__trigger:focus-visible {
+    outline: 2px solid var(--yt-gold);
+    outline-offset: 5px;
+  }
+
+  .yt-player__ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(196,154,60,0.5);
+    transform: scale(1);
+    opacity: 0.5;
+    transition: transform 0.55s ease, opacity 0.55s ease;
+    pointer-events: none;
+  }
+
+  .yt-player__play-icon { margin-left: 4px; }
+
+  /* Consent */
+  .yt-player__consent {
+    position: absolute;
+    bottom: 0.8rem;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    text-align: center;
+    color: var(--yt-muted);
+    font-size: 0.68rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+    margin: 0;
+    padding: 0 1rem;
+    pointer-events: none;
+  }
+
+  /*
+   * NOTE: .yt-player__embed iframe styles are NOT set here.
+   * Astro scopes component CSS with a hash attribute that dynamically
+   * created elements never receive. The iframe is sized via JS instead.
+   */
+
+  /* Loading spinner */
+  .yt-player--loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 2px solid var(--yt-border);
+    border-top-color: var(--yt-gold);
+    border-radius: 50%;
+    animation: yt-spin 0.7s linear infinite;
+    z-index: 3;
+  }
+
+  @keyframes yt-spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.yt-player').forEach((player) => {
+    const btn      = player.querySelector<HTMLButtonElement>('.yt-player__trigger');
+    const embedDiv = player.querySelector<HTMLElement>('.yt-player__embed');
+    if (!btn || !embedDiv) return;
+
+    btn.addEventListener('click', () => {
+      const videoId  = player.dataset.videoId;
+      const autoplay = player.dataset.autoplay === '1' ? 1 : 0;
+      if (!videoId) return;
+
+      player.classList.add('yt-player--loading');
+
+      const iframe = document.createElement('iframe');
+
+      /*
+       * Size the iframe via inline styles, not CSS class rules.
+       * Astro scopes component <style> with a hash attribute that
+       * dynamically created elements never have — so CSS selectors
+       * targeting them silently do nothing.
+       */
+      iframe.style.cssText = [
+        'position:absolute',
+        'inset:0',
+        'top:0',
+        'left:0',
+        'width:100%',
+        'height:100%',
+        'border:none',
+        'display:block',
+      ].join(';');
+
+      // Attach load listener BEFORE setting src
+      iframe.addEventListener('load', () => {
+        player.classList.remove('yt-player--loading');
+        player.classList.add('yt-player--loaded');
+        embedDiv.removeAttribute('hidden');
+        embedDiv.setAttribute('aria-hidden', 'false');
+      });
+
+      iframe.src          = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=${autoplay}&rel=0&modestbranding=1`;
+      iframe.title        = player.getAttribute('aria-label') ?? 'YouTube video';
+      iframe.allow        = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      iframe.allowFullscreen = true;
+
+      embedDiv.appendChild(iframe);
+    }, { once: true });
+  });
+</script>

@@ -1,11 +1,15 @@
 ---
 import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
+import YouTubePlayer from '../../components/YouTubePlayer.astro';
+import PodcastPlayer  from '../../components/PodcastPlayer.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('podcast');
+  const now = new Date();
   return entries
-    .filter(e => e.id.startsWith('en/') && e.data.status === 'published')
+    .filter(e => e.id.startsWith('en/') && (!e.data.publish_date || e.data.publish_date <= now))
     .map(entry => ({
       params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
       props: { entry },
@@ -22,6 +26,54 @@ const prefix = isDE ? '/de' : '';
 function formatDate(d: Date) {
   return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+// ── Local artwork lookup ─────────────────────────────────────────────────
+const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
+  { eager: true }
+);
+
+function getArtworkById(spotifyUrl: string): ImageMetadata | null {
+  const id = spotifyUrl.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1];
+  if (!id) return null;
+  const found = Object.entries(allArtwork).find(([path]) =>
+    path.split('/').pop()?.replace(/\.[^.]+$/, '') === id
+  );
+  return found?.[1]?.default ?? null;
+}
+
+const artwork = getArtworkById(entry.data.spotify_url);
+
+// ── YouTube video ID extraction ──────────────────────────────────────────
+function extractYtId(url?: string): string | null {
+  if (!url) return null;
+  return new URL(url).searchParams.get('v')
+    ?? url.match(/youtu\.be\/([^?&]+)/)?.[1]
+    ?? url.match(/youtube\.com\/embed\/([^?&]+)/)?.[1]
+    ?? null;
+}
+const ytVideoId = extractYtId(entry.data.youtube_url);
+
+// ── Prev / next episode ──────────────────────────────────────────────────
+const allEpisodes = await getCollection('podcast');
+const now = new Date();
+const published = allEpisodes
+  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && (!e.data.publish_date || e.data.publish_date <= now))
+  .sort((a, b) => a.data.episode_number - b.data.episode_number);
+
+const idx  = published.findIndex(e => e.id === entry.id);
+const prev = idx > 0  ? published[idx - 1] : null;
+const next = idx < published.length - 1 ? published[idx + 1] : null;
+
+function slugify(e: typeof published[number]) {
+  return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+}
+
+// ── Recent episodes for sidebar (excluding current) ─────────────────────
+const recentOthers = [...published]
+  .reverse()
+  .filter(e => e.id !== entry.id)
+  .slice(0, 4);
 ---
 
 <Base
@@ -31,10 +83,12 @@ function formatDate(d: Date) {
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- EPISODE HERO -->
-  <header class="episode-hero">
+  <!-- ── EPISODE HERO ────────────────────────────────────────────────── -->
+  <header class="ep-hero">
     <div class="hero-grid" aria-hidden="true"></div>
+
     <div class="container">
+      <!-- Breadcrumb -->
       <nav class="breadcrumb" aria-label="Breadcrumb">
         <a href={`${prefix}/podcast`}>{isDE ? 'Podcast' : 'Podcast'}</a>
         <span aria-hidden="true">/</span>
@@ -43,55 +97,165 @@ function formatDate(d: Date) {
         </span>
       </nav>
 
-      <div class="episode-hero__inner">
-        <div class="episode-hero__cover" aria-hidden="true">
-          <div class="img-ph" style="min-height:160px;min-width:160px;max-width:160px;border-radius:var(--radius-lg)">
-            <span class="img-ph__icon" aria-hidden="true">◎</span>
-            <span class="img-ph__label" style="font-size:10px">Cover Art</span>
-          </div>
+      <div class="ep-hero__inner">
+
+        <!-- Cover art -->
+        <div class="ep-hero__art">
+          {artwork ? (
+            <Image
+              src={artwork}
+              alt={`${entry.data.title} — cover art`}
+              width={260}
+              height={260}
+              class="ep-hero__img"
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            <div class="ep-hero__img ep-hero__img--fallback" aria-hidden="true">
+              <span class="ep-hero__fallback-num">
+                {String(entry.data.episode_number).padStart(3, '0')}
+              </span>
+            </div>
+          )}
         </div>
 
-        <div class="episode-hero__content">
-          <div class="episode-hero__meta">
-            <span class="episode-cat">{entry.data.category}</span>
-            <span class="episode-num">
+        <!-- Meta + title -->
+        <div class="ep-hero__content">
+          <div class="ep-hero__meta">
+            <span class="ep-hero__cat">{entry.data.category}</span>
+            <span class="ep-hero__num">
               {isDE ? 'Episode' : 'Episode'} {String(entry.data.episode_number).padStart(3, '0')}
             </span>
-            <time datetime={entry.data.date.toISOString()} class="episode-date">
+            <time datetime={entry.data.date.toISOString()} class="ep-hero__date">
               {formatDate(entry.data.date)}
             </time>
           </div>
 
-          <h1 class="episode-hero__title">{entry.data.title}</h1>
+          <h1 class="ep-hero__title">{entry.data.title}</h1>
 
           {entry.data.summary && (
-            <p class="episode-hero__summary">{entry.data.summary}</p>
+            <p class="ep-hero__summary">{entry.data.summary}</p>
           )}
 
-          <div class="episode-hero__actions">
+          <!-- Platform badges — shows available media, links to external -->
+          <div class="ep-hero__platforms">
             {entry.data.spotify_url && (
-              <a href={entry.data.spotify_url} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
-                {isDE ? 'Auf Spotify anhören' : 'Listen on Spotify'}
+              <a
+                href={entry.data.spotify_url}
+                class="ep-platform-badge ep-platform-badge--spotify"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={isDE ? 'Auf Spotify anhören' : 'Listen on Spotify'}
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                </svg>
+                Spotify
               </a>
             )}
             {entry.data.youtube_url && (
-              <a href={entry.data.youtube_url} class="btn btn--outline" target="_blank" rel="noopener noreferrer">
-                {isDE ? 'Auf YouTube ansehen' : 'Watch on YouTube'}
+              <a
+                href={entry.data.youtube_url}
+                class="ep-platform-badge ep-platform-badge--youtube"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={isDE ? 'Auf YouTube ansehen' : 'Watch on YouTube'}
+              >
+                <svg width="14" height="10" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+                  <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
+                  <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
+                </svg>
+                YouTube
               </a>
             )}
           </div>
         </div>
+
       </div>
     </div>
   </header>
 
-  <!-- TRANSCRIPT -->
-  <div class="episode-layout container">
-    <article class="article-body prose" aria-label={isDE ? 'Episoden-Transkript' : 'Episode transcript'}>
-      <Content />
+  <!-- ── BODY + SIDEBAR ──────────────────────────────────────────────── -->
+  <div class="ep-layout container">
+
+    <!-- Main content column -->
+    <article class="ep-main" aria-label={isDE ? 'Episodeninhalt' : 'Episode content'}>
+
+      <!-- ── Players ── -->
+      {/* YouTube video (recent episodes only) */}
+      {ytVideoId && (
+        <div class="ep-players">
+          <p class="ep-players__label">
+            <svg ...>...</svg>
+            Video
+          </p>
+          <YouTubePlayer
+            videoId={ytVideoId}
+            title={entry.data.title}
+          />
+        </div>
+      )}
+
+      {/* Audio player — always shown, compact if there's also a video */}
+      {entry.data.audio_url && (
+        <div class:list={['ep-players', ytVideoId && 'ep-players--secondary']}>
+          {ytVideoId && (
+            <p class="ep-players__label">Audio</p>
+          )}
+          <PodcastPlayer
+            audioUrl={entry.data.audio_url}
+            title={entry.data.title}
+            artworkId={entry.data.episode_id ?? episodeSlug}
+            spotifyUrl={entry.data.spotify_url}
+            youtubeUrl={entry.data.youtube_url}
+            duration={entry.data.duration}
+            compact={!!ytVideoId}
+            aspect="1/1"
+          />
+        </div>
+      )}
+
+      <!-- ── Transcript ── -->
+      <div class="ep-transcript">
+        <div class="ep-transcript__header">
+          <span class="label">{isDE ? 'Transkript' : 'Transcript'}</span>
+        </div>
+        <div class="prose ep-prose">
+          <Content />
+        </div>
+      </div>
+
+      <!-- ── Prev / next navigation ── -->
+      {(prev || next) && (
+        <nav class="ep-nav" aria-label={isDE ? 'Episodennavigation' : 'Episode navigation'}>
+          {prev ? (
+            <a href={`${prefix}/podcast/${slugify(prev)}`} class="ep-nav__item ep-nav__item--prev">
+              <span class="ep-nav__dir">
+                <span aria-hidden="true">←</span>
+                {isDE ? 'Vorherige Episode' : 'Previous episode'}
+              </span>
+              <span class="ep-nav__title">{prev.data.title}</span>
+            </a>
+          ) : <div />}
+          {next && (
+            <a href={`${prefix}/podcast/${slugify(next)}`} class="ep-nav__item ep-nav__item--next">
+              <span class="ep-nav__dir">
+                {isDE ? 'Nächste Episode' : 'Next episode'}
+                <span aria-hidden="true">→</span>
+              </span>
+              <span class="ep-nav__title">{next.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )}
+
     </article>
 
-    <aside class="article-aside">
+    <!-- Sidebar -->
+    <aside class="ep-sidebar" aria-label={isDE ? 'Podcast-Sidebar' : 'Podcast sidebar'}>
+
+      <!-- Subscribe card -->
       <div class="aside-card">
         <p class="label" style="margin-bottom:1rem">{isDE ? 'Abonnieren' : 'Subscribe'}</p>
         <p class="aside-card__text">
@@ -99,33 +263,115 @@ function formatDate(d: Date) {
             ? 'Neue Episoden direkt auf Ihrer bevorzugten Plattform.'
             : 'New episodes directly on your preferred platform.'}
         </p>
-        {entry.data.spotify_url && (
-          <a href={entry.data.spotify_url} class="btn btn--outline" style="margin-top:1.25rem;width:100%;justify-content:center" target="_blank" rel="noopener noreferrer">
+        <div class="aside-card__btns">
+          <a
+            href="https://open.spotify.com/show/36YRWk7nrI6V8w9lMncynG?si=2Za2A7VmQrOpCcOWOL0hTA"
+            class="aside-btn aside-btn--spotify"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+            </svg>
             Spotify
           </a>
-        )}
+          <a
+            href="https://www.youtube.com/@andredaus"
+            class="aside-btn aside-btn--youtube"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg width="14" height="10" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+              <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
+              <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
+            </svg>
+            YouTube
+          </a>
+          <a
+            href="https://podcasts.apple.com/podcast/iconoclast-insights/idXXXXXXXXX"
+            class="aside-btn aside-btn--apple"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            
+          <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="12" height="12" viewBox="0 0 300 300" aria-hidden="true">
+    <linearGradient id="apple-pod-grad" x1="150" x2="150" y1="0" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" style="stop-color:#f452ff"/>
+      <stop offset="1" style="stop-color:#832bc1"/>
+    </linearGradient>
+    <path fill="url(#apple-pod-grad)" fill-rule="evenodd" d="M294.1 260c-2.9 7.4-9.6 17.8-19.2 25.2-5.5 4.2-12.1 8.3-21.1 11-9.6 2.9-21.5 3.8-36.3 3.8h-135c-14.8 0-26.6-1-36.3-3.8-9-2.7-15.6-6.7-21.1-11-9.5-7.3-16.3-17.8-19.2-25.2C.1 245.1 0 228.2 0 217.5v-135C0 71.8.1 54.9 5.9 40c2.9-7.4 9.6-17.8 19.2-25.2 5.5-4.2 12.1-8.3 21.1-11C55.9 1 67.7 0 82.5 0h135c14.8 0 26.6 1 36.3 3.8 9 2.7 15.6 6.7 21.1 11 9.5 7.3 16.3 17.8 19.2 25.2 5.9 14.9 5.9 31.9 5.9 42.5v135c0 10.7-.1 27.6-5.9 42.5" clip-rule="evenodd"/>
+    <g fill="#fff">
+      <path d="M175.7 181.1c-.4-3.6-1.6-6.2-4-8.6-4.5-4.7-12.4-7.8-21.7-7.8s-17.2 3-21.7 7.8c-2.3 2.5-3.6 5-4 8.6-.8 7-.3 13 .5 22.7.8 9.2 2.3 21.5 4.2 33.9 1.4 8.9 2.5 13.7 3.5 17.1 1.7 5.6 7.8 10.4 17.5 10.4s15.9-4.9 17.5-10.4c1-3.4 2.1-8.2 3.5-17.1 1.9-12.5 3.4-24.7 4.2-33.9.9-9.7 1.3-15.7.5-22.7M174.6 130.1c0 13.6-11 24.6-24.6 24.6s-24.6-11-24.6-24.6 11-24.6 24.6-24.6 24.6 11.1 24.6 24.6"/>
+      <path d="M149.7 33.2C92.3 33.4 45.3 80 44.5 137.4c-.6 46.5 29.1 86.3 70.6 100.9 1 .4 2-.5 1.9-1.5-.5-3.6-1.1-7.2-1.5-10.8-.2-1.3-1-2.3-2.1-2.9-32.8-14.3-55.7-47.2-55.3-85.3.5-50 41.3-90.7 91.2-91.1 51.1-.4 92.8 41 92.8 92 0 37.7-22.8 70.1-55.3 84.4-1.2.5-2 1.6-2.1 2.9l-1.5 10.8c-.2 1.1.9 1.9 1.9 1.5 41.1-14.4 70.6-53.6 70.6-99.6-.2-58.2-47.7-105.6-106-105.5"/>
+      <path d="M147.3 68.2c-37.4 1.4-67.4 32.3-67.9 69.7-.3 24.6 12 46.4 30.9 59.3.9.6 2.2-.1 2.2-1.2-.3-4.3-.3-8.1-.1-12.1.1-1.3-.4-2.5-1.4-3.4-11.5-10.8-18.5-26.2-18.1-43.2.8-30 24.9-54.4 54.9-55.6 32.6-1.3 59.4 24.9 59.4 57.1 0 16.4-7 31.2-18.1 41.7-.9.9-1.4 2.1-1.4 3.4.2 3.9.1 7.7-.1 12-.1 1.1 1.2 1.9 2.2 1.2 18.6-12.7 30.9-34.2 30.9-58.4.1-39.8-33.2-72.1-73.4-70.5"/>
+    </g>
+  </svg>
+            Apple Podcasts
+          </a>
+        </div>
       </div>
 
-      <div class="aside-card" style="margin-top:1.5rem">
-        <p class="aside-card__back">
-          <a href={`${prefix}/podcast`} class="back-link">
+      <!-- More episodes card -->
+      {recentOthers.length > 0 && (
+        <div class="aside-card aside-card--episodes">
+          <p class="label" style="margin-bottom:1.25rem">
+            {isDE ? 'Weitere Episoden' : 'More Episodes'}
+          </p>
+          <ul class="aside-ep-list">
+            {recentOthers.map(ep => {
+              const epArt = getArtworkById(ep.data.spotify_url);
+              return (
+                <li class="aside-ep">
+                  <a href={`${prefix}/podcast/${slugify(ep)}`} class="aside-ep__link">
+                    <div class="aside-ep__art">
+                      {epArt ? (
+                        <Image
+                          src={epArt}
+                          alt=""
+                          width={48}
+                          height={48}
+                          class="aside-ep__img"
+                          loading="lazy"
+                          decoding="async"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <div class="aside-ep__img aside-ep__img--fallback" aria-hidden="true">
+                          <span>{String(ep.data.episode_number).padStart(3,'0')}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div class="aside-ep__info">
+                      <span class="aside-ep__num">Ep. {ep.data.episode_number}</span>
+                      <span class="aside-ep__title">{ep.data.title}</span>
+                    </div>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+          <a href={`${prefix}/podcast`} class="aside-all-link">
             {isDE ? '← Alle Episoden' : '← All Episodes'}
           </a>
-        </p>
-      </div>
+        </div>
+      )}
+
     </aside>
+
   </div>
 
 </Base>
 
 <style>
-  .episode-hero {
+  /* ── Hero ──────────────────────────────────────────────────────────── */
+  .ep-hero {
     position: relative;
     padding: calc(68px + 4rem) 0 4rem;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-light);
     overflow: hidden;
   }
+
   .hero-grid {
     position: absolute;
     inset: 0;
@@ -135,6 +381,7 @@ function formatDate(d: Date) {
     background-size: 60px 60px;
     pointer-events: none;
   }
+
   .breadcrumb {
     display: flex;
     align-items: center;
@@ -142,26 +389,54 @@ function formatDate(d: Date) {
     font-family: var(--mono);
     font-size: 11px;
     color: var(--text-muted);
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
   }
   .breadcrumb a { color: var(--gold); text-decoration: none; }
   .breadcrumb a:hover { text-decoration: underline; }
 
-  .episode-hero__inner {
+  .ep-hero__inner {
     display: flex;
-    gap: 3rem;
+    gap: 3.5rem;
     align-items: flex-start;
   }
-  .episode-hero__cover { flex-shrink: 0; }
 
-  .episode-hero__meta {
+  /* Cover art */
+  .ep-hero__art { flex-shrink: 0; }
+
+  .ep-hero__img {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .ep-hero__img--fallback {
+    background: var(--bg-card);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
+  }
+
+  .ep-hero__fallback-num {
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* Meta row */
+  .ep-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     flex-wrap: wrap;
     margin-bottom: 1.25rem;
   }
-  .episode-cat {
+
+  .ep-hero__cat {
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 500;
@@ -172,37 +447,74 @@ function formatDate(d: Date) {
     border: 1px solid var(--border);
     border-radius: 2px;
   }
-  .episode-num {
+
+  .ep-hero__num,
+  .ep-hero__date {
     font-family: var(--mono);
     font-size: 11px;
     color: var(--text-secondary);
+    letter-spacing: 0.04em;
   }
-  .episode-date {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
-  }
+  .ep-hero__date { color: var(--text-muted); }
 
-  .episode-hero__title {
+  /* Title + summary */
+  .ep-hero__title {
     font-family: var(--serif);
     font-size: clamp(1.8rem, 4vw, 2.8rem);
     font-weight: 400;
     line-height: 1.15;
     color: var(--text-primary);
-    max-width: 25ch;
+    max-width: 24ch;
     margin-bottom: 1.25rem;
   }
-  .episode-hero__summary {
+
+  .ep-hero__summary {
     font-size: var(--text-lg);
     color: var(--text-secondary);
-    max-width: 55ch;
-    line-height: 1.6;
+    max-width: 52ch;
+    line-height: 1.65;
     margin-bottom: 2rem;
   }
-  .episode-hero__actions { display: flex; gap: 1rem; flex-wrap: wrap; }
 
-  /* Layout */
-  .episode-layout {
+  /* Platform badges */
+  .ep-hero__platforms { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+  .ep-platform-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .ep-platform-badge--spotify {
+    color: #1db954;
+    border-color: rgba(29,185,84,0.3);
+  }
+  .ep-platform-badge--spotify:hover {
+    background: rgba(29,185,84,0.08);
+    border-color: #1db954;
+  }
+
+  .ep-platform-badge--youtube {
+    color: var(--gold);
+    border-color: var(--border);
+  }
+  .ep-platform-badge--youtube:hover {
+    background: var(--gold-trans);
+    border-color: var(--gold);
+  }
+
+  /* ── Page layout ───────────────────────────────────────────────────── */
+  .ep-layout {
     display: grid;
     grid-template-columns: 1fr 280px;
     gap: 5rem;
@@ -211,70 +523,309 @@ function formatDate(d: Date) {
     align-items: start;
   }
 
-  /* Article body */
-  .article-body :global(h2) {
+  /* ── Players section ───────────────────────────────────────────────── */
+  .ep-players {
+    margin-bottom: 3rem;
+  }
+
+  .ep-players--secondary {
+    margin-top: -1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .ep-players__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Transcript ────────────────────────────────────────────────────── */
+  .ep-transcript {
+    border-top: 1px solid var(--border-light);
+    padding-top: 3rem;
+  }
+
+  .ep-transcript__header {
+    margin-bottom: 2rem;
+  }
+
+  /* Prose styles */
+  .ep-prose :global(h2) {
     font-family: var(--serif);
     font-size: clamp(1.3rem, 2.5vw, 1.7rem);
     font-weight: 400;
     color: var(--text-primary);
     margin-top: 3rem;
     margin-bottom: 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-light);
   }
-  .article-body :global(h3) {
+
+  .ep-prose :global(h3) {
     font-family: var(--sans);
     font-size: var(--text-lg);
     font-weight: 600;
     color: var(--text-primary);
-    margin-top: 2rem;
+    margin-top: 2.25rem;
     margin-bottom: 0.75rem;
   }
-  .article-body :global(p) {
+
+  .ep-prose :global(p) {
     color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: 1.25rem;
+    line-height: 1.85;
+    margin-bottom: 1.4rem;
+    font-size: 1.025rem;
   }
-  .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
-  .article-body :global(em) { font-style: italic; color: var(--text-primary); }
-  .article-body :global(ul), .article-body :global(ol) {
+
+  .ep-prose :global(strong) { color: var(--text-primary); font-weight: 600; }
+  .ep-prose :global(em) { font-style: italic; color: var(--text-primary); }
+
+  .ep-prose :global(ul),
+  .ep-prose :global(ol) {
     padding-left: 1.5rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.4rem;
     color: var(--text-secondary);
     line-height: 1.8;
   }
-  .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
-  .article-body :global(ol li) { list-style: decimal; }
-  .article-body :global(hr) {
+  .ep-prose :global(li) { margin-bottom: 0.5rem; list-style: disc; }
+  .ep-prose :global(ol li) { list-style: decimal; }
+
+  .ep-prose :global(hr) {
     border: none;
     border-top: 1px solid var(--border-light);
     margin: 3rem 0;
   }
 
-  /* Aside */
-  .article-aside { position: sticky; top: calc(68px + 2rem); }
+  .ep-prose :global(blockquote) {
+    border-left: 2px solid var(--gold);
+    padding: 0.25rem 0 0.25rem 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  /* ── Prev/next nav ─────────────────────────────────────────────────── */
+  .ep-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-top: 4rem;
+  }
+
+  .ep-nav__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .ep-nav__item:hover { background: var(--bg-elevated); }
+  .ep-nav__item--next { text-align: right; border-left: 1px solid var(--border-light); }
+
+  .ep-nav__dir {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .ep-nav__item--next .ep-nav__dir { justify-content: flex-end; }
+
+  .ep-nav__title {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .ep-nav__item:hover .ep-nav__title { color: var(--text-primary); }
+
+  /* ── Sidebar ───────────────────────────────────────────────────────── */
+  .ep-sidebar { position: sticky; top: calc(68px + 2rem); }
+
   .aside-card {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     padding: 1.75rem;
   }
+
+  .aside-card + .aside-card { margin-top: 1.25rem; }
+
   .aside-card__text {
     font-size: var(--text-sm);
     color: var(--text-secondary);
     line-height: 1.7;
+    margin-bottom: 1.25rem;
   }
-  .back-link {
+
+  .aside-card__btns {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .aside-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border-radius: 2px;
     font-family: var(--mono);
     font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .aside-btn--spotify {
+    color: #1db954;
+    border-color: rgba(29,185,84,0.3);
+  }
+  .aside-btn--spotify:hover {
+    background: rgba(29,185,84,0.08);
+    border-color: #1db954;
+  }
+
+  .aside-btn--youtube {
+    color: var(--gold);
+    border-color: var(--border);
+  }
+  .aside-btn--youtube:hover {
+    background: var(--gold-trans);
+    border-color: var(--gold);
+  }
+
+  .aside-btn--apple {
+    color: #b150e2;
+    border-color: rgba(177, 80, 226, 0.3);
+  }
+  .aside-btn--apple:hover {
+    background: rgba(177, 80, 226, 0.08);
+    border-color: #b150e2; 
+  }
+
+  /* Recent episodes list in sidebar */
+  .aside-ep-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-bottom: 1.25rem;
+    background: var(--border-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .aside-ep { background: var(--bg-elevated); }
+  .aside-ep:hover { background: var(--bg-card-alt); }
+
+  .aside-ep__link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .aside-ep__art { flex-shrink: 0; }
+
+  .aside-ep__img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
+  }
+
+  .aside-ep__img--fallback {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--gold-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .aside-ep__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .aside-ep__num {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .aside-ep__title {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .aside-ep__link:hover .aside-ep__title { color: var(--text-primary); }
+
+  .aside-all-link {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--gold);
     text-decoration: none;
   }
+  .aside-all-link:hover { text-decoration: underline; }
+
+  /* ── Responsive ────────────────────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .ep-layout { grid-template-columns: 1fr 240px; gap: 3rem; }
+  }
 
   @media (max-width: 900px) {
-    .episode-hero__inner { flex-direction: column; gap: 1.5rem; }
-    .episode-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .article-aside { position: static; }
+    .ep-hero__inner { flex-direction: column; gap: 2rem; }
+    .ep-hero__img { width: 160px; height: 160px; }
+    .ep-layout { grid-template-columns: 1fr; gap: 3rem; }
+    .ep-sidebar { position: static; }
+  }
+
+  @media (max-width: 640px) {
+    .ep-nav { grid-template-columns: 1fr; }
+    .ep-nav__item--next { border-left: none; border-top: 1px solid var(--border-light); text-align: left; }
+    .ep-nav__item--next .ep-nav__dir { justify-content: flex-start; }
   }
 </style>

@@ -69,16 +69,21 @@ const faqs = defineCollection({
 const podcast = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/podcast' }),
   schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
+    title:          z.string(),
+    date:           z.coerce.date(),
     episode_number: z.number(),
-    summary: z.string().optional(), // AI-generated at build time
-    og_title: z.string(),
-    og_image: z.string().url().optional(),
-    spotify_url: z.string().url(),
-    youtube_url: z.string().url().optional(), // recent episodes only
-    category: z.string(), // Solo Episode | Interview | Case Study
-    status: z.enum(['draft', 'published']),
+    summary:        z.string().optional(),
+    og_title:       z.string(),
+    og_image:       z.string().url().optional(),
+    episode_id:     z.string().optional(),        // RSS <guid>
+    audio_url:      z.string().url(),             // ← RSS <enclosure url> — direct MP3
+    artwork_url:    z.string().url().optional(),  // RSS <itunes:image href>
+    spotify_url:    z.string().url().optional(),  // open.spotify.com/episode/... (external link only)
+    youtube_url:    z.string().url().optional(),  // YouTube watch URL
+    duration:       z.string().optional(),        // RSS <itunes:duration> e.g. "00:47:23"
+    category:       z.string(),
+    status:         z.enum(['draft', 'published']),
+    publish_date:   z.coerce.date().optional(),
   }),
 });
 
