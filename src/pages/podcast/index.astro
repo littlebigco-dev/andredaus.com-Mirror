@@ -7,655 +7,1083 @@ const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
 
-const now = new Date();
-
 const allEpisodes = await getCollection('podcast');
 const episodes = allEpisodes
-  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && (!e.data.publish_date || e.data.publish_date <= now))
+  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && e.data.status === 'published')
   .sort((a, b) => b.data.episode_number - a.data.episode_number);
 
-const categories = ['All', ...Array.from(new Set(episodes.map(e => e.data.category))).sort()];
-const featured = episodes[0] ?? null;
+const episodeCount = episodes.length;
+const featured     = episodes[0] ?? null;
+const rest         = episodes.slice(1);
 
-function slugify(entry: typeof episodes[number]) {
-  return entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+// Derive filter categories from the collection
+const allCats = Array.from(new Set(episodes.map(e => e.data.category))).sort();
+
+function slugify(e: typeof episodes[number]) {
+  return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
 }
+
 function formatDate(d: Date) {
-  return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// ── Local artwork lookup ────────────────────────────────────────────────────
-// Matches files by Spotify episode ID extracted from spotify_url stem
+function fmtDuration(d?: string): string {
+  if (!d) return '';
+  const parts = d.split(':').map(Number);
+  if (parts.length === 3) {
+    const m = parts[0] * 60 + parts[1];
+    return `${m}m`;
+  }
+  return d;
+}
+
+// Artwork lookup
 const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
   { eager: true }
 );
 
-function getArtwork(spotifyUrl: string): ImageMetadata | null {
-  const id = spotifyUrl.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1];
+function getArtwork(ep: typeof episodes[number]): ImageMetadata | null {
+  const id = ep.data.episode_id
+    ?? ep.data.spotify_url?.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1]
+    ?? null;
   if (!id) return null;
-  const entry = Object.entries(allArtwork).find(([path]) =>
+  const found = Object.entries(allArtwork).find(([path]) =>
     path.split('/').pop()?.replace(/\.[^.]+$/, '') === id
   );
-  return entry?.[1]?.default ?? null;
+  return found?.[1]?.default ?? null;
 }
 
-// Show-level cover art (use the first/oldest episode's artwork as the show cover)
-const showArtwork = featured ? getArtwork(featured.data.spotify_url) : null;
+// Show artwork = first episode's artwork, or null
+const showArtwork = featured ? getArtwork(featured) : null;
+
+// Spotify icon path
+const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z';
 ---
 
 <Base
-  title={isDE ? 'Podcast — André Daus' : 'Podcast — André Daus'}
+  title={isDE ? 'Iconoclast Insights — Podcast · André Daus' : 'Iconoclast Insights — Podcast · André Daus'}
   description={isDE
-    ? 'Iconoclast Insights: Episoden zu Strategic Opposition, Entscheidungspsychologie und den Annahmen, die Strategie scheitern lassen.'
-    : 'Iconoclast Insights: episodes on Strategic Opposition, decision psychology, and the assumptions that make strategy fail.'}
+    ? 'Solo-Kommentare zu Denkfehlern, bequemen Annahmen und dem Konsens, der Entscheidungen still ruiniert.'
+    : 'Solo commentary on the thinking errors, lazy consensus, and comfortable assumptions that quietly run business decisions.'}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- ── HERO ──────────────────────────────────────────────────────────── -->
-  <header class="pod-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="hero-noise" aria-hidden="true"></div>
+  <!-- ── SHOW HERO ──────────────────────────────────────────────────────── -->
+  <header class="show-hero" aria-labelledby="show-title">
+    <div class="show-hero__grid" aria-hidden="true"></div>
+    <div class="container">
+      <div class="show-hero__inner">
 
-    <div class="container pod-hero__inner">
+        <!-- Left: show identity -->
+        <div class="show-hero__content">
+          <p class="label show-hero__label">{isDE ? 'Podcast' : 'Podcast'}</p>
+          <h1 class="show-hero__title" id="show-title">
+            Iconoclast <em>Insights</em>
+          </h1>
+          <p class="show-hero__desc">
+            {isDE
+              ? 'Solo-Kommentare zu Denkfehlern, bequemem Konsens und den Annahmen, die Entscheidungen still ruinieren. Neue Episode, wenn es etwas zu sagen gibt.'
+              : 'Solo commentary on the thinking errors, lazy consensus, and comfortable assumptions that quietly run business decisions. New episode when there\'s something worth saying.'}
+          </p>
 
-      <!-- Left: show identity -->
-      <div class="pod-hero__content">
-        <p class="label">{isDE ? 'Podcast' : 'Podcast'}</p>
-        <h1 class="pod-hero__title">
-          Iconoclast <em>Insights</em>
-        </h1>
-        <p class="pod-hero__desc">
-          {isDE
-            ? 'Strategic Opposition, Entscheidungspsychologie und die Annahmen, auf denen Organisationen aufgebaut sind. Ein Podcast für Führungskräfte, die anders denken wollen.'
-            : 'Strategic Opposition, decision psychology, and the assumptions organisations are built on. A podcast for leaders who want to think differently.'}
-        </p>
+          <!-- Platform links -->
+          <nav class="platforms" aria-label={isDE ? 'Auf Plattformen anhören' : 'Listen on platforms'}>
+            <a href="https://www.youtube.com/@andredaus" class="platform-link" target="_blank" rel="noopener noreferrer">
+              <svg class="platform-link__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
+              </svg>
+              YouTube
+              <span class="platform-link__sub">{isDE ? 'Video + Audio' : 'Video + Audio'}</span>
+            </a>
+            <a href="https://open.spotify.com/show/36YRWk7nrI6V8w9lMncynG" class="platform-link" target="_blank" rel="noopener noreferrer">
+              <svg class="platform-link__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d={spPath}/>
+              </svg>
+              Spotify
+              <span class="platform-link__sub">{isDE ? 'Audio' : 'Audio'}</span>
+            </a>
+            <a href="https://podcasts.apple.com/podcast/iconoclast-insights/id0000000" class="platform-link" target="_blank" rel="noopener noreferrer">
+              <svg class="platform-link__icon" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 300 300" aria-hidden="true">
+                <linearGradient id="apple-grad-idx" x1="150" x2="150" y1="0" y2="300" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" style="stop-color:#f452ff"/>
+                  <stop offset="1" style="stop-color:#832bc1"/>
+                </linearGradient>
+                <path fill="url(#apple-grad-idx)" fill-rule="evenodd" d="M294.1 260c-2.9 7.4-9.6 17.8-19.2 25.2-5.5 4.2-12.1 8.3-21.1 11-9.6 2.9-21.5 3.8-36.3 3.8h-135c-14.8 0-26.6-1-36.3-3.8-9-2.7-15.6-6.7-21.1-11-9.5-7.3-16.3-17.8-19.2-25.2C.1 245.1 0 228.2 0 217.5v-135C0 71.8.1 54.9 5.9 40c2.9-7.4 9.6-17.8 19.2-25.2 5.5-4.2 12.1-8.3 21.1-11C55.9 1 67.7 0 82.5 0h135c14.8 0 26.6 1 36.3 3.8 9 2.7 15.6 6.7 21.1 11 9.5 7.3 16.3 17.8 19.2 25.2 5.9 14.9 5.9 31.9 5.9 42.5v135c0 10.7-.1 27.6-5.9 42.5" clip-rule="evenodd"/>
+                <g fill="#fff">
+                  <path d="M175.7 181.1c-.4-3.6-1.6-6.2-4-8.6-4.5-4.7-12.4-7.8-21.7-7.8s-17.2 3-21.7 7.8c-2.3 2.5-3.6 5-4 8.6-.8 7-.3 13 .5 22.7.8 9.2 2.3 21.5 4.2 33.9 1.4 8.9 2.5 13.7 3.5 17.1 1.7 5.6 7.8 10.4 17.5 10.4s15.9-4.9 17.5-10.4c1-3.4 2.1-8.2 3.5-17.1 1.9-12.5 3.4-24.7 4.2-33.9.9-9.7 1.3-15.7.5-22.7M174.6 130.1c0 13.6-11 24.6-24.6 24.6s-24.6-11-24.6-24.6 11-24.6 24.6-24.6 24.6 11.1 24.6 24.6"/>
+                  <path d="M149.7 33.2C92.3 33.4 45.3 80 44.5 137.4c-.6 46.5 29.1 86.3 70.6 100.9 1 .4 2-.5 1.9-1.5-.5-3.6-1.1-7.2-1.5-10.8-.2-1.3-1-2.3-2.1-2.9-32.8-14.3-55.7-47.2-55.3-85.3.5-50 41.3-90.7 91.2-91.1 51.1-.4 92.8 41 92.8 92 0 37.7-22.8 70.1-55.3 84.4-1.2.5-2 1.6-2.1 2.9l-1.5 10.8c-.2 1.1.9 1.9 1.9 1.5 41.1-14.4 70.6-53.6 70.6-99.6-.2-58.2-47.7-105.6-106-105.5"/>
+                  <path d="M147.3 68.2c-37.4 1.4-67.4 32.3-67.9 69.7-.3 24.6 12 46.4 30.9 59.3.9.6 2.2-.1 2.2-1.2-.3-4.3-.3-8.1-.1-12.1.1-1.3-.4-2.5-1.4-3.4-11.5-10.8-18.5-26.2-18.1-43.2.8-30 24.9-54.4 54.9-55.6 32.6-1.3 59.4 24.9 59.4 57.1 0 16.4-7 31.2-18.1 41.7-.9.9-1.4 2.1-1.4 3.4.2 3.9.1 7.7-.1 12-.1 1.1 1.2 1.9 2.2 1.2 18.6-12.7 30.9-34.2 30.9-58.4.1-39.8-33.2-72.1-73.4-70.5"/>
+                </g>
+              </svg>
+              Apple Podcasts
+              <span class="platform-link__sub">{isDE ? 'Audio' : 'Audio'}</span>
+            </a>
+          </nav>
 
-        <div class="pod-hero__meta-row">
-          <span class="pod-hero__count">
-            <span class="pod-hero__count-num">{episodes.length}</span>
-            {isDE ? 'Episoden' : 'Episodes'}
-          </span>
-          {featured && (
-            <span class="pod-hero__latest">
-              {isDE ? 'Neueste:' : 'Latest:'}
-              <a href={`${prefix}/podcast/${slugify(featured)}`} class="pod-hero__latest-link">
-                Ep. {String(featured.data.episode_number).padStart(3,'0')}
-              </a>
-            </span>
+          <!-- Show stats strip -->
+          {episodeCount > 0 && (
+            <div class="show-stats" role="list" aria-label={isDE ? 'Podcast-Statistiken' : 'Podcast stats'}>
+              <div class="show-stat" role="listitem">
+                <span class="show-stat__n">{episodeCount}</span>
+                <span class="show-stat__l">{isDE ? 'Episoden' : 'Episodes'}</span>
+              </div>
+              <div class="show-stat" role="listitem">
+                <span class="show-stat__n">10–15</span>
+                <span class="show-stat__l">{isDE ? 'Minuten' : 'Minutes'}</span>
+              </div>
+              <div class="show-stat" role="listitem">
+                <span class="show-stat__n"><em>Solo</em></span>
+                <span class="show-stat__l">{isDE ? 'Format' : 'Format'}</span>
+              </div>
+            </div>
           )}
         </div>
 
-        <div class="pod-hero__platforms">
-          <a
-            href="https://open.spotify.com/show/placeholder"
-            class="platform-pill platform-pill--spotify"
-            target="_blank" rel="noopener noreferrer"
-            aria-label={isDE ? 'Auf Spotify anhören' : 'Listen on Spotify'}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-            </svg>
-            Spotify
+        <!-- Right: subscription card -->
+        <aside class="show-sub" aria-label={isDE ? 'Abonnieren' : 'Subscribe'}>
+          {showArtwork && (
+            <Image
+              src={showArtwork}
+              alt="Iconoclast Insights podcast artwork"
+              width={160}
+              height={160}
+              class="show-sub__art"
+              loading="eager"
+              decoding="async"
+            />
+          )}
+          <h2 class="show-sub__heading">
+            {isDE ? 'Abonnieren und auf dem Laufenden bleiben' : 'Subscribe and never miss an episode'}
+          </h2>
+          <p class="show-sub__body">
+            {isDE
+              ? 'Neue Episoden erscheinen unregelmäßig — wenn es etwas Wichtiges zu sagen gibt. Abonnieren ist die zuverlässigste Art, es zu erfahren.'
+              : 'New episodes appear when there\'s something worth saying. Subscribing is the most reliable way to find out when that is.'}
+          </p>
+          <a href="https://open.spotify.com/show/36YRWk7nrI6V8w9lMncynG" class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+            {isDE ? 'Auf Spotify folgen' : 'Follow on Spotify'}
           </a>
-          <a
-            href="https://www.youtube.com/@andredaus"
-            class="platform-pill platform-pill--youtube"
-            target="_blank" rel="noopener noreferrer"
-            aria-label={isDE ? 'Auf YouTube ansehen' : 'Watch on YouTube'}
-          >
-            <svg width="18" height="13" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-              <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
-              <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
+          <a href="/podcast/feed.xml" class="show-sub__rss">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19.01 7.38 20 6.18 20C4.98 20 4 19.01 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/>
             </svg>
-            YouTube
+            RSS
           </a>
-        </div>
-      </div>
+        </aside>
 
-      <!-- Right: show cover art -->
-      <div class="pod-hero__cover" aria-hidden="true">
-        {showArtwork ? (
-          <Image
-            src={showArtwork}
-            alt=""
-            width={400}
-            height={400}
-            class="pod-hero__cover-img"
-            loading="eager"
-            decoding="async"
-          />
-        ) : (
-          <div class="pod-hero__cover-fallback">
-            <span class="pod-hero__cover-label">Iconoclast<br/>Insights</span>
-          </div>
-        )}
-        <div class="pod-hero__cover-glow" aria-hidden="true"></div>
       </div>
-
     </div>
   </header>
 
-  <!-- ── EPISODES ──────────────────────────────────────────────────────── -->
-  <section class="section" aria-label={isDE ? 'Episoden' : 'Episodes'}>
+  <!-- ── FILTER BAR ─────────────────────────────────────────────────────── -->
+  <div class="filter-bar" role="navigation" aria-label={isDE ? 'Episoden filtern' : 'Filter episodes'}>
     <div class="container">
-
-      <!-- Filter bar -->
-      <div class="filter-bar" role="group" aria-label={isDE ? 'Nach Kategorie filtern' : 'Filter by category'}>
-        {categories.map(cat => (
-          <button
-            class="filter-btn"
-            data-category={cat}
-            aria-pressed={cat === 'All' ? 'true' : 'false'}
-          >
-            {cat === 'All' ? (isDE ? 'Alle' : 'All') : cat}
+      <div class="filter-bar__inner">
+        <div class="cat-tabs" role="group" aria-label={isDE ? 'Nach Kategorie filtern' : 'Filter by category'}>
+          <button class="cat-btn is-active" data-cat="all" aria-pressed="true">
+            {isDE ? 'Alle' : 'All'}
           </button>
-        ))}
+          {allCats.map(cat => (
+            <button class="cat-btn" data-cat={cat} aria-pressed="false">
+              {cat}
+            </button>
+          ))}
+        </div>
+        <div class="ep-count-strip" aria-live="polite" aria-atomic="true">
+          <span id="visible-count">{episodeCount}</span>
+          <span>{isDE ? 'Episoden' : 'episodes'}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FEATURED LATEST EPISODE ───────────────────────────────────────── -->
+  {featured && (
+    <section class="latest" aria-labelledby="latest-heading">
+      <div class="container">
+        <p class="label latest__label">{isDE ? 'Neueste Episode' : 'Latest episode'}</p>
+        <a
+          href={`${prefix}/podcast/${slugify(featured)}`}
+          class="latest__card"
+          aria-label={`${isDE ? 'Episode' : 'Episode'} ${featured.data.episode_number}: ${featured.data.title}`}
+        >
+          <!-- Thumbnail -->
+          <div class="latest__thumb">
+            {(() => {
+              const art = getArtwork(featured);
+              return art ? (
+                <Image
+                  src={art}
+                  alt=""
+                  width={400}
+                  height={400}
+                  class="latest__thumb-img"
+                  loading="eager"
+                  decoding="async"
+                  aria-hidden="true"
+                />
+              ) : (
+                <div class="thumb-ph" aria-hidden="true">
+                  <span class="thumb-ph__icon">◎</span>
+                  <span class="thumb-ph__label">Ep. {String(featured.data.episode_number).padStart(3,'0')}</span>
+                </div>
+              );
+            })()}
+            <div class="play-overlay" aria-hidden="true">
+              <div class="play-btn">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Body -->
+          <div class="latest__body">
+            <p class="latest__ep">
+              {isDE ? 'Episode' : 'Episode'} {String(featured.data.episode_number).padStart(3,'0')} · {featured.data.category}
+            </p>
+            <h2 class="latest__title" id="latest-heading">{featured.data.title}</h2>
+            {featured.data.summary && (
+              <p class="latest__excerpt">{featured.data.summary}</p>
+            )}
+            <div class="latest__meta">
+              {featured.data.duration && (
+                <span class="latest__meta-item">
+                  {fmtDuration(featured.data.duration)}
+                </span>
+              )}
+              <time class="latest__meta-item" datetime={featured.data.date.toISOString()}>
+                {formatDate(featured.data.date)}
+              </time>
+              {featured.data.youtube_url && (
+                <span class="latest__meta-item">
+                  {isDE ? 'Video verfügbar' : 'Video available'}
+                </span>
+              )}
+              <span class="latest__listen">
+                {isDE ? 'Episode öffnen' : 'Open episode'}
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- ── ALL EPISODES ───────────────────────────────────────────────────── -->
+  <section class="episodes" aria-labelledby="episodes-heading">
+    <div class="container">
+      <div class="episodes__header">
+        <h2 class="episodes__heading" id="episodes-heading">
+          {isDE ? 'Alle Episoden' : 'All episodes'}
+        </h2>
       </div>
 
-      {episodes.length === 0 ? (
-        <p class="empty-state">{isDE ? 'Noch keine Episoden veröffentlicht.' : 'No episodes published yet.'}</p>
+      {rest.length === 0 && episodeCount === 0 ? (
+        <p class="empty-state">
+          {isDE ? 'Noch keine Episoden veröffentlicht.' : 'No episodes published yet.'}
+        </p>
       ) : (
-        <ul class="episodes-list" id="episodes-list">
-          {episodes.map(entry => {
-            const artwork = getArtwork(entry.data.spotify_url);
-            const hasVideo = !!entry.data.youtube_url;
+        <ol class="ep-grid" id="ep-grid">
+          {(featured ? [featured, ...rest] : episodes).map((ep, i) => {
+            const art = getArtwork(ep);
             return (
-              <li class="ep-card" data-category={entry.data.category}>
-                <a href={`${prefix}/podcast/${slugify(entry)}`} class="ep-card__link">
-
-                  <!-- Artwork column -->
-                  <div class="ep-card__art">
-                    {artwork ? (
+              <li class="fade-up" data-cat={ep.data.category}>
+                <a
+                  href={`${prefix}/podcast/${slugify(ep)}`}
+                  class="ep-row"
+                  aria-label={`${isDE ? 'Episode' : 'Episode'} ${ep.data.episode_number}: ${ep.data.title}${ep.data.duration ? ', ' + fmtDuration(ep.data.duration) : ''}`}
+                >
+                  <!-- Thumbnail -->
+                  <div class="ep-thumb" role="img" aria-label="">
+                    {art ? (
                       <Image
-                        src={artwork}
+                        src={art}
                         alt=""
-                        width={120}
-                        height={120}
-                        class="ep-card__img"
+                        width={56}
+                        height={56}
+                        class="ep-thumb-img"
                         loading="lazy"
                         decoding="async"
+                        aria-hidden="true"
                       />
                     ) : (
-                      <div class="ep-card__img ep-card__img--fallback" aria-hidden="true">
-                        <span class="ep-card__num">
-                          {String(entry.data.episode_number).padStart(3, '0')}
-                        </span>
+                      <div class="ep-thumb-ph" aria-hidden="true">
+                        {String(ep.data.episode_number).padStart(3,'0')}
                       </div>
                     )}
-                    {hasVideo && (
-                      <span class="ep-card__video-badge" title={isDE ? 'Video verfügbar' : 'Video available'} aria-label={isDE ? 'Video verfügbar' : 'Video available'}>
-                        <svg width="10" height="8" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-                          <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
-                          <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
-                        </svg>
-                      </span>
-                    )}
-                  </div>
-
-                  <!-- Content column -->
-                  <div class="ep-card__body">
-                    <div class="ep-card__meta">
-                      <span class="ep-cat">{entry.data.category}</span>
-                      <time datetime={entry.data.date.toISOString()} class="ep-date">
-                        {formatDate(entry.data.date)}
-                      </time>
-                    </div>
-                    <h2 class="ep-card__title">{entry.data.title}</h2>
-                    {entry.data.summary && (
-                      <p class="ep-card__summary">{entry.data.summary}</p>
-                    )}
-                    <div class="ep-card__actions">
-                      <span class="ep-card__read">
-                        {isDE ? 'Episode lesen' : 'Read episode'}
-                        <span aria-hidden="true"> →</span>
-                      </span>
-                      <div class="ep-card__platforms">
-                        <span class="ep-platform ep-platform--spotify" aria-label="Spotify">
-                          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                          </svg>
-                        </span>
-                        {hasVideo && (
-                          <span class="ep-platform ep-platform--youtube" aria-label="YouTube">
-                            <svg width="13" height="9" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-                              <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
-                              <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
-                            </svg>
-                          </span>
-                        )}
-                      </div>
+                    <div class="ep-play" aria-hidden="true">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
                     </div>
                   </div>
 
-                  <!-- Episode number -->
-                  <div class="ep-card__num-col" aria-hidden="true">
-                    {String(entry.data.episode_number).padStart(3, '0')}
+                  <!-- Episode info -->
+                  <div class="ep-info">
+                    <p class="ep-ep">
+                      {isDE ? 'Episode' : 'Episode'} {String(ep.data.episode_number).padStart(3,'0')} · {ep.data.category}
+                    </p>
+                    <p class="ep-title">{ep.data.title}</p>
+                    {ep.data.summary && (
+                      <p class="ep-excerpt">{ep.data.summary}</p>
+                    )}
                   </div>
 
+                  <!-- Aside: duration, date, arrow -->
+                  <div class="ep-aside" aria-label={`${fmtDuration(ep.data.duration)}, ${formatDate(ep.data.date)}`}>
+                    {ep.data.duration && (
+                      <span class="ep-duration">{fmtDuration(ep.data.duration)}</span>
+                    )}
+                    <time class="ep-date" datetime={ep.data.date.toISOString()}>
+                      {formatDate(ep.data.date)}
+                    </time>
+                    <span class="ep-arrow" aria-hidden="true">→</span>
+                  </div>
                 </a>
               </li>
             );
           })}
-        </ul>
+        </ol>
       )}
+    </div>
+  </section>
 
+  <!-- ── SUBSCRIBE BAND ─────────────────────────────────────────────────── -->
+  <section class="sub-band" aria-labelledby="sub-heading">
+    <div class="container">
+      <div class="sub-band__inner">
+        <div>
+          <h2 class="sub-band__heading" id="sub-heading">
+            {isDE
+              ? <Fragment>Hören, wo<br><em>Sie denken.</em></Fragment>
+              : <Fragment>Listen wherever<br><em>you think.</em></Fragment>}
+          </h2>
+          <p class="sub-band__body">
+            {isDE
+              ? 'Auf allen großen Plattformen verfügbar. Die Videoversion ist auf YouTube; Audio-only ist überall sonst. Abonnieren und wissen, wenn es etwas Herausforderndes gibt.'
+              : 'Available on all major platforms. The video version is on YouTube; audio-only is everywhere else. Subscribe and you\'ll know when something worth challenging shows up.'}
+          </p>
+        </div>
+        <nav aria-label={isDE ? 'Auf Plattform hören' : 'Listen on platform'}>
+          <div class="platform-grid">
+            <a href="https://www.youtube.com/@andredaus" class="platform-card" target="_blank" rel="noopener noreferrer">
+              <span class="platform-card__name">YouTube</span>
+              <span class="platform-card__sub">{isDE ? 'Video + Audio' : 'Video + Audio'}</span>
+            </a>
+            <a href="https://open.spotify.com/show/36YRWk7nrI6V8w9lMncynG" class="platform-card" target="_blank" rel="noopener noreferrer">
+              <span class="platform-card__name">Spotify</span>
+              <span class="platform-card__sub">{isDE ? 'Audio' : 'Audio'}</span>
+            </a>
+            <a href="https://podcasts.apple.com/podcast/iconoclast-insights/id0000000" class="platform-card" target="_blank" rel="noopener noreferrer">
+              <span class="platform-card__name">Apple Podcasts</span>
+              <span class="platform-card__sub">{isDE ? 'Audio' : 'Audio'}</span>
+            </a>
+            <a href="/podcast/feed.xml" class="platform-card">
+              <span class="platform-card__name">RSS</span>
+              <span class="platform-card__sub">{isDE ? 'Direkter Feed' : 'Direct feed'}</span>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">{isDE ? 'Jenseits des Podcasts' : 'Beyond the podcast'}</p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Wenn etwas hier wie<br><em>Ihre Organisation</em> klingt,</Fragment>
+          : <Fragment>If something in here<br>sounds like <em>your organisation,</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein Discovery Call findet heraus, welche der hier diskutierten Annahmen gerade in Ihrer Strategie aktiv sind.'
+          : 'A discovery call is where we find out which of the assumptions being discussed in these episodes are running live in your strategy right now.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/use-cases`} class="btn btn--outline">
+          {isDE ? 'Use Cases lesen' : 'Read the Use Cases'}
+        </a>
+      </div>
     </div>
   </section>
 
 </Base>
 
 <script>
-  const btns  = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-  const cards = document.querySelectorAll<HTMLLIElement>('.ep-card');
+  (function () {
+    // Category filter
+    const btns = document.querySelectorAll<HTMLButtonElement>('.cat-btn');
+    const items = document.querySelectorAll<HTMLElement>('#ep-grid > li');
+    const counter = document.getElementById('visible-count');
 
-  btns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.dataset.category!;
-      btns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-      btn.setAttribute('aria-pressed', 'true');
-      cards.forEach(card => {
-        const show = cat === 'All' || card.dataset.category === cat;
-        card.style.display = show ? '' : 'none';
+    function updateCount() {
+      let n = 0;
+      items.forEach(li => { if (li.style.display !== 'none') n++; });
+      if (counter) counter.textContent = String(n);
+    }
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-pressed', 'true');
+        const cat = btn.dataset.cat ?? 'all';
+        items.forEach(li => {
+          li.style.display = cat === 'all' || li.dataset.cat === cat ? '' : 'none';
+        });
+        updateCount();
       });
     });
-  });
+
+    updateCount();
+
+    // Scroll reveal
+    if (!window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      const io = new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+    } else {
+      document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+    }
+  })();
 </script>
 
 <style>
-  /* ── Hero ──────────────────────────────────────────────────────────── */
-  .pod-hero {
+  /* ── Show hero ─────────────────────────────────────────────────────────── */
+  .show-hero {
+    padding-top: 68px;
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+    border-bottom: 1px solid var(--border-light);
     position: relative;
-    padding: calc(68px + var(--section)) 0 var(--section);
     overflow: hidden;
   }
 
-  .hero-grid {
+  .show-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
 
-  .hero-noise {
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-    background-size: 200px 200px;
-    pointer-events: none;
-  }
-
-  .pod-hero__inner {
+  .show-hero__inner {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 340px;
     gap: 4rem;
     align-items: center;
+    padding-block: clamp(4rem, 8vw, 6.5rem);
   }
 
-  .pod-hero__content { max-width: 54ch; }
+  .show-hero__label { margin-bottom: 1.25rem; }
 
-  .pod-hero__title {
+  .show-hero__title {
     font-family: var(--serif);
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-size: clamp(2.2rem, 4.5vw, 3.5rem);
     font-weight: 400;
-    line-height: 1.1;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin: 1.25rem 0 1.5rem;
+    margin-bottom: 1.25rem;
   }
-  .pod-hero__title em { font-style: italic; color: var(--gold); }
+  .show-hero__title em { font-style: italic; color: var(--gold); }
 
-  .pod-hero__desc {
+  .show-hero__desc {
+    font-size: 15px;
+    line-height: 1.85;
     color: var(--text-secondary);
-    font-size: var(--text-lg);
-    line-height: 1.7;
+    max-width: 52ch;
     margin-bottom: 2rem;
   }
 
-  .pod-hero__meta-row {
+  /* Platform links */
+  .platforms {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-bottom: 2rem;
+  }
+
+  .platform-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.875rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 0.75rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: border-color 0.2s, color 0.2s;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .platform-link:hover { border-color: rgba(196,154,60,.3); color: var(--text-primary); }
+  .platform-link__icon { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+  .platform-link:hover .platform-link__icon { opacity: 1; }
+  .platform-link__sub { margin-left: auto; color: var(--text-subtle); font-size: 10px; }
+
+  /* Show stats */
+  .show-stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--bg-card-alt);
+  }
+  .show-stat {
+    flex: 1;
+    padding: 1.1rem 1.25rem;
+    border-right: 1px solid var(--border-light);
+    text-align: center;
+  }
+  .show-stat:last-child { border-right: none; }
+  .show-stat__n {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.6rem;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+  }
+  .show-stat__l {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* Subscription card */
+  .show-sub {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-self: center;
+  }
+  .show-sub__art {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+  }
+  .show-sub__heading {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--text-primary);
+  }
+  .show-sub__body {
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+  }
+  .show-sub .btn { width: 100%; justify-content: center; }
+  .show-sub__rss {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    padding: 0.75rem 1rem;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s;
+    justify-content: center;
+  }
+  .show-sub__rss:hover { color: var(--gold); border-color: rgba(196,154,60,.25); }
+
+  @media (max-width: 860px) {
+    .show-hero__inner { grid-template-columns: 1fr; }
+    .show-sub { display: none; }
+  }
+
+  /* ── Filter bar ────────────────────────────────────────────────────────── */
+  .filter-bar {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 68px;
+    z-index: 50;
+  }
+
+  .filter-bar__inner {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+  }
+
+  .cat-tabs {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+  }
+  .cat-tabs::-webkit-scrollbar { display: none; }
+
+  .cat-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 1.1rem 1.4rem;
+    color: var(--text-secondary);
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+  .cat-btn:hover { color: var(--text-primary); }
+  .cat-btn.is-active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .ep-count-strip {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--gutter) 0 1rem;
+    border-left: 1px solid var(--border-light);
+    flex-shrink: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    gap: 0.5rem;
+  }
+
+  #visible-count { color: var(--text-secondary); }
+
+  /* ── Latest featured episode ───────────────────────────────────────────── */
+  .latest {
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .latest__label { margin-bottom: 1.5rem; }
+
+  .latest__card {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s;
+  }
+  .latest__card:hover { border-color: rgba(196,154,60,.25); }
+
+  .latest__thumb {
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    position: relative;
+  }
+  .latest__thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+  .latest__card:hover .latest__thumb-img { transform: scale(1.04); }
+
+  .thumb-ph {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    background: var(--bg-elevated);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .thumb-ph__icon { font-size: 2rem; opacity: 0.15; display: block; color: var(--gold); }
+  .thumb-ph__label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(9,12,20,.4);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .latest__card:hover .play-overlay { opacity: 1; }
+
+  .play-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #080a10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    transition: transform 0.2s;
+  }
+  .play-btn svg { margin-left: 3px; }
+  .latest__card:hover .play-btn { transform: scale(1.1); }
+
+  .latest__body {
+    padding: 2rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .latest__ep {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .latest__title {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    transition: color 0.2s;
+  }
+  .latest__card:hover .latest__title { color: var(--gold-light); }
+
+  .latest__excerpt {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .latest__meta {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    margin-bottom: 2rem;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .pod-hero__count-num {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--gold);
-    margin-right: 0.3em;
-    letter-spacing: 0;
-  }
-
-  .pod-hero__latest-link {
-    color: var(--gold);
-    text-decoration: none;
-    margin-left: 0.3em;
-  }
-  .pod-hero__latest-link:hover { text-decoration: underline; }
-
-  /* Platform pills */
-  .pod-hero__platforms { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-
-  .platform-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-  }
-
-  .platform-pill--spotify {
-    color: #1db954;
-    border-color: rgba(29,185,84,0.25);
-  }
-  .platform-pill--spotify:hover {
-    background: rgba(29,185,84,0.08);
-    border-color: #1db954;
-  }
-
-  .platform-pill--youtube {
-    color: var(--gold);
-    border-color: var(--border);
-  }
-  .platform-pill--youtube:hover {
-    background: var(--gold-trans);
-    border-color: var(--gold);
-  }
-
-  /* Cover art */
-  .pod-hero__cover {
-    position: relative;
-    width: clamp(200px, 22vw, 320px);
-    aspect-ratio: 1;
-    flex-shrink: 0;
-  }
-
-  .pod-hero__cover-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-  }
-
-  .pod-hero__cover-fallback {
-    width: 100%;
-    height: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .pod-hero__cover-label {
-    font-family: var(--serif);
-    font-size: clamp(1rem, 2vw, 1.4rem);
-    color: var(--gold);
-    line-height: 1.3;
-    font-style: italic;
-  }
-
-  .pod-hero__cover-glow {
-    position: absolute;
-    inset: -30px;
-    border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(196,154,60,0.12) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  /* ── Filter bar ────────────────────────────────────────────────────── */
-  .filter-bar {
-    display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-light);
   }
-
-  .filter-btn {
+  .latest__meta-item {
     font-family: var(--mono);
     font-size: 11px;
-    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+  }
+  .latest__listen {
+    font-family: var(--mono);
+    font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: border-color 0.18s, color 0.18s, background 0.18s;
-  }
-  .filter-btn:hover,
-  .filter-btn[aria-pressed="true"] {
-    border-color: var(--gold);
     color: var(--gold);
-    background: var(--gold-trans);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap 0.2s;
+    margin-left: auto;
+  }
+  .latest__card:hover .latest__listen { gap: 14px; }
+  .latest__listen::after { content: '→'; }
+
+  @media (max-width: 720px) {
+    .latest__card { grid-template-columns: 1fr; }
+    .latest__thumb { aspect-ratio: 16/7; }
+    .latest__body { padding: 1.5rem; }
   }
 
-  /* ── Episode list ──────────────────────────────────────────────────── */
-  .episodes-list {
+  /* ── Episode list ──────────────────────────────────────────────────────── */
+  .episodes { padding-block: var(--section); }
+
+  .episodes__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .episodes__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+
+  .ep-grid {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    background: var(--border-light); /* shows as divider between cards */
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
+    gap: 0.75rem;
   }
 
-  .ep-card {
-    background: var(--bg-card);
-    transition: background-color 0.18s;
-  }
-  .ep-card:hover { background: var(--bg-elevated); }
-
-  .ep-card__link {
+  .ep-row {
     display: grid;
-    grid-template-columns: 120px 1fr auto;
-    gap: 0;
+    grid-template-columns: 56px 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 1.25rem 1.5rem;
     text-decoration: none;
     color: inherit;
-    min-height: 120px;
+    transition: border-color 0.2s, background 0.15s;
   }
+  .ep-row:hover { border-color: rgba(196,154,60,.25); background: var(--bg-card); }
 
-  /* Artwork cell */
-  .ep-card__art {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    flex-shrink: 0;
+  .ep-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 3px;
     overflow: hidden;
+    background: var(--bg-elevated);
+    flex-shrink: 0;
+    position: relative;
   }
-
-  .ep-card__img {
+  .ep-thumb-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.35s ease;
   }
-
-  .ep-card:hover .ep-card__img { transform: scale(1.04); }
-
-  .ep-card__img--fallback {
+  .ep-thumb-ph {
+    width: 100%;
+    height: 100%;
     background: var(--bg-elevated);
-    border-right: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .ep-card__num {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--gold-dim);
-    letter-spacing: 0.08em;
-  }
-
-  /* Video badge on artwork */
-  .ep-card__video-badge {
-    position: absolute;
-    bottom: 6px;
-    right: 6px;
-    background: rgba(9,12,20,0.82);
-    border: 1px solid rgba(196,154,60,0.3);
-    border-radius: 2px;
-    padding: 3px 5px;
-    display: flex;
-    align-items: center;
-    color: var(--gold);
-    backdrop-filter: blur(4px);
-  }
-
-  /* Content cell */
-  .ep-card__body {
-    padding: 1.5rem 1.75rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0;
-  }
-
-  .ep-card__meta {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.6rem;
-    flex-wrap: wrap;
-  }
-
-  .ep-cat {
     font-family: var(--mono);
     font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    color: var(--text-subtle);
+  }
+  .ep-play {
+    position: absolute;
+    inset: 0;
+    background: rgba(9,12,20,.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s;
+    border-radius: 3px;
+    color: var(--gold);
+  }
+  .ep-row:hover .ep-play { opacity: 1; }
+
+  .ep-ep {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
-    padding: 2px 7px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
+    margin-bottom: 4px;
   }
-
-  .ep-date {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    letter-spacing: 0.04em;
-  }
-
-  .ep-card__title {
-    font-family: var(--serif);
-    font-size: clamp(1rem, 1.8vw, 1.25rem);
-    font-weight: 400;
-    line-height: 1.3;
+  .ep-title {
+    font-size: 15px;
+    font-weight: 500;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    margin-bottom: 0.375rem;
+    transition: color 0.2s;
   }
-
-  .ep-card__summary {
-    font-size: var(--text-sm);
+  .ep-row:hover .ep-title { color: var(--gold-light); }
+  .ep-excerpt {
+    font-size: 13px;
+    line-height: 1.65;
     color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 0.9rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  .ep-card__actions {
+  .ep-aside {
     display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    flex-wrap: wrap;
-    margin-top: auto;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.625rem;
+    flex-shrink: 0;
   }
-
-  .ep-card__read {
+  .ep-duration {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+  }
+  .ep-date {
     font-family: var(--mono);
     font-size: 10px;
-    font-weight: 500;
+    color: var(--text-subtle);
+  }
+  .ep-arrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gold);
+    transition: transform 0.2s;
+  }
+  .ep-row:hover .ep-arrow { transform: translateX(4px); }
+
+  @media (max-width: 580px) {
+    .ep-row { grid-template-columns: 44px 1fr; }
+    .ep-aside { display: none; }
+    .ep-excerpt { display: none; }
+  }
+
+  /* ── Subscribe band ────────────────────────────────────────────────────── */
+  .sub-band {
+    background: var(--navy);
+    border-top: 1px solid rgba(29,45,68,.8);
+    border-bottom: 1px solid rgba(29,45,68,.8);
+    padding-block: 4rem;
+  }
+  .sub-band__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .sub-band__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: 0.875rem;
+  }
+  .sub-band__heading em { font-style: italic; color: var(--gold); }
+  .sub-band__body {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+  }
+
+  .platform-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  .platform-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.1rem 1.25rem;
+    background: rgba(0,0,0,.2);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 3px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s;
+    min-height: 44px;
+  }
+  .platform-card:hover { border-color: rgba(196,154,60,.25); }
+  .platform-card__name {
+    font-family: var(--mono);
+    font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--text-primary);
+  }
+  .platform-card__sub { font-size: 12px; color: var(--text-subtle); }
+
+  @media (max-width: 760px) {
+    .sub-band__inner { grid-template-columns: 1fr; }
   }
 
-  .ep-card__platforms {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band {
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding-block: 5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
   }
-
-  .ep-platform {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 7px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    color: var(--text-muted);
+  .cta-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,.06), transparent 70%);
+    pointer-events: none;
   }
-
-  .ep-platform--spotify { color: #1db954; border-color: rgba(29,185,84,0.2); }
-  .ep-platform--youtube { color: var(--gold); border-color: rgba(196,154,60,0.2); }
-
-  /* Episode number far-right column */
-  .ep-card__num-col {
-    width: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-    border-left: 1px solid var(--border-light);
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    padding: 1rem 0;
+  .cta-band__inner { position: relative; z-index: 1; }
+  .cta-band__label { margin-bottom: 1.5rem; justify-content: center; }
+  .cta-band__label::before { display: none; }
+  .cta-band__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.9rem, 3.5vw, 3rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text-primary);
+    max-width: 22ch;
+    margin-inline: auto;
+    margin-bottom: 1.25rem;
   }
-
-  .empty-state { color: var(--text-muted); font-style: italic; padding: 3rem 0; }
-
-  /* ── Responsive ────────────────────────────────────────────────────── */
-  @media (max-width: 900px) {
-    .pod-hero__inner {
-      grid-template-columns: 1fr;
-      gap: 2.5rem;
-    }
-    .pod-hero__cover {
-      width: clamp(140px, 40vw, 220px);
-      order: -1;
-    }
+  .cta-band__heading em { font-style: italic; color: var(--gold); }
+  .cta-band__sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 46ch;
+    margin-inline: auto;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
   }
+  .cta-band__actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
-  @media (max-width: 640px) {
-    .ep-card__link {
-      grid-template-columns: 80px 1fr;
-    }
-    .ep-card__art { width: 80px; height: 80px; }
-    .ep-card__num-col { display: none; }
-    .ep-card__body { padding: 1rem 1.25rem; }
-  }
+  /* ── Shared ────────────────────────────────────────────────────────────── */
+  .empty-state { color: var(--text-subtle); font-style: italic; padding: 3rem 0; }
+  .fade-up { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
 </style>

@@ -2,17 +2,16 @@
 import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
-import YouTubePlayer from '../../components/YouTubePlayer.astro';
+import YouTubePlayer  from '../../components/YouTubePlayer.astro';
 import PodcastPlayer  from '../../components/PodcastPlayer.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('podcast');
-  const now = new Date();
   return entries
-    .filter(e => e.id.startsWith('en/') && (!e.data.publish_date || e.data.publish_date <= now))
+    .filter(e => e.id.startsWith('en/') && e.data.status === 'published')
     .map(entry => ({
       params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
-      props: { entry },
+      props:  { entry },
     }));
 }
 
@@ -27,24 +26,18 @@ function formatDate(d: Date) {
   return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-// ── Local artwork lookup ─────────────────────────────────────────────────
-const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
-  { eager: true }
-);
-
-function getArtworkById(spotifyUrl: string): ImageMetadata | null {
-  const id = spotifyUrl.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1];
-  if (!id) return null;
-  const found = Object.entries(allArtwork).find(([path]) =>
-    path.split('/').pop()?.replace(/\.[^.]+$/, '') === id
-  );
-  return found?.[1]?.default ?? null;
+function fmtDuration(d?: string): string {
+  if (!d) return '';
+  const parts = d.split(':').map(Number);
+  if (parts.length === 3) {
+    const h = parts[0];
+    const m = parts[1];
+    return h > 0 ? `${h}h ${m}m` : `${m} min`;
+  }
+  return d;
 }
 
-const artwork = getArtworkById(entry.data.spotify_url);
-
-// ── YouTube video ID extraction ──────────────────────────────────────────
+// YouTube video ID extraction
 function extractYtId(url?: string): string | null {
   if (!url) return null;
   return new URL(url).searchParams.get('v')
@@ -54,778 +47,939 @@ function extractYtId(url?: string): string | null {
 }
 const ytVideoId = extractYtId(entry.data.youtube_url);
 
-// ── Prev / next episode ──────────────────────────────────────────────────
-const allEpisodes = await getCollection('podcast');
-const now = new Date();
-const published = allEpisodes
-  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && (!e.data.publish_date || e.data.publish_date <= now))
-  .sort((a, b) => a.data.episode_number - b.data.episode_number);
+// Artwork lookup
+const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
+  { eager: true }
+);
 
-const idx  = published.findIndex(e => e.id === entry.id);
-const prev = idx > 0  ? published[idx - 1] : null;
-const next = idx < published.length - 1 ? published[idx + 1] : null;
+function getArtwork(ep: typeof entry): ImageMetadata | null {
+  const id = ep.data.episode_id
+    ?? ep.data.spotify_url?.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1]
+    ?? null;
+  if (!id) return null;
+  const found = Object.entries(allArtwork).find(([path]) =>
+    path.split('/').pop()?.replace(/\.[^.]+$/, '') === id
+  );
+  return found?.[1]?.default ?? null;
+}
+
+const artwork = getArtwork(entry);
+const artworkId = entry.data.episode_id
+  ?? entry.data.spotify_url?.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1]
+  ?? entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+
+// Related episodes (same category, excluding current, up to 3)
+const allEpisodes = await getCollection('podcast');
+const published = allEpisodes
+  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && e.data.status === 'published')
+  .sort((a, b) => b.data.episode_number - a.data.episode_number);
+
+const related = published
+  .filter(e => e.id !== entry.id)
+  .slice(0, 3);
 
 function slugify(e: typeof published[number]) {
   return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
 }
 
-// ── Recent episodes for sidebar (excluding current) ─────────────────────
-const recentOthers = [...published]
-  .reverse()
-  .filter(e => e.id !== entry.id)
-  .slice(0, 4);
+// Spotify icon path
+const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z';
+
+const shareUrl = `https://andredaus.com${prefix}/podcast/${entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')}`;
 ---
 
 <Base
-  title={`${entry.data.title} — André Daus`}
+  title={`${entry.data.title} — Iconoclast Insights Ep. ${entry.data.episode_number} · André Daus`}
   description={entry.data.summary}
   ogImage={entry.data.og_image}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- ── EPISODE HERO ────────────────────────────────────────────────── -->
-  <header class="ep-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
-
+  <!-- ── BREADCRUMB ─────────────────────────────────────────────────────── -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
     <div class="container">
-      <!-- Breadcrumb -->
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href={`${prefix}/podcast`}>{isDE ? 'Podcast' : 'Podcast'}</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">
-          {isDE ? 'Episode' : 'Episode'} {entry.data.episode_number}
-        </span>
-      </nav>
+      <ol class="breadcrumb__inner">
+        <li><a href={`${prefix}/`} class="breadcrumb__link">{isDE ? 'Start' : 'Home'}</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><a href={`${prefix}/podcast`} class="breadcrumb__link">Iconoclast Insights</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><span class="breadcrumb__current" aria-current="page">{entry.data.title}</span></li>
+      </ol>
+    </div>
+  </nav>
 
+  <!-- ── EPISODE HERO ───────────────────────────────────────────────────── -->
+  <header class="ep-hero" aria-labelledby="ep-title">
+    <div class="ep-hero__grid" aria-hidden="true"></div>
+    <div class="container">
       <div class="ep-hero__inner">
 
-        <!-- Cover art -->
-        <div class="ep-hero__art">
-          {artwork ? (
-            <Image
-              src={artwork}
-              alt={`${entry.data.title} — cover art`}
-              width={260}
-              height={260}
-              class="ep-hero__img"
-              loading="eager"
-              decoding="async"
-            />
-          ) : (
-            <div class="ep-hero__img ep-hero__img--fallback" aria-hidden="true">
-              <span class="ep-hero__fallback-num">
-                {String(entry.data.episode_number).padStart(3, '0')}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <!-- Meta + title -->
-        <div class="ep-hero__content">
-          <div class="ep-hero__meta">
-            <span class="ep-hero__cat">{entry.data.category}</span>
-            <span class="ep-hero__num">
-              {isDE ? 'Episode' : 'Episode'} {String(entry.data.episode_number).padStart(3, '0')}
+        <!-- Left: title + meta -->
+        <div>
+          <div class="ep-hero__meta" role="list" aria-label={isDE ? 'Episoden-Metadaten' : 'Episode metadata'}>
+            <span class="ep-badge ep-badge--num" role="listitem">
+              {isDE ? 'Episode' : 'Episode'} {String(entry.data.episode_number).padStart(3,'0')}
             </span>
-            <time datetime={entry.data.date.toISOString()} class="ep-hero__date">
-              {formatDate(entry.data.date)}
-            </time>
+            <span class="ep-badge" role="listitem">{entry.data.category}</span>
+            {ytVideoId && (
+              <span class="ep-badge ep-badge--video" role="listitem">
+                {isDE ? 'Video verfügbar' : 'Video available'}
+              </span>
+            )}
           </div>
 
-          <h1 class="ep-hero__title">{entry.data.title}</h1>
+          <h1 class="ep-hero__title" id="ep-title">{entry.data.title}</h1>
 
           {entry.data.summary && (
-            <p class="ep-hero__summary">{entry.data.summary}</p>
+            <p class="ep-summary" aria-label={isDE ? 'Episoden-Zusammenfassung' : 'Episode summary'}>
+              {entry.data.summary}
+            </p>
           )}
 
-          <!-- Platform badges — shows available media, links to external -->
-          <div class="ep-hero__platforms">
-            {entry.data.spotify_url && (
-              <a
-                href={entry.data.spotify_url}
-                class="ep-platform-badge ep-platform-badge--spotify"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={isDE ? 'Auf Spotify anhören' : 'Listen on Spotify'}
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                </svg>
-                Spotify
-              </a>
+          <div class="ep-hero__timestamps" role="list" aria-label={isDE ? 'Episodendetails' : 'Episode details'}>
+            {entry.data.duration && (
+              <span role="listitem">{fmtDuration(entry.data.duration)}</span>
             )}
-            {entry.data.youtube_url && (
+            {entry.data.duration && <span class="ep-hero__timestamps-sep" aria-hidden="true">·</span>}
+            <time role="listitem" datetime={entry.data.date.toISOString()}>
+              {formatDate(entry.data.date)}
+            </time>
+            <span class="ep-hero__timestamps-sep" aria-hidden="true">·</span>
+            <span role="listitem">Iconoclast Insights</span>
+          </div>
+        </div>
+
+        <!-- Right: listen aside -->
+        <aside aria-label={isDE ? 'Auf Ihrer Plattform hören' : 'Listen on your platform'}>
+          <div class="ep-listen">
+            {ytVideoId && (
               <a
                 href={entry.data.youtube_url}
-                class="ep-platform-badge ep-platform-badge--youtube"
+                class="ep-listen-btn ep-listen-btn--primary"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={isDE ? 'Auf YouTube ansehen' : 'Watch on YouTube'}
               >
-                <svg width="14" height="10" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-                  <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
-                  <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
+                <svg class="ep-listen-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/>
                 </svg>
-                YouTube
+                {isDE ? 'Auf YouTube ansehen' : 'Watch on YouTube'}
               </a>
             )}
+            {entry.data.spotify_url && (
+              <a
+                href={entry.data.spotify_url}
+                class="ep-listen-btn"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={isDE ? 'Auf Spotify anhören' : 'Listen on Spotify'}
+              >
+                <svg class="ep-listen-btn__icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d={spPath}/>
+                </svg>
+                {isDE ? 'Auf Spotify anhören' : 'Listen on Spotify'}
+              </a>
+            )}
+            <a
+              href="https://podcasts.apple.com/podcast/iconoclast-insights/id0000000"
+              class="ep-listen-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={isDE ? 'Auf Apple Podcasts anhören' : 'Listen on Apple Podcasts'}
+            >
+              <svg class="ep-listen-btn__icon" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 300 300" aria-hidden="true">
+                <linearGradient id="apple-grad-detail" x1="150" x2="150" y1="0" y2="300" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" style="stop-color:#f452ff"/>
+                  <stop offset="1" style="stop-color:#832bc1"/>
+                </linearGradient>
+                <path fill="url(#apple-grad-detail)" fill-rule="evenodd" d="M294.1 260c-2.9 7.4-9.6 17.8-19.2 25.2-5.5 4.2-12.1 8.3-21.1 11-9.6 2.9-21.5 3.8-36.3 3.8h-135c-14.8 0-26.6-1-36.3-3.8-9-2.7-15.6-6.7-21.1-11-9.5-7.3-16.3-17.8-19.2-25.2C.1 245.1 0 228.2 0 217.5v-135C0 71.8.1 54.9 5.9 40c2.9-7.4 9.6-17.8 19.2-25.2 5.5-4.2 12.1-8.3 21.1-11C55.9 1 67.7 0 82.5 0h135c14.8 0 26.6 1 36.3 3.8 9 2.7 15.6 6.7 21.1 11 9.5 7.3 16.3 17.8 19.2 25.2 5.9 14.9 5.9 31.9 5.9 42.5v135c0 10.7-.1 27.6-5.9 42.5" clip-rule="evenodd"/>
+                <g fill="#fff">
+                  <path d="M175.7 181.1c-.4-3.6-1.6-6.2-4-8.6-4.5-4.7-12.4-7.8-21.7-7.8s-17.2 3-21.7 7.8c-2.3 2.5-3.6 5-4 8.6-.8 7-.3 13 .5 22.7.8 9.2 2.3 21.5 4.2 33.9 1.4 8.9 2.5 13.7 3.5 17.1 1.7 5.6 7.8 10.4 17.5 10.4s15.9-4.9 17.5-10.4c1-3.4 2.1-8.2 3.5-17.1 1.9-12.5 3.4-24.7 4.2-33.9.9-9.7 1.3-15.7.5-22.7M174.6 130.1c0 13.6-11 24.6-24.6 24.6s-24.6-11-24.6-24.6 11-24.6 24.6-24.6 24.6 11.1 24.6 24.6"/>
+                  <path d="M149.7 33.2C92.3 33.4 45.3 80 44.5 137.4c-.6 46.5 29.1 86.3 70.6 100.9 1 .4 2-.5 1.9-1.5-.5-3.6-1.1-7.2-1.5-10.8-.2-1.3-1-2.3-2.1-2.9-32.8-14.3-55.7-47.2-55.3-85.3.5-50 41.3-90.7 91.2-91.1 51.1-.4 92.8 41 92.8 92 0 37.7-22.8 70.1-55.3 84.4-1.2.5-2 1.6-2.1 2.9l-1.5 10.8c-.2 1.1.9 1.9 1.9 1.5 41.1-14.4 70.6-53.6 70.6-99.6-.2-58.2-47.7-105.6-106-105.5"/>
+                  <path d="M147.3 68.2c-37.4 1.4-67.4 32.3-67.9 69.7-.3 24.6 12 46.4 30.9 59.3.9.6 2.2-.1 2.2-1.2-.3-4.3-.3-8.1-.1-12.1.1-1.3-.4-2.5-1.4-3.4-11.5-10.8-18.5-26.2-18.1-43.2.8-30 24.9-54.4 54.9-55.6 32.6-1.3 59.4 24.9 59.4 57.1 0 16.4-7 31.2-18.1 41.7-.9.9-1.4 2.1-1.4 3.4.2 3.9.1 7.7-.1 12-.1 1.1 1.2 1.9 2.2 1.2 18.6-12.7 30.9-34.2 30.9-58.4.1-39.8-33.2-72.1-73.4-70.5"/>
+                </g>
+              </svg>
+              Apple Podcasts
+            </a>
           </div>
-        </div>
+
+          <p class="ep-listen-note">
+            {isDE
+              ? 'Audio auf allen Plattformen · Video auf YouTube'
+              : 'Audio-only available on all platforms · Video on YouTube'}
+          </p>
+
+          <!-- Share buttons -->
+          <div class="ep-share">
+            <span class="ep-share-label">{isDE ? 'Teilen' : 'Share'}</span>
+            <button
+              class="ep-share-btn"
+              id="copy-link-btn"
+              data-url={shareUrl}
+              aria-label={isDE ? 'Link kopieren' : 'Copy link to clipboard'}
+              title={isDE ? 'Link kopieren' : 'Copy link'}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(entry.data.title)}&url=${encodeURIComponent(shareUrl)}`}
+              class="ep-share-btn"
+              aria-label={isDE ? 'Auf X teilen' : 'Share on X'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true">
+                <path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/>
+              </svg>
+            </a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+              class="ep-share-btn"
+              aria-label={isDE ? 'Auf LinkedIn teilen' : 'Share on LinkedIn'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true">
+                <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/>
+              </svg>
+            </a>
+          </div>
+        </aside>
 
       </div>
     </div>
   </header>
 
-  <!-- ── BODY + SIDEBAR ──────────────────────────────────────────────── -->
-  <div class="ep-layout container">
-
-    <!-- Main content column -->
-    <article class="ep-main" aria-label={isDE ? 'Episodeninhalt' : 'Episode content'}>
-
-      <!-- ── Players ── -->
-      {/* YouTube video (recent episodes only) */}
-      {ytVideoId && (
-        <div class="ep-players">
-          <p class="ep-players__label">
-            <svg ...>...</svg>
-            Video
-          </p>
-          <YouTubePlayer
-            videoId={ytVideoId}
-            title={entry.data.title}
-          />
-        </div>
-      )}
-
-      {/* Audio player — always shown, compact if there's also a video */}
-      {entry.data.audio_url && (
-        <div class:list={['ep-players', ytVideoId && 'ep-players--secondary']}>
-          {ytVideoId && (
-            <p class="ep-players__label">Audio</p>
-          )}
-          <PodcastPlayer
-            audioUrl={entry.data.audio_url}
-            title={entry.data.title}
-            artworkId={entry.data.episode_id ?? episodeSlug}
-            spotifyUrl={entry.data.spotify_url}
-            youtubeUrl={entry.data.youtube_url}
-            duration={entry.data.duration}
-            compact={!!ytVideoId}
-            aspect="1/1"
-          />
-        </div>
-      )}
-
-      <!-- ── Transcript ── -->
-      <div class="ep-transcript">
-        <div class="ep-transcript__header">
-          <span class="label">{isDE ? 'Transkript' : 'Transcript'}</span>
-        </div>
-        <div class="prose ep-prose">
-          <Content />
-        </div>
+  <!-- ── VIDEO / AUDIO EMBED ────────────────────────────────────────────── -->
+  {ytVideoId ? (
+    <section class="ep-video" aria-labelledby="video-section-label">
+      <div class="container">
+        <h2 class="sr-only" id="video-section-label">
+          {isDE ? 'Episodenvideo' : 'Episode video'}
+        </h2>
+        <YouTubePlayer
+          videoId={ytVideoId}
+          title={entry.data.title}
+        />
+        {entry.data.audio_url && (
+          <div style="margin-top:1rem">
+            <PodcastPlayer
+              audioUrl={entry.data.audio_url}
+              title={entry.data.title}
+              artworkId={artworkId}
+              spotifyUrl={entry.data.spotify_url}
+              duration={entry.data.duration}
+              compact={true}
+            />
+          </div>
+        )}
       </div>
-
-      <!-- ── Prev / next navigation ── -->
-      {(prev || next) && (
-        <nav class="ep-nav" aria-label={isDE ? 'Episodennavigation' : 'Episode navigation'}>
-          {prev ? (
-            <a href={`${prefix}/podcast/${slugify(prev)}`} class="ep-nav__item ep-nav__item--prev">
-              <span class="ep-nav__dir">
-                <span aria-hidden="true">←</span>
-                {isDE ? 'Vorherige Episode' : 'Previous episode'}
-              </span>
-              <span class="ep-nav__title">{prev.data.title}</span>
-            </a>
-          ) : <div />}
-          {next && (
-            <a href={`${prefix}/podcast/${slugify(next)}`} class="ep-nav__item ep-nav__item--next">
-              <span class="ep-nav__dir">
-                {isDE ? 'Nächste Episode' : 'Next episode'}
-                <span aria-hidden="true">→</span>
-              </span>
-              <span class="ep-nav__title">{next.data.title}</span>
-            </a>
-          )}
-        </nav>
-      )}
-
-    </article>
-
-    <!-- Sidebar -->
-    <aside class="ep-sidebar" aria-label={isDE ? 'Podcast-Sidebar' : 'Podcast sidebar'}>
-
-      <!-- Subscribe card -->
-      <div class="aside-card">
-        <p class="label" style="margin-bottom:1rem">{isDE ? 'Abonnieren' : 'Subscribe'}</p>
-        <p class="aside-card__text">
-          {isDE
-            ? 'Neue Episoden direkt auf Ihrer bevorzugten Plattform.'
-            : 'New episodes directly on your preferred platform.'}
-        </p>
-        <div class="aside-card__btns">
-          <a
-            href="https://open.spotify.com/show/36YRWk7nrI6V8w9lMncynG?si=2Za2A7VmQrOpCcOWOL0hTA"
-            class="aside-btn aside-btn--spotify"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-            </svg>
-            Spotify
-          </a>
-          <a
-            href="https://www.youtube.com/@andredaus"
-            class="aside-btn aside-btn--youtube"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <svg width="14" height="10" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-              <path d="M19.582 2.186A2.506 2.506 0 0 0 17.822.418C16.254 0 10 0 10 0S3.746 0 2.178.418A2.506 2.506 0 0 0 .418 2.186C0 3.76 0 7 0 7s0 3.24.418 4.814a2.506 2.506 0 0 0 1.76 1.768C3.746 14 10 14 10 14s6.254 0 7.822-.418a2.506 2.506 0 0 0 1.76-1.768C20 10.24 20 7 20 7s0-3.24-.418-4.814Z" fill="currentColor"/>
-              <path d="M8 10l5.196-3L8 4v6Z" fill="#090c14"/>
-            </svg>
-            YouTube
-          </a>
-          <a
-            href="https://podcasts.apple.com/podcast/iconoclast-insights/idXXXXXXXXX"
-            class="aside-btn aside-btn--apple"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            
-          <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="12" height="12" viewBox="0 0 300 300" aria-hidden="true">
-    <linearGradient id="apple-pod-grad" x1="150" x2="150" y1="0" y2="300" gradientUnits="userSpaceOnUse">
-      <stop offset="0" style="stop-color:#f452ff"/>
-      <stop offset="1" style="stop-color:#832bc1"/>
-    </linearGradient>
-    <path fill="url(#apple-pod-grad)" fill-rule="evenodd" d="M294.1 260c-2.9 7.4-9.6 17.8-19.2 25.2-5.5 4.2-12.1 8.3-21.1 11-9.6 2.9-21.5 3.8-36.3 3.8h-135c-14.8 0-26.6-1-36.3-3.8-9-2.7-15.6-6.7-21.1-11-9.5-7.3-16.3-17.8-19.2-25.2C.1 245.1 0 228.2 0 217.5v-135C0 71.8.1 54.9 5.9 40c2.9-7.4 9.6-17.8 19.2-25.2 5.5-4.2 12.1-8.3 21.1-11C55.9 1 67.7 0 82.5 0h135c14.8 0 26.6 1 36.3 3.8 9 2.7 15.6 6.7 21.1 11 9.5 7.3 16.3 17.8 19.2 25.2 5.9 14.9 5.9 31.9 5.9 42.5v135c0 10.7-.1 27.6-5.9 42.5" clip-rule="evenodd"/>
-    <g fill="#fff">
-      <path d="M175.7 181.1c-.4-3.6-1.6-6.2-4-8.6-4.5-4.7-12.4-7.8-21.7-7.8s-17.2 3-21.7 7.8c-2.3 2.5-3.6 5-4 8.6-.8 7-.3 13 .5 22.7.8 9.2 2.3 21.5 4.2 33.9 1.4 8.9 2.5 13.7 3.5 17.1 1.7 5.6 7.8 10.4 17.5 10.4s15.9-4.9 17.5-10.4c1-3.4 2.1-8.2 3.5-17.1 1.9-12.5 3.4-24.7 4.2-33.9.9-9.7 1.3-15.7.5-22.7M174.6 130.1c0 13.6-11 24.6-24.6 24.6s-24.6-11-24.6-24.6 11-24.6 24.6-24.6 24.6 11.1 24.6 24.6"/>
-      <path d="M149.7 33.2C92.3 33.4 45.3 80 44.5 137.4c-.6 46.5 29.1 86.3 70.6 100.9 1 .4 2-.5 1.9-1.5-.5-3.6-1.1-7.2-1.5-10.8-.2-1.3-1-2.3-2.1-2.9-32.8-14.3-55.7-47.2-55.3-85.3.5-50 41.3-90.7 91.2-91.1 51.1-.4 92.8 41 92.8 92 0 37.7-22.8 70.1-55.3 84.4-1.2.5-2 1.6-2.1 2.9l-1.5 10.8c-.2 1.1.9 1.9 1.9 1.5 41.1-14.4 70.6-53.6 70.6-99.6-.2-58.2-47.7-105.6-106-105.5"/>
-      <path d="M147.3 68.2c-37.4 1.4-67.4 32.3-67.9 69.7-.3 24.6 12 46.4 30.9 59.3.9.6 2.2-.1 2.2-1.2-.3-4.3-.3-8.1-.1-12.1.1-1.3-.4-2.5-1.4-3.4-11.5-10.8-18.5-26.2-18.1-43.2.8-30 24.9-54.4 54.9-55.6 32.6-1.3 59.4 24.9 59.4 57.1 0 16.4-7 31.2-18.1 41.7-.9.9-1.4 2.1-1.4 3.4.2 3.9.1 7.7-.1 12-.1 1.1 1.2 1.9 2.2 1.2 18.6-12.7 30.9-34.2 30.9-58.4.1-39.8-33.2-72.1-73.4-70.5"/>
-    </g>
-  </svg>
-            Apple Podcasts
-          </a>
-        </div>
+    </section>
+  ) : entry.data.audio_url ? (
+    <section class="ep-video ep-video--audio" aria-labelledby="audio-section-label">
+      <div class="container">
+        <h2 class="sr-only" id="audio-section-label">
+          {isDE ? 'Episodenaudio' : 'Episode audio'}
+        </h2>
+        <PodcastPlayer
+          audioUrl={entry.data.audio_url}
+          title={entry.data.title}
+          artworkId={artworkId}
+          spotifyUrl={entry.data.spotify_url}
+          duration={entry.data.duration}
+          compact={false}
+          aspect="1/1"
+        />
       </div>
+    </section>
+  ) : null}
 
-      <!-- More episodes card -->
-      {recentOthers.length > 0 && (
-        <div class="aside-card aside-card--episodes">
-          <p class="label" style="margin-bottom:1.25rem">
-            {isDE ? 'Weitere Episoden' : 'More Episodes'}
-          </p>
-          <ul class="aside-ep-list">
-            {recentOthers.map(ep => {
-              const epArt = getArtworkById(ep.data.spotify_url);
-              return (
-                <li class="aside-ep">
-                  <a href={`${prefix}/podcast/${slugify(ep)}`} class="aside-ep__link">
-                    <div class="aside-ep__art">
-                      {epArt ? (
-                        <Image
-                          src={epArt}
-                          alt=""
-                          width={48}
-                          height={48}
-                          class="aside-ep__img"
-                          loading="lazy"
-                          decoding="async"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <div class="aside-ep__img aside-ep__img--fallback" aria-hidden="true">
-                          <span>{String(ep.data.episode_number).padStart(3,'0')}</span>
-                        </div>
-                      )}
-                    </div>
-                    <div class="aside-ep__info">
-                      <span class="aside-ep__num">Ep. {ep.data.episode_number}</span>
-                      <span class="aside-ep__title">{ep.data.title}</span>
-                    </div>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-          <a href={`${prefix}/podcast`} class="aside-all-link">
-            {isDE ? '← Alle Episoden' : '← All Episodes'}
-          </a>
+  <!-- ── BODY LAYOUT ────────────────────────────────────────────────────── -->
+  <div class="container">
+    <div class="ep-layout">
+
+      <!-- Main content -->
+      <article class="ep-body" aria-label={isDE ? 'Episodeninhalt' : 'Episode content'}>
+
+        <!-- Transcript / description -->
+        <section class="ep-section fade-up" aria-labelledby="transcript-heading">
+          <h2 class="ep-section__heading" id="transcript-heading">
+            {isDE ? 'Transkript' : 'Transcript'}
+            <span class="ep-section__badge">
+              {isDE ? 'Vollständig' : 'Full text'}
+            </span>
+          </h2>
+          <div class="ep-description">
+            <Content />
+          </div>
+        </section>
+
+      </article>
+
+      <!-- Sticky sidebar -->
+      <aside class="ep-sidebar" aria-label={isDE ? 'Episoden-Sidebar' : 'Episode sidebar'}>
+
+        <!-- Episode meta card -->
+        <div class="ep-meta-card">
+          <div class="ep-meta-row">
+            <span class="ep-meta-key">{isDE ? 'Episode' : 'Episode'}</span>
+            <span class="ep-meta-val">
+              {String(entry.data.episode_number).padStart(3,'0')}
+            </span>
+          </div>
+          <div class="ep-meta-row">
+            <span class="ep-meta-key">{isDE ? 'Datum' : 'Date'}</span>
+            <time class="ep-meta-val" datetime={entry.data.date.toISOString()}>
+              {formatDate(entry.data.date)}
+            </time>
+          </div>
+          {entry.data.duration && (
+            <div class="ep-meta-row">
+              <span class="ep-meta-key">{isDE ? 'Dauer' : 'Duration'}</span>
+              <span class="ep-meta-val">{fmtDuration(entry.data.duration)}</span>
+            </div>
+          )}
+          <div class="ep-meta-row">
+            <span class="ep-meta-key">{isDE ? 'Kategorie' : 'Category'}</span>
+            <span class="ep-meta-val">{entry.data.category}</span>
+          </div>
+          {entry.data.spotify_url && (
+            <div class="ep-meta-row">
+              <span class="ep-meta-key">Spotify</span>
+              <span class="ep-meta-val">
+                <a href={entry.data.spotify_url} target="_blank" rel="noopener noreferrer">
+                  {isDE ? 'Öffnen ↗' : 'Open ↗'}
+                </a>
+              </span>
+            </div>
+          )}
         </div>
-      )}
 
-    </aside>
+        <!-- Show card -->
+        <a href={`${prefix}/podcast`} class="show-card">
+          <div class="show-card__art">
+            {artwork ? (
+              <Image
+                src={artwork}
+                alt=""
+                width={48}
+                height={48}
+                class="show-card__art-img"
+                loading="lazy"
+                decoding="async"
+                aria-hidden="true"
+              />
+            ) : (
+              <div class="show-card__art-ph" aria-hidden="true">II</div>
+            )}
+          </div>
+          <div class="show-card__info">
+            <p class="show-card__label">{isDE ? 'Podcast' : 'Podcast'}</p>
+            <p class="show-card__name">Iconoclast Insights</p>
+            <p class="show-card__sub">
+              {isDE ? 'Alle Episoden ansehen' : 'View all episodes'}
+            </p>
+          </div>
+        </a>
 
+      </aside>
+    </div>
   </div>
+
+  <!-- Mobile sticky CTA -->
+  <div class="mobile-cta" aria-label={isDE ? 'Episodenaktionen' : 'Episode actions'}>
+    {entry.data.spotify_url && (
+      <a href={entry.data.spotify_url} class="btn btn--outline" target="_blank" rel="noopener noreferrer">
+        {isDE ? 'Auf Spotify' : 'On Spotify'}
+      </a>
+    )}
+    {ytVideoId && (
+      <a href={entry.data.youtube_url} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+        {isDE ? 'Auf YouTube' : 'On YouTube'}
+      </a>
+    )}
+  </div>
+
+  <!-- ── RELATED EPISODES ───────────────────────────────────────────────── -->
+  {related.length > 0 && (
+    <section class="related" aria-labelledby="related-heading">
+      <div class="container">
+        <h2 class="related__heading" id="related-heading">
+          {isDE ? 'Weitere Episoden' : 'More episodes'}
+        </h2>
+        <ul class="related__grid">
+          {related.map(rel => {
+            const relArt = getArtwork(rel);
+            return (
+              <li>
+                <a href={`${prefix}/podcast/${slugify(rel)}`} class="rel-ep-card">
+                  <div class="rel-ep-card__thumb">
+                    {relArt ? (
+                      <Image
+                        src={relArt}
+                        alt=""
+                        width={56}
+                        height={56}
+                        class="rel-ep-card__thumb-img"
+                        loading="lazy"
+                        decoding="async"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <div class="rel-ep-card__thumb-ph" aria-hidden="true">
+                        {String(rel.data.episode_number).padStart(3,'0')}
+                      </div>
+                    )}
+                  </div>
+                  <div class="rel-ep-card__info">
+                    <p class="rel-ep-card__ep">
+                      {isDE ? 'Ep.' : 'Ep.'} {rel.data.episode_number} · {rel.data.category}
+                    </p>
+                    <p class="rel-ep-card__title">{rel.data.title}</p>
+                    {rel.data.duration && (
+                      <p class="rel-ep-card__duration">
+                        {rel.data.duration.split(':').slice(0,2).map(Number).reduce((h,m) => h*60+m, 0)} min
+                      </p>
+                    )}
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">{isDE ? 'Jenseits des Podcasts' : 'Beyond the podcast'}</p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Wenn das hier wie<br><em>Ihr Problem</em> klingt,</Fragment>
+          : <Fragment>If this sounds like<br><em>your problem,</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? '30 Minuten. Keine Vorbereitung. Wir finden die Annahme, die am dringendsten zu untersuchen ist.'
+          : '30 minutes. No preparation. We find the assumption most worth examining first.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/podcast`} class="btn btn--outline">
+          {isDE ? 'Alle Episoden' : 'All Episodes'}
+        </a>
+      </div>
+    </div>
+  </section>
 
 </Base>
 
+<script>
+  // Copy link
+  document.getElementById('copy-link-btn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const url = btn.dataset.url ?? window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c49a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+      setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    } catch {}
+  });
+
+  // Scroll reveal
+  if (!window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+  } else {
+    document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+  }
+</script>
+
 <style>
-  /* ── Hero ──────────────────────────────────────────────────────────── */
-  .ep-hero {
-    position: relative;
-    padding: calc(68px + 4rem) 0 4rem;
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+
+  /* ── Breadcrumb ────────────────────────────────────────────────────────── */
+  .breadcrumb {
+    padding-top: 68px;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-light);
+  }
+  .breadcrumb__inner {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    padding-block: 0.875rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  .breadcrumb__link {
+    color: var(--text-secondary);
+    transition: color 0.2s;
+    text-decoration: none;
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .breadcrumb__link:hover { color: var(--gold); }
+  .breadcrumb__sep { color: var(--text-subtle); user-select: none; padding-inline: 0.125rem; }
+  .breadcrumb__current {
+    color: var(--text-primary);
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40ch;
   }
 
-  .hero-grid {
+  /* ── Episode hero ──────────────────────────────────────────────────────── */
+  .ep-hero {
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+    border-bottom: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+  }
+  .ep-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
+  .ep-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 4rem;
+    align-items: start;
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  }
 
-  .breadcrumb {
+  .ep-hero__meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+  .ep-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  .ep-badge--num { color: var(--text-secondary); background: transparent; border-color: var(--border-light); }
+  .ep-badge--video { color: #1db954; background: rgba(29,185,84,.08); border-color: rgba(29,185,84,.25); }
+
+  .ep-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+  .ep-hero__title em { font-style: italic; color: var(--gold); }
+
+  .ep-summary {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.65;
+    color: var(--gold-light);
+    max-width: 56ch;
+    border-left: 3px solid var(--gold);
+    padding: 0.875rem 1.75rem;
+    background: var(--gold-trans);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: 2rem;
+  }
+
+  .ep-hero__timestamps {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-light);
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 2.5rem;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
   }
-  .breadcrumb a { color: var(--gold); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
+  .ep-hero__timestamps-sep { color: var(--border-light); user-select: none; }
 
-  .ep-hero__inner {
+  /* Listen buttons */
+  .ep-listen { display: flex; flex-direction: column; gap: 0.625rem; }
+  .ep-listen-btn {
     display: flex;
-    gap: 3.5rem;
-    align-items: flex-start;
-  }
-
-  /* Cover art */
-  .ep-hero__art { flex-shrink: 0; }
-
-  .ep-hero__img {
-    width: 220px;
-    height: 220px;
-    object-fit: cover;
-    display: block;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  }
-
-  .ep-hero__img--fallback {
+    align-items: center;
+    gap: 0.875rem;
     background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 0.875rem 1.25rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: border-color 0.2s, color 0.2s;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .ep-listen-btn:hover { border-color: rgba(196,154,60,.3); color: var(--text-primary); }
+  .ep-listen-btn--primary {
+    background: var(--gold);
+    color: #080a10;
+    font-weight: 600;
+    border-color: var(--gold);
+  }
+  .ep-listen-btn--primary:hover { background: var(--gold-light); color: #080a10; border-color: var(--gold-light); }
+  .ep-listen-btn__icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .ep-listen-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    margin-top: 0.25rem;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .ep-share { display: flex; align-items: center; gap: 0.625rem; margin-top: 0.5rem; }
+  .ep-share-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+  }
+  .ep-share-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-
-  .ep-hero__fallback-num {
-    font-family: var(--mono);
-    font-size: 1.5rem;
-    color: var(--gold-dim);
-    letter-spacing: 0.06em;
-  }
-
-  /* Meta row */
-  .ep-hero__meta {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.25rem;
-  }
-
-  .ep-hero__cat {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-    padding: 3px 8px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-  }
-
-  .ep-hero__num,
-  .ep-hero__date {
-    font-family: var(--mono);
-    font-size: 11px;
     color: var(--text-secondary);
-    letter-spacing: 0.04em;
-  }
-  .ep-hero__date { color: var(--text-muted); }
-
-  /* Title + summary */
-  .ep-hero__title {
-    font-family: var(--serif);
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 400;
-    line-height: 1.15;
-    color: var(--text-primary);
-    max-width: 24ch;
-    margin-bottom: 1.25rem;
-  }
-
-  .ep-hero__summary {
-    font-size: var(--text-lg);
-    color: var(--text-secondary);
-    max-width: 52ch;
-    line-height: 1.65;
-    margin-bottom: 2rem;
-  }
-
-  /* Platform badges */
-  .ep-hero__platforms { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-
-  .ep-platform-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
     text-decoration: none;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
   }
+  .ep-share-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
 
-  .ep-platform-badge--spotify {
-    color: #1db954;
-    border-color: rgba(29,185,84,0.3);
-  }
-  .ep-platform-badge--spotify:hover {
-    background: rgba(29,185,84,0.08);
-    border-color: #1db954;
-  }
+  @media (max-width: 820px) { .ep-hero__inner { grid-template-columns: 1fr; } }
 
-  .ep-platform-badge--youtube {
-    color: var(--gold);
-    border-color: var(--border);
+  /* ── Video/audio section ───────────────────────────────────────────────── */
+  .ep-video {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+    padding-block: clamp(2.5rem, 5vw, 4rem);
   }
-  .ep-platform-badge--youtube:hover {
-    background: var(--gold-trans);
-    border-color: var(--gold);
-  }
+  .ep-video--audio { background: var(--bg-base); }
 
-  /* ── Page layout ───────────────────────────────────────────────────── */
+  /* ── Body layout ───────────────────────────────────────────────────────── */
   .ep-layout {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 5rem;
-    padding-top: 4rem;
-    padding-bottom: 6rem;
+    grid-template-columns: 1fr 300px;
+    gap: 4rem;
     align-items: start;
+    padding-block: var(--section);
   }
+  .ep-body { min-width: 0; }
 
-  /* ── Players section ───────────────────────────────────────────────── */
-  .ep-players {
-    margin-bottom: 3rem;
-  }
-
-  .ep-players--secondary {
-    margin-top: -1.5rem;
-    margin-bottom: 3rem;
-  }
-
-  .ep-players__label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.75rem;
-  }
-
-  /* ── Transcript ────────────────────────────────────────────────────── */
-  .ep-transcript {
-    border-top: 1px solid var(--border-light);
-    padding-top: 3rem;
-  }
-
-  .ep-transcript__header {
-    margin-bottom: 2rem;
-  }
-
-  /* Prose styles */
-  .ep-prose :global(h2) {
+  /* ── Episode sections ──────────────────────────────────────────────────── */
+  .ep-section { margin-bottom: 3.5rem; scroll-margin-top: 90px; }
+  .ep-section:last-child { margin-bottom: 0; }
+  .ep-section__heading {
     font-family: var(--serif);
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-size: clamp(1.4rem, 2.3vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+  .ep-section__badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Description prose */
+  .ep-description :global(h2) {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 2vw, 1.6rem);
     font-weight: 400;
     color: var(--text-primary);
-    margin-top: 3rem;
+    margin-top: 2.5rem;
     margin-bottom: 1rem;
-    padding-bottom: 0.6rem;
-    border-bottom: 1px solid var(--border-light);
   }
-
-  .ep-prose :global(h3) {
+  .ep-description :global(h3) {
     font-family: var(--sans);
-    font-size: var(--text-lg);
     font-weight: 600;
+    font-size: 1rem;
     color: var(--text-primary);
-    margin-top: 2.25rem;
-    margin-bottom: 0.75rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.625rem;
   }
-
-  .ep-prose :global(p) {
+  .ep-description :global(p) {
+    font-size: clamp(15px, 1.15vw, 16.5px);
+    line-height: 1.9;
     color: var(--text-secondary);
-    line-height: 1.85;
-    margin-bottom: 1.4rem;
-    font-size: 1.025rem;
+    margin-bottom: 1.25rem;
   }
-
-  .ep-prose :global(strong) { color: var(--text-primary); font-weight: 600; }
-  .ep-prose :global(em) { font-style: italic; color: var(--text-primary); }
-
-  .ep-prose :global(ul),
-  .ep-prose :global(ol) {
+  .ep-description :global(p:last-child) { margin-bottom: 0; }
+  .ep-description :global(strong) { color: var(--text-primary); font-weight: 600; }
+  .ep-description :global(a) {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .ep-description :global(a:hover) { color: var(--gold-light); }
+  .ep-description :global(ul), .ep-description :global(ol) {
     padding-left: 1.5rem;
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.25rem;
     color: var(--text-secondary);
     line-height: 1.8;
   }
-  .ep-prose :global(li) { margin-bottom: 0.5rem; list-style: disc; }
-  .ep-prose :global(ol li) { list-style: decimal; }
-
-  .ep-prose :global(hr) {
-    border: none;
-    border-top: 1px solid var(--border-light);
-    margin: 3rem 0;
-  }
-
-  .ep-prose :global(blockquote) {
-    border-left: 2px solid var(--gold);
-    padding: 0.25rem 0 0.25rem 1.5rem;
-    margin: 2rem 0;
+  .ep-description :global(li) { margin-bottom: 0.5rem; list-style: disc; }
+  .ep-description :global(ol li) { list-style: decimal; }
+  .ep-description :global(blockquote) {
+    border-left: 3px solid var(--gold);
+    padding: 0.875rem 1.75rem;
+    background: var(--gold-trans);
+    border-radius: 0 3px 3px 0;
+    margin-block: 1.5rem;
     font-style: italic;
-    color: var(--text-secondary);
+    font-family: var(--serif);
+    color: var(--gold-light);
+    font-size: 1.1rem;
   }
 
-  /* ── Prev/next nav ─────────────────────────────────────────────────── */
-  .ep-nav {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    margin-top: 4rem;
-  }
-
-  .ep-nav__item {
+  /* ── Sidebar ───────────────────────────────────────────────────────────── */
+  .ep-sidebar {
+    position: sticky;
+    top: calc(68px + 2rem);
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
-    padding: 1.5rem;
-    background: var(--bg-card);
-    text-decoration: none;
-    transition: background 0.2s;
+    gap: 1.5rem;
   }
-  .ep-nav__item:hover { background: var(--bg-elevated); }
-  .ep-nav__item--next { text-align: right; border-left: 1px solid var(--border-light); }
 
-  .ep-nav__dir {
+  .ep-meta-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .ep-meta-row {
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 13px;
+  }
+  .ep-meta-row:last-child { border-bottom: none; }
+  .ep-meta-key {
     font-family: var(--mono);
     font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--text-subtle);
+    flex-shrink: 0;
   }
-  .ep-nav__item--next .ep-nav__dir { justify-content: flex-end; }
+  .ep-meta-val { color: var(--text-secondary); text-align: right; line-height: 1.4; }
+  .ep-meta-val a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 
-  .ep-nav__title {
-    font-family: var(--serif);
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .ep-nav__item:hover .ep-nav__title { color: var(--text-primary); }
-
-  /* ── Sidebar ───────────────────────────────────────────────────────── */
-  .ep-sidebar { position: sticky; top: calc(68px + 2rem); }
-
-  .aside-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
-  }
-
-  .aside-card + .aside-card { margin-top: 1.25rem; }
-
-  .aside-card__text {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 1.25rem;
-  }
-
-  .aside-card__btns {
+  .show-card {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: flex-start;
+    gap: 1rem;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 1.25rem;
+    text-decoration: none;
+    transition: border-color 0.2s;
   }
-
-  .aside-btn {
-    display: inline-flex;
+  .show-card:hover { border-color: rgba(196,154,60,.25); }
+  .show-card__art {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+  }
+  .show-card__art-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .show-card__art-ph {
+    width: 100%;
+    height: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    border-radius: 2px;
     font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-size: 9px;
+    color: var(--text-subtle);
+  }
+  .show-card__label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    text-decoration: none;
-    border: 1px solid var(--border);
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-  }
-
-  .aside-btn--spotify {
-    color: #1db954;
-    border-color: rgba(29,185,84,0.3);
-  }
-  .aside-btn--spotify:hover {
-    background: rgba(29,185,84,0.08);
-    border-color: #1db954;
-  }
-
-  .aside-btn--youtube {
     color: var(--gold);
-    border-color: var(--border);
+    margin-bottom: 3px;
   }
-  .aside-btn--youtube:hover {
-    background: var(--gold-trans);
-    border-color: var(--gold);
+  .show-card__name { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+  .show-card__sub { font-size: 12px; color: var(--text-subtle); }
+
+  @media (max-width: 960px) {
+    .ep-layout { grid-template-columns: 1fr; }
+    .ep-sidebar { display: none; }
   }
 
-  .aside-btn--apple {
-    color: #b150e2;
-    border-color: rgba(177, 80, 226, 0.3);
+  /* ── Mobile sticky CTA ─────────────────────────────────────────────────── */
+  .mobile-cta {
+    display: none;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-light);
+    padding: 1.25rem var(--gutter);
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
   }
-  .aside-btn--apple:hover {
-    background: rgba(177, 80, 226, 0.08);
-    border-color: #b150e2; 
-  }
+  @media (max-width: 960px) { .mobile-cta { display: flex; } }
 
-  /* Recent episodes list in sidebar */
-  .aside-ep-list {
+  /* ── Related episodes ──────────────────────────────────────────────────── */
+  .related {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+    padding-block: var(--section);
+  }
+  .related__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+  }
+  .related__grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; }
+
+  .rel-ep-card {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
     display: flex;
-    flex-direction: column;
-    gap: 1px;
-    margin-bottom: 1.25rem;
-    background: var(--border-light);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-  }
-
-  .aside-ep { background: var(--bg-elevated); }
-  .aside-ep:hover { background: var(--bg-card-alt); }
-
-  .aside-ep__link {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: 1rem;
+    padding: 1.25rem;
     text-decoration: none;
     color: inherit;
+    transition: border-color 0.2s, transform 0.2s;
+    align-items: flex-start;
   }
+  .rel-ep-card:hover { border-color: rgba(196,154,60,.25); transform: translateY(-2px); }
 
-  .aside-ep__art { flex-shrink: 0; }
-
-  .aside-ep__img {
-    width: 44px;
-    height: 44px;
-    object-fit: cover;
-    border-radius: 2px;
-    display: block;
+  .rel-ep-card__thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
   }
-
-  .aside-ep__img--fallback {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+  .rel-ep-card__thumb-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rel-ep-card__thumb-ph {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--mono);
-    font-size: 9px;
-    color: var(--gold-dim);
-    letter-spacing: 0.06em;
+    font-size: 10px;
+    color: var(--text-subtle);
   }
-
-  .aside-ep__info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    min-width: 0;
-  }
-
-  .aside-ep__num {
+  .rel-ep-card__ep {
     font-family: var(--mono);
     font-size: 9px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gold);
+    margin-bottom: 4px;
   }
-
-  .aside-ep__title {
-    font-size: 0.78rem;
-    color: var(--text-secondary);
-    line-height: 1.35;
+  .rel-ep-card__title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.3;
+    transition: color 0.2s;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .aside-ep__link:hover .aside-ep__title { color: var(--text-primary); }
+  .rel-ep-card:hover .rel-ep-card__title { color: var(--gold-light); }
+  .rel-ep-card__duration { font-family: var(--mono); font-size: 10px; color: var(--text-subtle); margin-top: 4px; }
 
-  .aside-all-link {
-    display: block;
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gold);
-    text-decoration: none;
-  }
-  .aside-all-link:hover { text-decoration: underline; }
+  @media (max-width: 960px) and (min-width: 721px) { .related__grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 720px) { .related__grid { grid-template-columns: 1fr; } }
 
-  /* ── Responsive ────────────────────────────────────────────────────── */
-  @media (max-width: 1024px) {
-    .ep-layout { grid-template-columns: 1fr 240px; gap: 3rem; }
-  }
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band__inner { position:relative;z-index:1 }
+  .cta-band__label { margin-bottom:1.5rem;justify-content:center }
+  .cta-band__label::before { display:none }
+  .cta-band__heading { font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem }
+  .cta-band__heading em { font-style:italic;color:var(--gold) }
+  .cta-band__sub { font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem }
+  .cta-band__actions { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap }
 
-  @media (max-width: 900px) {
-    .ep-hero__inner { flex-direction: column; gap: 2rem; }
-    .ep-hero__img { width: 160px; height: 160px; }
-    .ep-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .ep-sidebar { position: static; }
-  }
-
-  @media (max-width: 640px) {
-    .ep-nav { grid-template-columns: 1fr; }
-    .ep-nav__item--next { border-left: none; border-top: 1px solid var(--border-light); text-align: left; }
-    .ep-nav__item--next .ep-nav__dir { justify-content: flex-start; }
-  }
+  /* ── Fade ──────────────────────────────────────────────────────────────── */
+  .fade-up { opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease }
+  .fade-up.visible { opacity:1;transform:translateY(0) }
 </style>

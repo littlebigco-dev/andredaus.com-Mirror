@@ -14,6 +14,13 @@ const services = allServices
 function slugify(entry: typeof services[number]) {
   return entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
 }
+
+const serviceCount = services.length;
+
+// Derive unique filter categories from the collection
+const allTypes = Array.from(
+  new Set(services.flatMap(s => s.data.type ?? []))
+).sort();
 ---
 
 <Base
@@ -24,223 +31,697 @@ function slugify(entry: typeof services[number]) {
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- HERO -->
-  <header class="coll-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- ── PAGE HERO ──────────────────────────────────────────────────────── -->
+  <header class="page-hero" aria-labelledby="page-heading">
+    <div class="page-hero__grid" aria-hidden="true"></div>
     <div class="container">
-      <p class="label">{isDE ? 'Leistungen' : 'Services'}</p>
-      <h1 class="coll-hero__heading">
-        {isDE
-          ? <Fragment>Die richtige Art <em>zusammenzuarbeiten.</em></Fragment>
-          : <Fragment>The right way to <em>work together.</em></Fragment>}
-      </h1>
-      <p class="coll-hero__sub">
-        {isDE
-          ? 'Jedes Engagement beginnt mit dem gleichen Ausgangspunkt: Ihren Annahmen. Das Format hängt davon ab, was wirklich los ist.'
-          : 'Every engagement starts from the same place: your assumptions. The format depends on what\'s actually going on.'}
-      </p>
-      <a href={`${prefix}/contact`} class="btn btn--outline" style="margin-top:2rem">
-        {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
-      </a>
+      <div class="page-hero__inner">
+
+        <div>
+          <p class="label" style="margin-bottom:1.25rem">
+            {isDE ? 'Wie ich arbeite' : 'How I work'}
+          </p>
+          <h1 class="page-hero__heading" id="page-heading">
+            {isDE
+              ? <Fragment>Jedes Engagement beginnt mit der gleichen Frage: <em>Was sehen Sie nicht?</em></Fragment>
+              : <Fragment>Every engagement starts with the same question: <em>what are you not seeing?</em></Fragment>}
+          </h1>
+          <p class="page-hero__lede">
+            {isDE
+              ? 'Mehrere Wege zur Zusammenarbeit. Eine Methodik dahinter. Das Ziel ist immer dasselbe: Kompetenz, die Sie behalten, wenn ich gegangen bin.'
+              : 'Several ways to engage. One methodology behind all of them. The goal is always the same: capability you keep when I leave.'}
+          </p>
+        </div>
+
+        {serviceCount > 0 && (
+          <div class="page-hero__aside" aria-hidden="true">
+            <div>
+              <div class="page-hero__aside-number">{serviceCount}</div>
+              <div class="page-hero__aside-label">
+                {isDE ? 'Leistungen' : 'Engagements'}
+              </div>
+            </div>
+            <div>
+              <div class="page-hero__aside-number" style="font-size:1.5rem;font-style:normal">
+                {isDE ? 'Eine' : 'One'}
+              </div>
+              <div class="page-hero__aside-label">
+                {isDE ? 'Methodik' : 'Methodology'}
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   </header>
 
-  <!-- SERVICE CARDS -->
-  <section class="section" aria-label={isDE ? 'Leistungsübersicht' : 'Services overview'}>
-    <div class="container">
+  <!-- ── TYPE FILTER NAV ────────────────────────────────────────────────── -->
+  {allTypes.length > 1 && (
+    <nav
+      class="type-nav"
+      aria-label={isDE ? 'Leistungen filtern' : 'Filter services by type'}
+    >
+      <div class="container">
+        <div
+          class="type-nav__inner"
+          role="group"
+          aria-label={isDE ? 'Leistungstyp-Filter' : 'Service type filter'}
+        >
+          <button class="type-btn" data-filter="all" aria-pressed="true">
+            {isDE ? 'Alle' : 'All'}
+          </button>
+          {allTypes.map(type => (
+            <button class="type-btn" data-filter={type} aria-pressed="false">
+              {type === 'individual' ? (isDE ? 'Einzelperson'  : 'Individual')       : ''}
+              {type === 'team'       ? (isDE ? 'Team & Org.'   : 'Team & Organisation') : ''}
+              {type === 'workshop'   ? (isDE ? 'Workshops'     : 'Workshops')        : ''}
+              {type === 'cohort'     ? (isDE ? 'Gruppe/Kohorte': 'Group / Cohort')   : ''}
+            </button>
+          ))}
+        </div>
+      </div>
+    </nav>
+  )}
+
+  <!-- ── SERVICES LIST ──────────────────────────────────────────────────── -->
+  <section aria-label={isDE ? 'Leistungsübersicht' : 'Services overview'} style="padding-inline:0">
+    <div style="max-width:var(--max-w);margin-inline:auto">
+
       {services.length === 0 ? (
-        <p class="empty-state">{isDE ? 'Keine aktiven Leistungen.' : 'No active services.'}</p>
+        <div class="container" style="padding-block:var(--section)">
+          <p class="empty-state">
+            {isDE ? 'Keine aktiven Leistungen.' : 'No active services.'}
+          </p>
+        </div>
       ) : (
-        <ul class="services-grid">
-          {services.map(entry => (
-            <li class="service-card fade-up">
-              <div class="service-card__body">
-                <div class="service-card__meta">
-                  <span class="service-price">{entry.data.price}</span>
-                  <span class="service-format">{entry.data.format}</span>
+        <ul class="services-grid" id="services-grid">
+          {services.map((entry, i) => (
+            <li
+              class="service-row fade-up"
+              data-type={(entry.data.type ?? []).join(' ')}
+            >
+              <!-- Image column — placeholder until real images are added -->
+              <div class="service-row__image" aria-hidden="true">
+                <div class="img-ph">
+                  <span class="img-ph__icon">◎</span>
+                  <span class="img-ph__tag">{entry.data.title}</span>
                 </div>
-                <h2 class="service-card__title">
-                  <a href={`${prefix}/services/${slugify(entry)}`} class="service-card__link">
-                    {entry.data.title}
-                  </a>
-                </h2>
-                <a href={`${prefix}/services/${slugify(entry)}`} class="btn btn--outline service-card__cta">
-                  {entry.data.cta_label}
+              </div>
+
+              <!-- Content column -->
+              <div class="service-row__content">
+                {entry.data.engagement_type && (
+                  <span class="service-row__type">{entry.data.engagement_type}</span>
+                )}
+
+                <h2 class="service-row__title">{entry.data.title}</h2>
+
+                {entry.data.one_liner && (
+                  <p class="service-row__oneliner">{entry.data.one_liner}</p>
+                )}
+
+                {entry.data.description && (
+                  <p class="service-row__body">{entry.data.description}</p>
+                )}
+
+                <dl class="service-row__meta">
+                  <div class="service-row__meta-item">
+                    <dt class="service-row__meta-label">
+                      {isDE ? 'Format' : 'Format'}
+                    </dt>
+                    <dd class="service-row__meta-value">{entry.data.format}</dd>
+                  </div>
+                  {entry.data.duration && (
+                    <div class="service-row__meta-item">
+                      <dt class="service-row__meta-label">
+                        {isDE ? 'Dauer' : 'Duration'}
+                      </dt>
+                      <dd class="service-row__meta-value">{entry.data.duration}</dd>
+                    </div>
+                  )}
+                  {entry.data.suitable_for && (
+                    <div class="service-row__meta-item">
+                      <dt class="service-row__meta-label">
+                        {isDE ? 'Geeignet für' : 'Suitable for'}
+                      </dt>
+                      <dd class="service-row__meta-value">{entry.data.suitable_for}</dd>
+                    </div>
+                  )}
+                </dl>
+
+                <a
+                  href={`${prefix}/services/${slugify(entry)}`}
+                  class="service-row__link"
+                  aria-label={isDE
+                    ? `Details zu ${entry.data.title}`
+                    : `View ${entry.data.title} service details`}
+                >
+                  {isDE ? 'Leistung ansehen' : 'View this service'}
                 </a>
               </div>
             </li>
           ))}
         </ul>
       )}
+
     </div>
   </section>
 
-  <!-- PROCESS STRIP -->
-  <section class="process-strip section" aria-labelledby="process-heading">
+  <!-- ── CONNECT SECTION ────────────────────────────────────────────────── -->
+  <section class="connect section" aria-labelledby="connect-heading">
     <div class="container">
-      <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Der Prozess' : 'The process'}</p>
-      <h2 class="process-strip__heading" id="process-heading">
+      <div class="connect__inner">
+
+        <div>
+          <p class="label" style="margin-bottom:1.25rem">
+            {isDE ? 'Unsicher, wo anfangen?' : 'Not sure where to start?'}
+          </p>
+          <h2 class="connect__heading" id="connect-heading">
+            {isDE
+              ? 'Die meisten Engagements beginnen gleich'
+              : 'Most engagements begin the same way'}
+          </h2>
+          <p class="connect__sub">
+            {isDE
+              ? 'Der Discovery Call ist kein Verkaufsgespräch. Es sind dreißig Minuten systematischer Befragung, um die Annahme zu finden, die am dringendsten zu untersuchen ist.'
+              : 'The discovery call isn\'t a sales call. It\'s thirty minutes of systematic questioning designed to surface the assumption most worth examining first.'}
+          </p>
+          <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+            {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+          </a>
+        </div>
+
+        <ol class="connect__paths" aria-label={isDE ? 'Typischer Engagement-Pfad' : 'Typical engagement path'}>
+          <li class="connect__path">
+            <span class="connect__path-num" aria-label={isDE ? 'Schritt 1' : 'Step 1'}>1</span>
+            <div>
+              <h3 class="connect__path-title">
+                {isDE ? 'Discovery Call — keine Vorbereitung nötig' : 'Discovery Call — no preparation needed'}
+              </h3>
+              <p class="connect__path-body">
+                {isDE
+                  ? '30 Minuten. Ich stelle Fragen, die die Annahmen hinter Ihrem dringendsten Problem aufdecken. Sie gehen mit Klarheit, unabhängig davon, ob wir fortfahren.'
+                  : '30 minutes. I ask questions that surface the assumptions behind your most pressing problem. You leave with clarity regardless of whether we proceed.'}
+              </p>
+            </div>
+          </li>
+          <li class="connect__path">
+            <span class="connect__path-num" aria-label={isDE ? 'Schritt 2' : 'Step 2'}>2</span>
+            <div>
+              <h3 class="connect__path-title">
+                {isDE ? 'Scopiertes Engagement — Projekt oder Retainer' : 'Scoped engagement — project or retainer'}
+              </h3>
+              <p class="connect__path-body">
+                {isDE
+                  ? 'Basierend auf dem, was der Call zeigt, empfehle ich das geeignetste Engagement. Keine Zweideutigkeit darüber, was Sie bekommen.'
+                  : 'Based on what the call surfaces, I\'ll recommend the most appropriate engagement. No ambiguity about what you\'re getting.'}
+              </p>
+            </div>
+          </li>
+          <li class="connect__path">
+            <span class="connect__path-num" aria-label={isDE ? 'Schritt 3' : 'Step 3'}>3</span>
+            <div>
+              <h3 class="connect__path-title">
+                {isDE ? 'Kompetenz-Transfer — keine Abhängigkeit' : 'Capability transfer — not dependency'}
+              </h3>
+              <p class="connect__path-body">
+                {isDE
+                  ? 'Jedes Engagement endet damit, dass Sie Ihr eigenes Denken stärker unabhängig herausfordern können. Eine Rückkehr sollte aus eigener Wahl erfolgen — nicht weil ich einen Bedarf geschaffen habe.'
+                  : 'Every engagement ends with you in a stronger position to challenge your own thinking independently. A return engagement should be by choice — not because I\'ve created a need for it.'}
+              </p>
+            </div>
+          </li>
+        </ol>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Bereit?' : 'Ready?'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
         {isDE
-          ? 'Jedes Engagement folgt dem gleichen Pfad. Die Tiefe variiert. Der Einstieg tut es nicht.'
-          : 'Every engagement follows the same path. The depth varies. The entry point doesn\'t.'}
+          ? <Fragment>Das richtige Engagement beginnt mit <em>der richtigen Frage.</em></Fragment>
+          : <Fragment>The right engagement starts with <em>the right question.</em></Fragment>}
       </h2>
-      <div class="process-steps">
-        <div class="process-step">
-          <span class="process-step__num" aria-hidden="true">01</span>
-          <h3 class="process-step__title">{isDE ? 'Discovery Call' : 'Discovery Call'}</h3>
-          <p class="process-step__body">{isDE ? '30 Minuten. Kein Pitch. Ich stelle Fragen.' : '30 minutes. No pitch. I ask questions.'}</p>
-        </div>
-        <div class="process-step">
-          <span class="process-step__num" aria-hidden="true">02</span>
-          <h3 class="process-step__title">{isDE ? 'Diagnose' : 'Diagnosis'}</h3>
-          <p class="process-step__body">{isDE ? 'Wir finden heraus, was wirklich los ist — und welches Format passt.' : 'We find out what\'s actually going on — and which format fits.'}</p>
-        </div>
-        <div class="process-step">
-          <span class="process-step__num" aria-hidden="true">03</span>
-          <h3 class="process-step__title">{isDE ? 'Arbeit' : 'Work'}</h3>
-          <p class="process-step__body">{isDE ? 'Strukturierte gegnerische Untersuchung. Echte Ergebnisse.' : 'Structured adversarial examination. Real outcomes.'}</p>
-        </div>
-        <div class="process-step">
-          <span class="process-step__num" aria-hidden="true">04</span>
-          <h3 class="process-step__title">{isDE ? 'Transfer' : 'Transfer'}</h3>
-          <p class="process-step__body">{isDE ? 'Die Methodik gehört Ihnen. Sie brauchen mich nicht dauerhaft.' : 'The methodology is yours. You don\'t need me permanently.'}</p>
-        </div>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein 30-minütiger Discovery Call reicht aus, um sie zu finden. Keine Vorbereitung Ihrerseits erforderlich.'
+          : 'A 30-minute discovery call is enough to find it. No preparation required on your part.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/use-cases`} class="btn btn--outline">
+          {isDE ? 'Use Cases ansehen' : 'See use cases'}
+        </a>
       </div>
     </div>
   </section>
 
 </Base>
 
+<script>
+  // ── Type filter ───────────────────────────────────────────────────────────
+  const btns = document.querySelectorAll<HTMLButtonElement>('.type-btn');
+  const rows = document.querySelectorAll<HTMLElement>('.service-row');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.setAttribute('aria-pressed', 'false'));
+      btn.setAttribute('aria-pressed', 'true');
+
+      const filter = btn.dataset.filter ?? 'all';
+      rows.forEach(row => {
+        const types = row.dataset.type ?? '';
+        row.style.display =
+          filter === 'all' || types.split(' ').includes(filter) ? '' : 'none';
+      });
+    });
+  });
+
+  // ── Fade-up on scroll ─────────────────────────────────────────────────────
+  const io = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    }),
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+</script>
+
 <style>
-  .coll-hero {
+  /* ── Page hero ─────────────────────────────────────────────────────────── */
+  .page-hero {
+    padding-top: 68px;
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 60%);
+    border-bottom: 1px solid var(--border-light);
     position: relative;
-    padding: calc(68px + var(--section)) 0 var(--section);
     overflow: hidden;
   }
-  .hero-grid {
+
+  .page-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
-  .coll-hero .label { margin-bottom: 1.25rem; }
-  .coll-hero__heading {
+
+  .page-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: end;
+    padding-block: clamp(4rem, 8vw, 6rem) clamp(3rem, 6vw, 5rem);
+  }
+
+  .page-hero__heading {
     font-family: var(--serif);
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-size: clamp(2.2rem, 5vw, 3.75rem);
     font-weight: 400;
     line-height: 1.1;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
+    max-width: 20ch;
+    margin-bottom: 1.25rem;
   }
-  .coll-hero__heading em { font-style: italic; color: var(--gold); }
-  .coll-hero__sub {
-    max-width: 52ch;
+  .page-hero__heading em { font-style: italic; color: var(--gold); }
+
+  .page-hero__lede {
+    font-size: clamp(1rem, 1.3vw, 1.05rem);
     color: var(--text-secondary);
-    font-size: var(--text-lg);
+    line-height: 1.85;
+    max-width: 52ch;
   }
 
-  /* Services grid */
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .service-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    transition: border-color var(--transition-base);
-  }
-  .service-card:hover { border-color: var(--border); }
-
-  .service-card__body {
-    padding: 2rem;
+  .page-hero__aside {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    height: 100%;
+    gap: 1.5rem;
+    align-items: flex-end;
   }
-
-  .service-card__meta {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .service-price {
-    font-family: var(--mono);
-    font-size: var(--text-lg);
-    font-weight: 500;
+  .page-hero__aside-number {
+    font-family: var(--serif);
+    font-size: 2.25rem;
+    font-style: italic;
     color: var(--gold);
+    line-height: 1;
   }
-  .service-format {
+  .page-hero__aside-label {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-muted);
   }
 
-  .service-card__title {
+  @media (max-width: 760px) {
+    .page-hero__inner { grid-template-columns: 1fr; }
+    .page-hero__aside { display: none; }
+  }
+
+  /* ── Type filter nav ───────────────────────────────────────────────────── */
+  .type-nav {
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 68px;
+    z-index: 50;
+  }
+
+  .type-nav__inner {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .type-nav__inner::-webkit-scrollbar { display: none; }
+
+  .type-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 1.1rem 1.5rem;
+    min-height: 48px;
+    color: var(--text-muted);
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .type-btn:hover { color: var(--text-primary); }
+  .type-btn[aria-pressed="true"] {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* ── Services grid ─────────────────────────────────────────────────────── */
+  .services-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--border-light);
+    transition: background 0.2s;
+  }
+  .service-row:first-child { border-top: 1px solid var(--border-light); }
+  .service-row:hover { background: rgba(196,154,60,0.02); }
+
+  /* Alternate image/content sides */
+  .service-row:nth-child(even) .service-row__image {
+    order: 1;
+    border-right: none;
+    border-left: 1px solid var(--border-light);
+  }
+  .service-row:nth-child(even) .service-row__content { order: 0; }
+
+  /* Image column */
+  .service-row__image {
+    position: relative;
+    min-height: 320px;
+    overflow: hidden;
+    border-right: 1px solid var(--border-light);
+  }
+
+  .img-ph {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    background: var(--bg-elevated);
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem;
+    text-align: center;
+  }
+  .img-ph__icon {
+    font-size: 2rem;
+    opacity: 0.15;
+    color: var(--gold);
+  }
+  .img-ph__tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  /* Content column */
+  .service-row__content {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .service-row__type {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .service-row__title {
     font-family: var(--serif);
-    font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 400;
     line-height: 1.2;
     color: var(--text-primary);
+  }
+
+  .service-row__oneliner {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--gold-light);
+    line-height: 1.5;
+  }
+
+  .service-row__body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-secondary);
     flex: 1;
   }
-  .service-card__link { text-decoration: none; color: inherit; }
-  .service-card__link:hover { color: var(--gold); }
-  .service-card__cta { align-self: flex-start; margin-top: auto; }
 
-  /* Process strip */
-  .process-strip {
+  .service-row__meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+  }
+  .service-row__meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .service-row__meta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .service-row__meta-value {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .service-row__link {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap 0.2s;
+    min-height: 32px;
+    width: fit-content;
+  }
+  .service-row__link::after { content: '→'; }
+  .service-row__link:hover { gap: 14px; }
+
+  @media (max-width: 860px) {
+    .service-row { grid-template-columns: 1fr; }
+    .service-row__image {
+      min-height: 220px;
+      border-right: none;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .service-row:nth-child(even) .service-row__image {
+      order: 0;
+      border-left: none;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .service-row:nth-child(even) .service-row__content { order: 1; }
+    .service-row__content { padding: 2rem; }
+  }
+
+  /* ── Connect section ───────────────────────────────────────────────────── */
+  .connect {
     background: var(--bg-surface);
     border-top: 1px solid var(--border-light);
   }
-  .process-strip__heading {
-    font-family: var(--serif);
-    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
-    font-weight: 400;
-    color: var(--text-primary);
-    max-width: 50ch;
-    margin-bottom: 3rem;
-  }
-  .process-steps {
+
+  .connect__inner {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 5rem;
+    align-items: start;
   }
-  .process-step__num {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--gold-dim);
-    letter-spacing: 0.1em;
-    display: block;
+
+  .connect__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
     margin-bottom: 1rem;
   }
-  .process-step__title {
-    font-family: var(--sans);
-    font-size: var(--text-base);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-  }
-  .process-step__body {
-    font-size: var(--text-sm);
+
+  .connect__sub {
+    font-size: 14px;
     color: var(--text-secondary);
-    line-height: 1.6;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    max-width: 44ch;
   }
 
-  .empty-state { color: var(--text-subtle); font-style: italic; padding: 3rem 0; }
-
-  @media (max-width: 800px) {
-    .process-steps { grid-template-columns: repeat(2, 1fr); }
+  .connect__paths {
+    display: flex;
+    flex-direction: column;
   }
-  @media (max-width: 500px) {
-    .process-steps { grid-template-columns: 1fr; }
-    .services-grid { grid-template-columns: 1fr; }
+
+  .connect__path {
+    padding-block: 1.75rem;
+    border-bottom: 1px solid var(--border-light);
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .connect__path:first-child { border-top: 1px solid var(--border-light); }
+
+  .connect__path-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.75rem;
+    color: var(--gold-dim);
+    line-height: 1.1;
+  }
+
+  .connect__path-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.4rem;
+  }
+
+  .connect__path-body {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+  }
+
+  @media (max-width: 820px) {
+    .connect__inner { grid-template-columns: 1fr; gap: 3rem; }
+  }
+
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band {
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding-block: 5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,0.06), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-band__inner { position: relative; z-index: 1; }
+
+  .cta-band__label {
+    margin-bottom: 1.5rem;
+    justify-content: center;
+  }
+  .cta-band__label::before { display: none; }
+
+  .cta-band__heading {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text-primary);
+    max-width: 22ch;
+    margin-inline: auto;
+    margin-bottom: 1.25rem;
+  }
+  .cta-band__heading em { font-style: italic; color: var(--gold); }
+
+  .cta-band__sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 46ch;
+    margin-inline: auto;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+  }
+
+  .cta-band__actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ── Shared ────────────────────────────────────────────────────────────── */
+  .empty-state {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 3rem 0;
+  }
+
+  .fade-up {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>

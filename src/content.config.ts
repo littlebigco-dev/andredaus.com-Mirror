@@ -17,12 +17,58 @@ const insights = defineCollection({
 const services = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/services' }),
   schema: z.object({
-    title: z.string(),
-    status: z.enum(['active', 'retired']),
-    price: z.string(),
-    format: z.string(),
-    cta_label: z.string(),
+    // ── Existing fields ──────────────────────────────────────────────────
+    title:              z.string(),
+    status:             z.enum(['active', 'retired']),
+    price:              z.string(),
+    format:             z.string(),
+    cta_label:          z.string(),
     featured_use_cases: z.array(reference('use-cases')).default([]),
+ 
+    // ── New fields ───────────────────────────────────────────────────────
+ 
+    /** Filter tags for the archive type-nav. One or more of these values.
+     *  e.g. ["individual"] or ["individual", "team"] */
+    type: z.array(
+      z.enum(['individual', 'team', 'workshop', 'cohort'])
+    ).default(['individual']),
+ 
+    /** Shown in the hero badge: "Discovery Engagement · Individual or Team" */
+    engagement_type: z.string().optional(),
+ 
+    /** Short italic gold one-liner under the title */
+    one_liner: z.string().optional(),
+ 
+    /** 2–3 sentence hero description (longer than summary) */
+    description: z.string().optional(),
+ 
+    /** Stats strip values */
+    duration:     z.string().optional(),   // "1–3 days"
+    group_size:   z.string().optional(),   // "Individual" / "6–20"
+    delivery:     z.string().optional(),   // "On-site, remote, or both"
+    suitable_for: z.string().optional(),   // "Leaders, founders, teams"
+ 
+    /** Pull quote for the detail page body */
+    pull_quote: z.string().optional(),
+ 
+    /** Outcomes list — "What you leave with" section */
+    outcomes: z.array(z.object({
+      name:        z.string(),
+      description: z.string(),
+    })).default([]),
+ 
+    /** Who it's for cards */
+    for_profiles: z.array(z.object({
+      title: z.string(),
+      body:  z.string(),
+    })).default([]),
+ 
+    /** Not-for disclaimer */
+    not_for: z.string().optional(),
+ 
+    /** OG / SEO */
+    og_title: z.string().optional(),
+    og_image: z.string().url().optional(),
   }),
 });
 

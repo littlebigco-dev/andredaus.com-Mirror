@@ -1,5 +1,5 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
 export async function getStaticPaths() {
@@ -8,7 +8,7 @@ export async function getStaticPaths() {
     .filter(e => e.id.startsWith('en/') && e.data.status === 'active')
     .map(entry => ({
       params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
-      props: { entry },
+      props:  { entry },
     }));
 }
 
@@ -19,259 +19,887 @@ const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
 
-// Load featured use cases
-const featuredUseCases = await Promise.all(
-  entry.data.featured_use_cases.map(ref => getEntry(ref))
-);
-const validUseCases = featuredUseCases.filter(Boolean);
+// Related services — other active services, excluding this one, up to 3
+const allServices = await getCollection('services');
+const related = allServices
+  .filter(e =>
+    e.id.startsWith(isDE ? 'de/' : 'en/') &&
+    e.data.status === 'active' &&
+    e.id !== entry.id
+  )
+  .slice(0, 3);
+
+function slugify(e: typeof related[number]) {
+  return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+}
+
+const {
+  title,
+  engagement_type,
+  one_liner,
+  description,
+  format,
+  duration,
+  group_size,
+  delivery,
+  suitable_for,
+  pull_quote,
+  outcomes,
+  for_profiles,
+  not_for,
+  og_title,
+  og_image,
+} = entry.data;
+
+// Stats strip — only show rows that have values
+const stats = [
+  { label: isDE ? 'Format'        : 'Format',       value: format       },
+  { label: isDE ? 'Dauer'         : 'Duration',      value: duration     },
+  { label: isDE ? 'Teilnehmer'    : 'Participants',  value: group_size   },
+  { label: isDE ? 'Durchführung'  : 'Delivery',      value: delivery     },
+].filter(s => s.value);
 ---
 
 <Base
-  title={`${entry.data.title} — André Daus`}
-  description={isDE
-    ? `${entry.data.price} · ${entry.data.format}`
-    : `${entry.data.price} · ${entry.data.format}`}
+  title={`${og_title ?? title} — André Daus`}
+  description={description}
+  ogImage={og_image}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- HERO -->
-  <header class="service-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- ── BREADCRUMB ─────────────────────────────────────────────────────── -->
+  <div class="breadcrumb">
     <div class="container">
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href={`${prefix}/services`}>{isDE ? 'Leistungen' : 'Services'}</a>
+      <nav class="breadcrumb__inner" aria-label="Breadcrumb">
+        <a href={`${prefix}/`}        class="breadcrumb__link">
+          {isDE ? 'Start' : 'Home'}
+        </a>
         <span aria-hidden="true">/</span>
-        <span aria-current="page">{entry.data.title}</span>
+        <a href={`${prefix}/services`} class="breadcrumb__link">
+          {isDE ? 'Leistungen' : 'Services'}
+        </a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{title}</span>
       </nav>
+    </div>
+  </div>
 
+  <!-- ── SERVICE HERO ───────────────────────────────────────────────────── -->
+  <header class="service-hero" aria-labelledby="service-title">
+    <div class="service-hero__grid" aria-hidden="true"></div>
+    <div class="container">
       <div class="service-hero__inner">
+
+        <!-- Content side -->
         <div class="service-hero__content">
-          <p class="label" style="margin-bottom:1.25rem">{isDE ? 'Leistung' : 'Service'}</p>
-          <h1 class="service-hero__title">{entry.data.title}</h1>
-
-          <div class="service-hero__details">
-            <div class="service-detail">
-              <span class="service-detail__label">{isDE ? 'Preis' : 'Price'}</span>
-              <span class="service-detail__value">{entry.data.price}</span>
-            </div>
-            <div class="service-detail">
-              <span class="service-detail__label">{isDE ? 'Format' : 'Format'}</span>
-              <span class="service-detail__value">{entry.data.format}</span>
-            </div>
-          </div>
-
-          <div class="service-hero__actions">
+          {engagement_type && (
+            <span class="service-hero__type">{engagement_type}</span>
+          )}
+          <h1 class="service-hero__title" id="service-title">{title}</h1>
+          {one_liner && (
+            <p class="service-hero__oneliner">{one_liner}</p>
+          )}
+          {description && (
+            <p class="service-hero__lede">{description}</p>
+          )}
+          <div class="service-hero__ctas">
             <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
-              {entry.data.cta_label}
+              {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
             </a>
             <a href={`${prefix}/services`} class="btn btn--outline">
-              {isDE ? 'Alle Leistungen' : 'All Services'}
+              {isDE ? 'Alle Leistungen' : 'All services'}
             </a>
           </div>
         </div>
+
+        <!-- Image side — placeholder until real photos are added -->
+        <div class="service-hero__image" aria-hidden="true">
+          <div class="img-placeholder">
+            <span class="img-placeholder__icon">◎</span>
+            <span class="img-placeholder__label">{title}</span>
+          </div>
+        </div>
+
+        <!-- Stats strip — full width, below both columns -->
+        {stats.length > 0 && (
+          <div
+            class="service-hero__stats"
+            role="list"
+            aria-label={isDE ? 'Leistungsdetails' : 'Service details'}
+          >
+            {stats.map(stat => (
+              <div class="service-hero__stat" role="listitem">
+                <span class="service-hero__stat-label">{stat.label}</span>
+                <span class="service-hero__stat-value">{stat.value}</span>
+              </div>
+            ))}
+            <div class="service-hero__stat" role="listitem">
+              <span class="service-hero__stat-label">
+                {isDE ? 'Sprache' : 'Language'}
+              </span>
+              <span class="service-hero__stat-value">
+                {isDE ? 'Deutsch oder Englisch' : 'German or English'}
+              </span>
+            </div>
+            <div class="service-hero__stat" role="listitem">
+              <span class="service-hero__stat-label">
+                {isDE ? 'Verfügbarkeit' : 'Availability'}
+              </span>
+              <span class="service-hero__stat-value">
+                {isDE ? 'Auf Anfrage — Discovery Call zuerst' : 'By application — discovery call first'}
+              </span>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   </header>
 
-  <!-- SERVICE BODY -->
-  <div class="service-layout container">
-    <article class="article-body prose">
-      <Content />
-    </article>
+  <!-- ── BODY + SIDEBAR ─────────────────────────────────────────────────── -->
+  <div class="container">
+    <div class="service-body">
 
-    <aside class="article-aside">
-      <div class="aside-card aside-card--cta">
-        <p class="label" style="margin-bottom:1rem">{isDE ? 'Bereit?' : 'Ready?'}</p>
-        <p class="service-price-aside">{entry.data.price}</p>
-        <p class="aside-card__text">{entry.data.format}</p>
-        <a href={`${prefix}/contact`} class="btn btn--primary" style="margin-top:1.5rem;width:100%;justify-content:center">
-          {entry.data.cta_label}
-        </a>
-      </div>
+      <!-- ── Main article ── -->
+      <article class="service-content" aria-label={isDE ? 'Leistungsdetails' : 'Service details'}>
 
-      {validUseCases.length > 0 && (
-        <div class="aside-card" style="margin-top:1.5rem">
-          <p class="label" style="margin-bottom:1rem">{isDE ? 'Praxisbeispiele' : 'In Practice'}</p>
-          <ul class="aside-usecases">
-            {validUseCases.map(uc => {
-              if (!uc) return null;
-              const ucSlug = uc.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-              return (
-                <li>
-                  <a href={`${prefix}/use-cases/${ucSlug}`} class="aside-uc-link">
-                    {uc.data.title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+        <!-- Prose body from markdown — problem description, what happens, etc. -->
+        {/* Only show if there's actual markdown content */}
+        <div class="prose-body fade-up">
+          <Content />
         </div>
-      )}
 
-      <div class="aside-card" style="margin-top:1.5rem">
-        <a href={`${prefix}/services`} class="back-link">
-          {isDE ? '← Alle Leistungen' : '← All Services'}
+        <!-- Pull quote -->
+        {pull_quote && (
+          <blockquote class="pull-quote fade-up">
+            <p>"{pull_quote}"</p>
+          </blockquote>
+        )}
+
+        <!-- Outcomes — "What you leave with" -->
+        {outcomes.length > 0 && (
+          <section class="content-section fade-up" aria-labelledby="outcomes-heading">
+            <span class="content-section__label">
+              {isDE ? 'Ergebnisse' : 'Outcomes'}
+            </span>
+            <h2 class="content-section__heading" id="outcomes-heading">
+              {isDE ? 'Was Sie mitnehmen' : 'What you leave with'}
+            </h2>
+            <p class="content-section__sub">
+              {isDE ? 'Keine Deliverables. Fähigkeiten und Klarheit.' : 'Not deliverables. Capabilities and clarity.'}
+            </p>
+            <ul class="outcomes" aria-label={isDE ? 'Engagement-Ergebnisse' : 'Engagement outcomes'}>
+              {outcomes.map(o => (
+                <li class="outcome">
+                  <span class="outcome__check" aria-hidden="true">✦</span>
+                  <div class="outcome__text">
+                    <strong>{o.name}</strong>
+                    {o.description}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <!-- Who it's for -->
+        {(for_profiles.length > 0 || not_for) && (
+          <section class="content-section fade-up" aria-labelledby="fit-heading">
+            <span class="content-section__label">
+              {isDE ? 'Passung' : 'Fit'}
+            </span>
+            <h2 class="content-section__heading" id="fit-heading">
+              {isDE ? 'Das ist für Sie, wenn…' : 'This is for you if…'}
+            </h2>
+            <div class="for-grid">
+              {for_profiles.map(p => (
+                <div class="for-card">
+                  <strong>{p.title}</strong>
+                  {p.body}
+                </div>
+              ))}
+              {not_for && (
+                <div class="for-card for-card--not">
+                  <strong>{isDE ? 'Das ist nicht für Sie, wenn…' : 'This is not for you if…'}</strong>
+                  {not_for}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+      </article>
+
+      <!-- ── Sidebar ── -->
+      <aside
+        class="service-body__sidebar"
+        aria-label={isDE ? 'Leistungsdetails und Buchung' : 'Service details and booking'}
+      >
+
+        <!-- Engagement details card -->
+        <div class="sidebar-card">
+          <h3 class="sidebar-card__heading">
+            {isDE ? 'Leistungsdetails' : 'Engagement details'}
+          </h3>
+          <dl class="sidebar-card__meta">
+            <div class="sidebar-card__row">
+              <dt class="sidebar-card__label">{isDE ? 'Format' : 'Format'}</dt>
+              <dd class="sidebar-card__value">{format}</dd>
+            </div>
+            {duration && (
+              <div class="sidebar-card__row">
+                <dt class="sidebar-card__label">{isDE ? 'Dauer' : 'Duration'}</dt>
+                <dd class="sidebar-card__value">{duration}</dd>
+              </div>
+            )}
+            {group_size && (
+              <div class="sidebar-card__row">
+                <dt class="sidebar-card__label">{isDE ? 'Teilnehmer' : 'Participants'}</dt>
+                <dd class="sidebar-card__value">{group_size}</dd>
+              </div>
+            )}
+            {delivery && (
+              <div class="sidebar-card__row">
+                <dt class="sidebar-card__label">{isDE ? 'Durchführung' : 'Delivery'}</dt>
+                <dd class="sidebar-card__value">{delivery}</dd>
+              </div>
+            )}
+            <div class="sidebar-card__row">
+              <dt class="sidebar-card__label">{isDE ? 'Sprache' : 'Language'}</dt>
+              <dd class="sidebar-card__value">
+                {isDE ? 'Deutsch oder Englisch' : 'German or English'}
+              </dd>
+            </div>
+            <div class="sidebar-card__row">
+              <dt class="sidebar-card__label">{isDE ? 'Verfügbarkeit' : 'Availability'}</dt>
+              <dd class="sidebar-card__value">
+                {isDE
+                  ? 'Auf Anfrage — Discovery Call zuerst'
+                  : 'By application — discovery call first'}
+              </dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- CTA card -->
+        <div class="sidebar-cta">
+          <h3 class="sidebar-cta__heading">
+            {isDE ? 'Starten Sie mit einem Discovery Call' : 'Start with a discovery call'}
+          </h3>
+          <p class="sidebar-cta__body">
+            {isDE
+              ? '30 Minuten. Ich decke die Annahme auf, die am dringendsten zu untersuchen ist — unabhängig davon, ob wir formal fortfahren.'
+              : '30 minutes. I\'ll surface the assumption most worth examining first — regardless of whether we proceed to a formal engagement.'}
+          </p>
+          <a
+            href={`${prefix}/contact`}
+            class="btn btn--primary btn-arrow"
+            style="width:100%;justify-content:center"
+          >
+            {isDE ? 'Call buchen' : 'Book a Call'}
+          </a>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- ── RELATED SERVICES ───────────────────────────────────────────────── -->
+  {related.length > 0 && (
+    <section class="related section" aria-labelledby="related-heading">
+      <div class="container">
+        <h2 class="related__heading" id="related-heading">
+          {isDE ? 'Weitere Möglichkeiten zur Zusammenarbeit' : 'Other ways to work together'}
+        </h2>
+        <ul class="related__grid">
+          {related.map(rel => (
+            <li class="related-card fade-up">
+              {rel.data.engagement_type && (
+                <span class="related-card__type">{rel.data.engagement_type}</span>
+              )}
+              <h3 class="related-card__title">{rel.data.title}</h3>
+              {rel.data.one_liner && (
+                <p class="related-card__body">{rel.data.one_liner}</p>
+              )}
+              <a
+                href={`${prefix}/services/${slugify(rel)}`}
+                class="related-card__link"
+                aria-label={isDE
+                  ? `Details zu ${rel.data.title}`
+                  : `View ${rel.data.title}`}
+              >
+                {isDE ? 'Leistung ansehen' : 'View service'}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Nächster Schritt' : 'Next step'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Die richtige Frage ist schon <em>im Raum.</em></Fragment>
+          : <Fragment>The right question is already <em>in the room.</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein Discovery Call bringt sie ans Licht. 30 Minuten, keine Vorbereitung erforderlich.'
+          : 'A discovery call surfaces it. 30 minutes, no preparation required.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`}  class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/services`} class="btn btn--outline">
+          {isDE ? 'Alle Leistungen' : 'All services'}
         </a>
       </div>
-    </aside>
-  </div>
+    </div>
+  </section>
 
 </Base>
 
+<script>
+  const io = new IntersectionObserver(
+    entries => entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+      }
+    }),
+    { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+  );
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+</script>
+
 <style>
-  .service-hero {
-    position: relative;
-    padding: calc(68px + 4rem) 0 4rem;
+  /* ── Breadcrumb ────────────────────────────────────────────────────────── */
+  .breadcrumb {
+    padding-top: 68px;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-light);
+  }
+  .breadcrumb__inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 0.875rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .breadcrumb__link {
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+  .breadcrumb__link:hover { color: var(--gold); }
+
+  /* ── Service hero ──────────────────────────────────────────────────────── */
+  .service-hero {
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+    position: relative;
     overflow: hidden;
   }
-  .hero-grid {
+  .service-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
       linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black, transparent);
     pointer-events: none;
   }
-  .breadcrumb {
-    display: flex;
+  .service-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
     align-items: center;
-    gap: 0.5rem;
+    padding-block: clamp(4rem, 8vw, 6.5rem);
+  }
+
+  .service-hero__type {
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 2rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1.25rem;
+    display: block;
   }
-  .breadcrumb a { color: var(--gold); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
 
   .service-hero__title {
     font-family: var(--serif);
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2.4rem, 5vw, 4rem);
     font-weight: 400;
-    line-height: 1.1;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
-  .service-hero__details {
-    display: flex;
-    gap: 2.5rem;
-    flex-wrap: wrap;
+  .service-hero__oneliner {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+    color: var(--gold-light);
+    line-height: 1.5;
+    margin-bottom: 1.75rem;
+    max-width: 40ch;
+  }
+
+  .service-hero__lede {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.85;
+    max-width: 52ch;
     margin-bottom: 2.5rem;
-    padding: 1.5rem;
+  }
+
+  .service-hero__ctas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* Image column */
+  .service-hero__image {
+    border-radius: 4px;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+  }
+
+  .img-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 340px;
+    background: var(--bg-elevated);
+    border: 1px dashed rgba(196,154,60,0.2);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem;
+    text-align: center;
+  }
+  .img-placeholder__icon {
+    font-size: 2rem;
+    opacity: 0.15;
+    color: var(--gold);
+  }
+  .img-placeholder__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  /* Stats strip — spans both columns */
+  .service-hero__stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border-light);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .service-hero__stat {
+    background: var(--bg-card-alt);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .service-hero__stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .service-hero__stat-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  @media (max-width: 860px) {
+    .service-hero__inner { grid-template-columns: 1fr; }
+    .service-hero__image { display: none; }
+    .service-hero__stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ── Body layout ───────────────────────────────────────────────────────── */
+  .service-body {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 5rem;
+    align-items: start;
+    padding-block: var(--section);
+  }
+  .service-body__sidebar {
+    position: sticky;
+    top: calc(68px + 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  @media (max-width: 960px) {
+    .service-body { grid-template-columns: 1fr; }
+    .service-body__sidebar { position: static; }
+  }
+
+  /* ── Article content ───────────────────────────────────────────────────── */
+  .service-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  /* Prose styles from markdown body */
+  .prose-body :global(h2) {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    margin-top: 2.5rem;
+  }
+  .prose-body :global(h2:first-child) { margin-top: 0; }
+
+  .prose-body :global(h3) {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    margin-top: 1.75rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+  }
+
+  .prose-body :global(p) {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .prose-body :global(strong) { color: var(--text-primary); font-weight: 600; }
+
+  /* Pull quote */
+  .pull-quote {
+    border-left: 2px solid var(--gold);
+    padding: 1.5rem 2rem;
+    background: rgba(196,154,60,0.06);
+    border-radius: 0 3px 3px 0;
+  }
+  .pull-quote p {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  /* Content sections */
+  .content-section { }
+
+  .content-section__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .content-section__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  .content-section__sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+  }
+
+  /* Outcomes list */
+  .outcomes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+  .outcome {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding: 0.875rem 1rem;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    transition: border-color 0.2s;
+  }
+  .outcome:hover { border-color: rgba(196,154,60,0.25); }
+  .outcome__check { color: var(--gold); font-size: 0.9rem; margin-top: 0.2rem; }
+  .outcome__text { font-size: 14px; line-height: 1.7; color: var(--text-secondary); }
+  .outcome__text strong {
+    display: block;
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+  }
+
+  /* For-profiles grid */
+  .for-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+  .for-card {
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+  }
+  .for-card strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 15px;
+    margin-bottom: 0.4rem;
+  }
+  .for-card--not {
+    border-top-color: rgba(255,100,100,0.3);
+    background: rgba(255,80,80,0.03);
+  }
+  .for-card--not strong { color: var(--text-muted); }
+  @media (max-width: 600px) {
+    .for-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Sidebar ───────────────────────────────────────────────────────────── */
+  .sidebar-card {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    width: fit-content;
+    border-top: 2px solid var(--gold-dim);
+    padding: 1.75rem;
+    border-radius: 3px;
   }
-  .service-detail__label {
-    display: block;
+  .sidebar-card__heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1.25rem;
+  }
+  .sidebar-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+  .sidebar-card__row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .sidebar-card__row:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  .sidebar-card__label {
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 0.25rem;
   }
-  .service-detail__value {
-    font-family: var(--mono);
-    font-size: var(--text-base);
-    font-weight: 500;
+  .sidebar-card__value {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .sidebar-cta {
+    background: rgba(196,154,60,0.06);
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .sidebar-cta__heading {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    line-height: 1.3;
     color: var(--text-primary);
   }
-
-  .service-hero__actions { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-  /* Layout */
-  .service-layout {
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 5rem;
-    padding-top: 4rem;
-    padding-bottom: 6rem;
-    align-items: start;
+  .sidebar-cta__body {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.75;
   }
 
-  /* Article */
-  .article-body :global(h2) {
+  /* ── Related services ──────────────────────────────────────────────────── */
+  .related {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+  }
+  .related__heading {
     font-family: var(--serif);
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 400;
     color: var(--text-primary);
-    margin-top: 3rem;
-    margin-bottom: 1rem;
+    margin-bottom: 2.5rem;
   }
-  .article-body :global(h3) {
-    font-family: var(--sans);
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+  .related__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
   }
-  .article-body :global(p) {
-    color: var(--text-secondary);
-    line-height: 1.8;
-    margin-bottom: 1.25rem;
-  }
-  .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
-  .article-body :global(ul), .article-body :global(ol) {
-    padding-left: 1.5rem;
-    margin-bottom: 1.25rem;
-    color: var(--text-secondary);
-    line-height: 1.8;
-  }
-  .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
-  .article-body :global(ol li) { list-style: decimal; }
-  .article-body :global(hr) {
-    border: none;
-    border-top: 1px solid var(--border-light);
-    margin: 3rem 0;
-  }
-
-  /* Aside */
-  .article-aside { position: sticky; top: calc(68px + 2rem); }
-  .aside-card {
-    background: var(--bg-card);
+  .related-card {
+    background: var(--bg-card-alt);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
+    border-top: 2px solid var(--gold-dim);
+    padding: 2rem;
+    border-radius: 3px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    transition: border-top-color 0.2s, transform 0.2s;
   }
-  .aside-card--cta { border-color: var(--border); }
-  .service-price-aside {
+  .related-card:hover {
+    border-top-color: var(--gold);
+    transform: translateY(-3px);
+  }
+  .related-card__type {
     font-family: var(--mono);
-    font-size: var(--text-xl);
-    font-weight: 500;
-    color: var(--gold);
-    margin-bottom: 0.25rem;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
   }
-  .aside-card__text { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.7; }
-
-  .aside-usecases { display: flex; flex-direction: column; gap: 0.75rem; }
-  .aside-uc-link {
-    font-size: var(--text-sm);
+  .related-card__title {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    color: var(--text-primary);
+  }
+  .related-card__body {
+    font-size: 13px;
+    line-height: 1.75;
     color: var(--text-secondary);
-    text-decoration: none;
-    line-height: 1.4;
-    display: block;
+    flex: 1;
+    font-style: italic;
   }
-  .aside-uc-link:hover { color: var(--gold); }
-
-  .back-link {
+  .related-card__link {
     font-family: var(--mono);
     font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
-    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: gap 0.2s;
+  }
+  .related-card__link::after { content: '→'; }
+  .related-card__link:hover { gap: 14px; }
+  @media (max-width: 760px) {
+    .related__grid { grid-template-columns: 1fr; }
   }
 
-  @media (max-width: 900px) {
-    .service-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .article-aside { position: static; }
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band {
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding-block: 5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,0.06), transparent 70%);
+    pointer-events: none;
+  }
+  .cta-band__inner { position: relative; z-index: 1; }
+  .cta-band__label { margin-bottom: 1.5rem; justify-content: center; }
+  .cta-band__label::before { display: none; }
+  .cta-band__heading {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text-primary);
+    max-width: 22ch;
+    margin-inline: auto;
+    margin-bottom: 1.25rem;
+  }
+  .cta-band__heading em { font-style: italic; color: var(--gold); }
+  .cta-band__sub {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 46ch;
+    margin-inline: auto;
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+  }
+  .cta-band__actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ── Fade-up ───────────────────────────────────────────────────────────── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>
