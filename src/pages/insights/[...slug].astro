@@ -8,7 +8,7 @@ export async function getStaticPaths() {
     .filter(e => e.id.startsWith('en/') && e.data.status === 'published')
     .map(entry => ({
       params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
-      props: { entry },
+      props:  { entry },
     }));
 }
 
@@ -22,226 +22,837 @@ const prefix = isDE ? '/de' : '';
 function formatDate(d: Date) {
   return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+// Related articles: same category, excluding current, up to 3
+const allInsights = await getCollection('insights');
+const related = allInsights
+  .filter(e =>
+    e.id.startsWith(isDE ? 'de/' : 'en/') &&
+    e.data.status === 'published' &&
+    e.id !== entry.id
+  )
+  .sort((a, b) => {
+    // Same category first
+    const aCat = a.data.category === entry.data.category ? 0 : 1;
+    const bCat = b.data.category === entry.data.category ? 0 : 1;
+    return aCat - bCat || b.data.date.getTime() - a.data.date.getTime();
+  })
+  .slice(0, 3);
+
+function slugify(e: typeof related[number]) {
+  return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+}
+
+const shareUrl = `https://andredaus.com${prefix}/insights/${entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')}`;
 ---
 
 <Base
-  title={`${entry.data.title} — André Daus`}
+  title={`${entry.data.og_title ?? entry.data.title} — André Daus`}
   description={entry.data.summary}
   ogImage={entry.data.og_image}
   lang={isDE ? 'de' : 'en'}
 >
-  <!-- ARTICLE HERO -->
-  <header class="article-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
-    <div class="container">
-      <nav class="breadcrumb" aria-label={isDE ? 'Breadcrumb' : 'Breadcrumb'}>
-        <a href={`${prefix}/insights`}>{isDE ? 'Insights' : 'Insights'}</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">{entry.data.category}</span>
-      </nav>
 
-      <div class="article-hero__meta">
-        <span class="article-cat">{entry.data.category}</span>
-        <time datetime={entry.data.date.toISOString()} class="article-date">
-          {formatDate(entry.data.date)}
-        </time>
+  <!-- ── BREADCRUMB ─────────────────────────────────────────────────────── -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <div class="container">
+      <ol class="breadcrumb__inner">
+        <li><a href={`${prefix}/`} class="breadcrumb__link">{isDE ? 'Start' : 'Home'}</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><a href={`${prefix}/insights`} class="breadcrumb__link">Insights</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><span class="breadcrumb__current" aria-current="page">{entry.data.title}</span></li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- ── ARTICLE HERO ───────────────────────────────────────────────────── -->
+  <header class="article-hero" aria-labelledby="article-title">
+    <div class="article-hero__grid" aria-hidden="true"></div>
+    <div class="container">
+      <div class="article-hero__inner">
+
+        <!-- Category tags -->
+        <div class="article-hero__cats" role="list" aria-label={isDE ? 'Kategorien' : 'Article categories'}>
+          <span class="cat-tag" role="listitem">{entry.data.category}</span>
+        </div>
+
+        <!-- Title -->
+        <h1 class="article-hero__title" id="article-title">
+          {entry.data.title}
+        </h1>
+
+        <!-- Deck / summary -->
+        {entry.data.summary && (
+          <p class="article-hero__deck">{entry.data.summary}</p>
+        )}
+
+        <!-- Meta row -->
+        <div class="article-hero__meta" role="list" aria-label={isDE ? 'Artikel-Metadaten' : 'Article metadata'}>
+          <span role="listitem">André Daus</span>
+          <span class="article-hero__meta-sep" aria-hidden="true">·</span>
+          <time role="listitem" datetime={entry.data.date.toISOString()}>
+            {formatDate(entry.data.date)}
+          </time>
+          <span class="article-hero__meta-sep" aria-hidden="true">·</span>
+          <span role="listitem">{entry.data.category}</span>
+        </div>
       </div>
 
-      <h1 class="article-hero__title">{entry.data.title}</h1>
-
-      {entry.data.summary && (
-        <p class="article-hero__summary">{entry.data.summary}</p>
+      <!-- Hero image — full width 21:8 below headline block -->
+      {entry.data.og_image && (
+        <div
+          class="article-hero__image"
+          role="img"
+          aria-label={entry.data.og_title ?? entry.data.title}
+        >
+          <img
+            src={entry.data.og_image}
+            alt=""
+            loading="eager"
+            decoding="async"
+            style="width:100%;height:100%;object-fit:cover"
+          />
+        </div>
       )}
     </div>
   </header>
 
-  <!-- ARTICLE BODY -->
-  <div class="article-layout container">
-    <article class="article-body prose" aria-label={entry.data.title}>
-      <Content />
-    </article>
+  <!-- ── ARTICLE BODY + SIDEBAR ─────────────────────────────────────────── -->
+  <div class="container">
+    <div class="article-layout">
 
-    <aside class="article-aside">
-      <div class="aside-card">
-        <p class="label" style="margin-bottom:1rem">{isDE ? 'Nächster Schritt' : 'Next step'}</p>
-        <p class="aside-card__text">
-          {isDE
-            ? 'Wenn dieser Artikel eine Frage aufgeworfen hat, die es wert ist, gestellt zu werden, ist ein Discovery Call der richtige Ort, um sie zu stellen.'
-            : 'If this article raised a question worth asking, a discovery call is the right place to ask it.'}
+      <!-- Main article content -->
+      <article class="article-body" aria-label={isDE ? 'Artikelinhalt' : 'Article content'}>
+        <Content />
+      </article>
+
+      <!-- Sticky sidebar -->
+      <aside
+        class="article-sidebar"
+        aria-label={isDE ? 'Artikel-Navigation' : 'Article navigation and related content'}
+      >
+
+        <!-- TOC — populated by JS scanning h2 elements -->
+        <nav class="toc" aria-label={isDE ? 'Inhaltsverzeichnis' : 'Table of contents'}>
+          <p class="toc__heading" id="toc-label">
+            {isDE ? 'In diesem Artikel' : 'In this article'}
+          </p>
+          <ul class="toc__list" id="toc-list" aria-labelledby="toc-label">
+            <!-- JS populates this from article h2 headings -->
+          </ul>
+        </nav>
+
+        <!-- Author card -->
+        <div class="author-card">
+          <div class="author-card__top">
+            <div class="author-card__avatar" role="img" aria-label="André Daus">
+              <!--
+                Replace with:
+                <img src="/images/andredaus-headshot.jpg" alt="" width="96" height="96" loading="lazy">
+              -->
+              <div class="author-card__avatar-ph" aria-hidden="true">AD</div>
+            </div>
+            <div>
+              <p class="author-card__name">André Daus</p>
+              <p class="author-card__role">Strategic Opposition</p>
+            </div>
+          </div>
+          <p class="author-card__bio">
+            {isDE
+              ? 'André arbeitet mit Führungskräften und Organisationen, um die Annahmen hinter ihren Strategien aufzudecken — bevor es der Markt für sie tut.'
+              : 'André works with leaders and organisations to surface the assumptions their strategies depend on — before the market does it for them.'}
+          </p>
+          <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+            {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+          </a>
+          <a href={`${prefix}/services`} class="btn btn--ghost">
+            {isDE ? 'Leistungen ansehen' : 'View Services'}
+          </a>
+        </div>
+
+        <!-- Share -->
+        <div class="share-block">
+          <p class="share-label" style="margin-bottom:.75rem">
+            {isDE ? 'Teilen' : 'Share'}
+          </p>
+          <div class="share-row">
+            <button
+              class="share-btn"
+              id="copy-link-btn"
+              data-url={shareUrl}
+              aria-label={isDE ? 'Artikellink kopieren' : 'Copy article link to clipboard'}
+              title={isDE ? 'Link kopieren' : 'Copy link'}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(entry.data.title)}&url=${encodeURIComponent(shareUrl)}`}
+              class="share-btn"
+              aria-label={isDE ? 'Auf X (Twitter) teilen' : 'Share on X (Twitter)'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true">
+                <path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/>
+              </svg>
+            </a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+              class="share-btn"
+              aria-label={isDE ? 'Auf LinkedIn teilen' : 'Share on LinkedIn'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true">
+                <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- Mobile sticky CTA -->
+  <div class="mobile-cta" aria-label={isDE ? 'Discovery Call buchen' : 'Book a discovery call'}>
+    <a
+      href={`${prefix}/contact`}
+      class="btn btn--primary btn-arrow"
+      style="flex:1;justify-content:center;max-width:320px"
+    >
+      {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+    </a>
+  </div>
+
+  <!-- ── RELATED ARTICLES ───────────────────────────────────────────────── -->
+  {related.length > 0 && (
+    <section class="related" aria-labelledby="related-heading">
+      <div class="container">
+        <p class="label" style="margin-bottom:1.25rem">
+          {isDE ? 'Weiterlesen' : 'Continue reading'}
         </p>
-        <a href={`${prefix}/contact`} class="btn btn--primary" style="margin-top:1.5rem">
+        <h2 class="related__heading" id="related-heading">
+          {isDE ? 'Mehr über Denken und Strategie' : 'More on thinking and strategy'}
+        </h2>
+        <ul class="related__grid">
+          {related.map(rel => (
+            <li>
+              <a href={`${prefix}/insights/${slugify(rel)}`} class="related-card">
+                <span class="related-card__tag">{rel.data.category}</span>
+                <h3 class="related-card__title">{rel.data.title}</h3>
+                {rel.data.summary && (
+                  <p class="related-card__excerpt">{rel.data.summary}</p>
+                )}
+                <span class="related-card__read">{isDE ? 'Lesen' : 'Read'}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Nächster Schritt' : 'Next step'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Die Überzeugung, die Ihre Organisation<br>am stärksten hält, ist die, die <em>am meisten hinterfragt werden muss.</em></Fragment>
+          : <Fragment>The belief your organisation<br>holds most confidently is the one that <em>needs the most scrutiny.</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein 30-minütiger Discovery Call zeigt, was es ist. Kommen Sie mit Ihrer besten strategischen Position. Ich werde sie herausfordern.'
+          : 'A 30-minute discovery call is where we surface what it is. Come with your best strategic position. I\'ll challenge it.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
           {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
         </a>
+        <a href={`${prefix}/insights`} class="btn btn--outline">
+          {isDE ? 'Alle Insights' : 'All Insights'}
+        </a>
       </div>
-
-      <div class="aside-card" style="margin-top:1.5rem">
-        <p class="aside-card__back">
-          <a href={`${prefix}/insights`} class="btn-arrow back-link">
-            {isDE ? '← Alle Insights' : '← All Insights'}
-          </a>
-        </p>
-      </div>
-    </aside>
-  </div>
+    </div>
+  </section>
 
 </Base>
 
+<script>
+  (function () {
+    // Reading progress bar
+    const bar = document.getElementById('reading-progress');
+    if (bar && !window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      function updateProgress() {
+        const s = document.documentElement.scrollTop;
+        const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const p = h > 0 ? Math.round(s / h * 100) : 0;
+        (bar as HTMLElement).style.width = p + '%';
+        bar.setAttribute('aria-valuenow', String(p));
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+
+    // Build TOC from article h2 headings
+    const article = document.querySelector<HTMLElement>('.article-body');
+    const tocList  = document.getElementById('toc-list');
+    if (article && tocList) {
+      const headings = Array.from(article.querySelectorAll<HTMLHeadingElement>('h2'));
+      headings.forEach((h, i) => {
+        if (!h.id) h.id = `sec-${i}`;
+        const li = document.createElement('li');
+        const a  = document.createElement('a');
+        a.href      = `#${h.id}`;
+        a.className = i === 0 ? 'toc__link is-active' : 'toc__link';
+        a.textContent = h.textContent;
+        li.appendChild(a);
+        tocList.appendChild(li);
+      });
+
+      // Scroll-spy
+      const tocLinks = Array.from(tocList.querySelectorAll<HTMLAnchorElement>('.toc__link'));
+      const sections = tocLinks
+        .map(l => document.querySelector<HTMLElement>(l.getAttribute('href') ?? ''))
+        .filter(Boolean) as HTMLElement[];
+
+      function setActive() {
+        const y = window.scrollY + 90;
+        let active = 0;
+        sections.forEach((s, i) => { if (s && s.offsetTop <= y) active = i; });
+        tocLinks.forEach((l, i) => l.classList.toggle('is-active', i === active));
+      }
+      window.addEventListener('scroll', setActive, { passive: true });
+      setActive();
+    }
+
+    // Copy link
+    document.getElementById('copy-link-btn')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const url = btn.dataset.url ?? window.location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c49a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+        btn.setAttribute('aria-label', 'Link copied!');
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.setAttribute('aria-label', 'Copy article link to clipboard');
+        }, 2000);
+      } catch {}
+    });
+  })();
+</script>
+
 <style>
-  /* Hero */
-  .article-hero {
-    position: relative;
-    padding: calc(68px + 4rem) 0 4rem;
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+
+  /* ── Breadcrumb ────────────────────────────────────────────────────────── */
+  .breadcrumb {
+    padding-top: 68px;
     background: var(--bg-surface);
     border-bottom: 1px solid var(--border-light);
+  }
+  .breadcrumb__inner {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    flex-wrap: wrap;
+    padding-block: 0.875rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+  .breadcrumb__link { color: var(--text-secondary); transition: color 0.2s; text-decoration: none; min-height: 24px; display: inline-flex; align-items: center; }
+  .breadcrumb__link:hover { color: var(--gold); }
+  .breadcrumb__sep { color: var(--text-subtle); user-select: none; padding-inline: 0.125rem; }
+  .breadcrumb__current { color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 40ch; }
+
+  /* ── Article hero ──────────────────────────────────────────────────────── */
+  .article-hero {
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 60%);
+    border-bottom: 1px solid var(--border-light);
+    position: relative;
     overflow: hidden;
   }
-  .hero-grid {
+  .article-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
+  .article-hero__inner {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(3.5rem, 7vw, 5.5rem) clamp(2rem, 4vw, 3rem);
+  }
 
-  .breadcrumb {
+  .article-hero__cats {
     display: flex;
-    align-items: center;
     gap: 0.5rem;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
+    flex-wrap: wrap;
     margin-bottom: 1.5rem;
   }
-  .breadcrumb a { color: var(--gold); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
-
-  .article-hero__meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  .article-cat {
+  .cat-tag {
     font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-size: 9px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
-    padding: 3px 8px;
+    background: var(--gold-trans);
     border: 1px solid var(--border);
+    padding: 4px 10px;
     border-radius: 2px;
-  }
-  .article-date {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
   }
 
   .article-hero__title {
     font-family: var(--serif);
-    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-size: clamp(2.2rem, 5vw, 3.75rem);
     font-weight: 400;
-    line-height: 1.15;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
     color: var(--text-primary);
     max-width: 22ch;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
-  .article-hero__summary {
-    font-size: var(--text-lg);
-    color: var(--text-secondary);
-    max-width: 55ch;
+  .article-hero__title :global(em) { font-style: italic; color: var(--gold); }
+
+  .article-hero__deck {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
     line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 56ch;
+    margin-bottom: 2rem;
   }
 
-  /* Layout */
+  .article-hero__meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+  }
+  .article-hero__meta-sep { color: var(--border-light); user-select: none; }
+
+  /* Full-width hero image 21:8 */
+  .article-hero__image {
+    aspect-ratio: 21/8;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    margin-top: clamp(2rem, 4vw, 3rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Two-column layout ─────────────────────────────────────────────────── */
   .article-layout {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 5rem;
-    padding-top: 4rem;
-    padding-bottom: 6rem;
+    grid-template-columns: 1fr 300px;
+    gap: 4rem;
     align-items: start;
+    padding-block: var(--section);
   }
+  .article-body { min-width: 0; }
 
-  /* Article body — prose */
+  /* ── Prose typography ──────────────────────────────────────────────────── */
   .article-body :global(h2) {
     font-family: var(--serif);
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
     font-weight: 400;
+    line-height: 1.2;
     color: var(--text-primary);
     margin-top: 3rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    scroll-margin-top: 90px;
   }
+  .article-body :global(h2:first-child) { margin-top: 0; }
+
   .article-body :global(h3) {
-    font-family: var(--sans);
-    font-size: var(--text-lg);
-    font-weight: 600;
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    font-weight: 400;
+    line-height: 1.3;
     color: var(--text-primary);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+    margin-top: 2.25rem;
+    margin-bottom: 0.875rem;
   }
+
   .article-body :global(p) {
+    font-size: clamp(15px, 1.15vw, 16.5px);
+    line-height: 1.9;
     color: var(--text-secondary);
-    line-height: 1.8;
     margin-bottom: 1.25rem;
   }
+  .article-body :global(p:last-child) { margin-bottom: 0; }
   .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
-  .article-body :global(em) { font-style: italic; color: var(--text-primary); }
-  .article-body :global(ul), .article-body :global(ol) {
+
+  .article-body :global(a) {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .article-body :global(a:hover) { color: var(--gold-light); }
+
+  .article-body :global(ul),
+  .article-body :global(ol) {
     padding-left: 1.5rem;
     margin-bottom: 1.25rem;
     color: var(--text-secondary);
-    line-height: 1.8;
+    line-height: 1.85;
   }
   .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
   .article-body :global(ol li) { list-style: decimal; }
+
+  /* Pull quote */
   .article-body :global(blockquote) {
-    border-left: 3px solid var(--gold);
-    padding-left: 1.5rem;
-    margin: 2rem 0;
-    color: var(--text-secondary);
+    font-family: var(--serif);
     font-style: italic;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.5;
+    color: var(--gold-light);
+    border-left: 3px solid var(--gold);
+    padding: 0.875rem 1.75rem;
+    margin-block: 2rem;
+    background: var(--gold-trans);
+    border-radius: 0 3px 3px 0;
   }
-  .article-body :global(hr) {
-    border: none;
-    border-top: 1px solid var(--border-light);
-    margin: 3rem 0;
+  .article-body :global(blockquote p) {
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin-bottom: 0;
   }
-  .article-body :global(a) { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 
-  /* Aside */
-  .article-aside { position: sticky; top: calc(68px + 2rem); }
-
-  .aside-card {
-    background: var(--bg-card);
+  /* Data table */
+  .article-body :global(.data-table-wrap) {
+    margin-block: 2rem;
+    overflow-x: auto;
+    border-radius: 3px;
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
   }
-  .aside-card__text {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    line-height: 1.7;
+  .article-body :global(.data-table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
   }
-
-  .back-link {
+  .article-body :global(.data-table thead) { background: var(--bg-card); }
+  .article-body :global(.data-table th) {
     font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
-    text-decoration: none;
+    padding: 0.875rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
+  }
+  .article-body :global(.data-table td) {
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  .article-body :global(.data-table tbody tr:last-child td) { border-bottom: none; }
+  .article-body :global(.data-table tbody tr:hover td) { background: rgba(196,154,60,.03); }
+  .article-body :global(.data-table td:first-child) { color: var(--text-primary); font-weight: 500; }
+
+  /* Insight box — SO signature element */
+  .article-body :global(.insight-box) {
+    background: var(--navy);
+    border: 1px solid rgba(196,154,60,.2);
+    border-top: 3px solid var(--gold);
+    border-radius: 3px;
+    padding: 2rem;
+    margin-block: 2.5rem;
+  }
+  .article-body :global(.insight-box__label) {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .article-body :global(.insight-box__label::before) { content: '⚑'; font-size: 12px; }
+  .article-body :global(.insight-box__heading) {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+  .article-body :global(.insight-box__body) { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+
+  /* Related concepts list */
+  .article-body :global(.related-concepts) { margin-block: 2rem; }
+  .article-body :global(.concept-item) {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-light);
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 1.25rem;
+    align-items: start;
+  }
+  .article-body :global(.concept-item:first-child) { border-top: 1px solid var(--border-light); }
+  .article-body :global(.concept-name) {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding-top: 0.125rem;
+  }
+  .article-body :global(.concept-body) { font-size: 14px; line-height: 1.75; color: var(--text-secondary); }
+  @media (max-width: 560px) {
+    .article-body :global(.concept-item) { grid-template-columns: 1fr; }
   }
 
-  @media (max-width: 900px) {
-    .article-layout {
-      grid-template-columns: 1fr;
-      gap: 3rem;
-    }
-    .article-aside { position: static; }
+  /* Further reading */
+  .article-body :global(.reading-list) { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.25rem; }
+  .article-body :global(.reading-item) {
+    padding: 1.25rem;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-left: 2px solid var(--gold-dim);
+    border-radius: 0 3px 3px 0;
   }
+  .article-body :global(.reading-item__title) { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem; }
+  .article-body :global(.reading-item__author) { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-subtle); margin-bottom: 0.5rem; }
+  .article-body :global(.reading-item__note) { font-size: 13px; line-height: 1.7; color: var(--text-secondary); }
+
+  /* ── Sticky sidebar ────────────────────────────────────────────────────── */
+  .article-sidebar {
+    position: sticky;
+    top: calc(68px + 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* TOC */
+  .toc {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .toc__heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .toc__list { display: flex; flex-direction: column; padding: 0.5rem 0; }
+
+  /* toc__link — can't use :global here since it's on dynamically created elements */
+  /* These are applied via JS-created elements; use a global block */
+
+  /* Author card */
+  .author-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .author-card__top { display: flex; align-items: center; gap: 1rem; }
+  .author-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    flex-shrink: 0;
+  }
+  .author-card__avatar-ph {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .author-card__name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .author-card__role { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+  .author-card__bio { font-size: 12px; line-height: 1.7; color: var(--text-secondary); }
+  .author-card .btn { width: 100%; justify-content: center; font-size: 11px; padding: 10px 14px; }
+
+  /* Share */
+  .share-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-subtle); }
+  .share-row { display: flex; gap: 0.75rem; align-items: center; }
+  .share-btn {
+    width: 44px;
+    height: 44px;
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none;
+  }
+  .share-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  @media (max-width: 960px) {
+    .article-layout { grid-template-columns: 1fr; }
+    .article-sidebar { display: none; }
+  }
+
+  /* ── Mobile CTA ────────────────────────────────────────────────────────── */
+  .mobile-cta {
+    display: none;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-light);
+    padding: 1.25rem var(--gutter);
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  @media (max-width: 960px) { .mobile-cta { display: flex; } }
+
+  /* ── Related articles ──────────────────────────────────────────────────── */
+  .related {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-light);
+    padding-block: var(--section);
+  }
+  .related__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 2.5rem;
+  }
+  .related__grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+  .related-card {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .related-card:hover { border-color: rgba(196,154,60,.25); transform: translateY(-2px); }
+  .related-card__tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+    width: fit-content;
+  }
+  .related-card__title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--text-primary);
+    transition: color 0.2s;
+  }
+  .related-card:hover .related-card__title { color: var(--gold-light); }
+  .related-card__excerpt {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .related-card__read {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    transition: gap 0.2s;
+  }
+  .related-card:hover .related-card__read { gap: 12px; }
+  .related-card__read::after { content: '→'; }
+  @media (max-width: 760px) { .related__grid { grid-template-columns: 1fr; } }
+
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band__inner { position:relative;z-index:1 }
+  .cta-band__label { margin-bottom:1.5rem;justify-content:center }
+  .cta-band__label::before { display:none }
+  .cta-band__heading { font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem }
+  .cta-band__heading em { font-style:italic;color:var(--gold) }
+  .cta-band__sub { font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem }
+  .cta-band__actions { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap }
+</style>
+
+<!-- TOC link styles — in a global block because these are JS-created elements -->
+<style is:global>
+  .toc__link {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    padding: 0.625rem 1.25rem;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    display: block;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+  }
+  .toc__link:hover { color: var(--text-primary); background: var(--gold-trans); }
+  .toc__link.is-active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-trans); }
 </style>
