@@ -1,10 +1,57 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
+
+const allEpisodes = await getCollection('podcast');
+const latestEpisodes = allEpisodes
+  .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && e.data.status === 'published')
+  .sort((a, b) => b.data.episode_number - a.data.episode_number)
+  .slice(0, 3);
+
+const episodeCount = allEpisodes
+  .filter(e => e.id.startsWith('en/') && e.data.status === 'published').length;
+
+function epSlug(e: typeof latestEpisodes[number]) {
+  return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
+}
+
+function fmtDuration(d?: string): string {
+  if (!d) return '';
+  // "00:11:48" → "11 min", "01:02:00" → "62 min"
+  const parts = d.split(':').map(Number);
+  if (parts.length === 3) {
+    const mins = parts[0] * 60 + parts[1];
+    return `${mins} min`;
+  }
+  return d;
+}
+
+// Show artwork: use the most recent episode's artwork as the show cover
+const allArtwork = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
+  { eager: true }
+);
+
+function findArtwork(episodeId?: string, slug?: string): ImageMetadata | null {
+  const id = episodeId ?? slug;
+  if (!id) return null;
+  const entry = Object.entries(allArtwork).find(([path]) =>
+    path.split('/').pop()?.replace(/\.[^.]+$/, '') === id
+  );
+  return entry?.[1]?.default ?? null;
+}
+
+const showCover = latestEpisodes.length > 0
+  ? findArtwork(
+      latestEpisodes[0].data.episode_id,
+      latestEpisodes[0].id.replace(/^(en|de)\//, '').replace(/\.md$/, '')
+    )
+  : null;
 
 const allFaqs = await getCollection('faqs');
 const enFaqs = allFaqs
@@ -307,11 +354,22 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
     <div class="podcast__inner">
 
       <div class="podcast__cover" role="img" aria-label="Iconoclast Insights — podcast cover art">
-        <div class="img-ph" style="min-height:240px">
-          <span class="img-ph__icon" aria-hidden="true">◎</span>
-          <span class="img-ph__label">Podcast Cover Art</span>
-          <p class="img-ph__desc">Iconoclast Insights cover art. Replace with existing podcast artwork. 600×600px, 1:1 ratio.</p>
-        </div>
+        {showCover ? (
+          <Image
+            src={showCover}
+            alt="Iconoclast Insights podcast cover art"
+            width={400}
+            height={400}
+            class="podcast__cover-img"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div class="img-ph" style="min-height:240px">
+            <span class="img-ph__icon" aria-hidden="true">◎</span>
+            <span class="img-ph__label">Podcast Cover Art</span>
+          </div>
+        )}
       </div>
 
       <div class="podcast__main">
@@ -333,44 +391,38 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
           </div>
           <div class="podcast__meta-item">
             <strong>{isDE ? 'Episoden' : 'Episodes'}</strong>
-            50+
+            {episodeCount}
           </div>
         </div>
 
-        <ol class="episodes" aria-label={isDE ? 'Aktuelle Iconoclast Insights Episoden' : 'Recent Iconoclast Insights episodes'}>
-          <li>
-            <a href={`${prefix}/podcast`} class="episode">
-              <span class="episode__num" aria-hidden="true">—</span>
-              <div>
-                <p class="episode__title">{isDE ? '[Episodentitel folgt]' : '[Latest episode — coming soon]'}</p>
-                <p class="episode__topic">{isDE ? 'Strategie' : 'Strategy'}</p>
-              </div>
-              <span class="episode__dur">— min</span>
-            </a>
-          </li>
-          <li>
-            <a href={`${prefix}/podcast`} class="episode">
-              <span class="episode__num" aria-hidden="true">—</span>
-              <div>
-                <p class="episode__title">{isDE ? '[Episodentitel folgt]' : '[Episode — coming soon]'}</p>
-                <p class="episode__topic">{isDE ? 'Führung' : 'Leadership'}</p>
-              </div>
-              <span class="episode__dur">— min</span>
-            </a>
-          </li>
-          <li>
-            <a href={`${prefix}/podcast`} class="episode">
-              <span class="episode__num" aria-hidden="true">—</span>
-              <div>
-                <p class="episode__title">{isDE ? '[Episodentitel folgt]' : '[Episode — coming soon]'}</p>
-                <p class="episode__topic">{isDE ? 'Technologie' : 'Technology'}</p>
-              </div>
-              <span class="episode__dur">— min</span>
-            </a>
-          </li>
-        </ol>
+        {latestEpisodes.length > 0 ? (
+          <ol class="episodes" aria-label={isDE ? 'Aktuelle Iconoclast Insights Episoden' : 'Recent Iconoclast Insights episodes'}>
+            {latestEpisodes.map(ep => (
+              <li>
+                <a href={`${prefix}/podcast/${epSlug(ep)}`} class="episode">
+                  <span class="episode__num" aria-hidden="true">
+                    {String(ep.data.episode_number).padStart(3, '0')}
+                  </span>
+                  <div>
+                    <p class="episode__title">{ep.data.title}</p>
+                    <p class="episode__topic">{ep.data.category}</p>
+                  </div>
+                  <span class="episode__dur">
+                    {fmtDuration(ep.data.duration)}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p class="podcast__empty">
+            {isDE ? 'Episoden erscheinen in Kürze.' : 'Episodes coming soon.'}
+          </p>
+        )}
 
-        <a href={`${prefix}/podcast`} class="btn btn--outline btn-arrow" style="margin-top:1.5rem">{isDE ? 'Alle Episoden' : 'All Episodes'}</a>
+        <a href={`${prefix}/podcast`} class="btn btn--outline btn-arrow" style="margin-top:1.5rem">
+          {isDE ? 'Alle Episoden' : 'All Episodes'}
+        </a>
       </div>
     </div>
   </div>
@@ -674,6 +726,14 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
   .podcast { background: var(--bg-surface); border-top: 1px solid var(--border-light); }
   .podcast__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
   .podcast__cover { border-radius: 4px; overflow: hidden; aspect-ratio: 1/1; background: var(--bg-elevated); border: 1px solid var(--border-light); flex-shrink: 0; }
+  .podcast__cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
   .podcast__label { margin-bottom: 1.5rem; }
   .podcast__heading { font-family: var(--serif); font-size: clamp(1.6rem, 3vw, 2.25rem); font-weight: 400; line-height: 1.2; color: var(--text-primary); margin-bottom: 1rem; }
   .podcast__desc { font-size: 15px; line-height: 1.85; color: var(--text-secondary); margin-bottom: 1.5rem; }

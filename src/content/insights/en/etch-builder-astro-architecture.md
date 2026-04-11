@@ -3,7 +3,7 @@ title: "How the Most Promising Builder Gave Me an Architecture That Needs No Bui
 date: 2026-04-10
 og_title: "The Builder That Made Me Ditch Builders"
 summary: "I went all in on Etch. The bugs didn't kill it — they diagnosed something deeper. How the most promising WordPress builder led me to an architecture that needs no builder at all."
-category: Strategy, WordPress
+category: [Strategy, WordPress]
 status: published
 ---
 
