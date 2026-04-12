@@ -134,15 +134,32 @@ const useCases = defineCollection({
 const library = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/library' }),
   schema: z.object({
-    title: z.string(),
-    category: z.string(), // bias | liberating-structure | mental-model
-    og_title: z.string(),
-    og_image: z.string().url().optional(),
-    summary: z.string().optional(), // AI-generated at build time
-    last_updated: z.coerce.date(),
-    related_concepts: z.array(reference('library')).default([]), // cross-category
-    related_entries: z.array(reference('library')).default([]),  // same-category
-    related_use_cases: z.array(reference('use-cases')).default([]),
+ 
+    title:      z.string(),
+    type:       z.enum(['bias', 'structure', 'method']),
+    definition: z.string(),
+    summary:    z.string().optional(),
+ 
+    first_described: z.string().optional(),
+    applies_to:      z.string().optional(),
+    risk_level:      z.string().optional(),
+ 
+    tags: z.array(z.string()).default([]),
+ 
+    /** Slugs of related library entries.
+     *  Title, type, and definition are resolved from those files at build time. */
+    related_entries: z.array(z.string()).default([]),
+ 
+    /** References to use cases or insights where this concept appears.
+     *  Title is resolved from the respective collection at build time.
+     *  `note` is an optional sentence describing how the concept appears. */
+    in_practice: z.array(z.object({
+      type: z.enum(['use-case', 'insight']),
+      slug: z.string(),
+      note: z.string().optional(),
+    })).default([]),
+ 
+    og_title: z.string().optional(),
   }),
 });
 

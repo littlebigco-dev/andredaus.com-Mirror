@@ -11,7 +11,6 @@ There is a particular kind of problem that doesn't announce itself as a problem.
 
 You are wrong. The friction is trying to tell you something. You're just not listening yet.
 
----
 
 ## I was all in on Etch.
 
@@ -25,7 +24,6 @@ Each bug was fixable. I fixed them. I wrote an MU-plugin to patch the conflicts.
 
 And then I stopped and looked at what I had built.
 
----
 
 ## I was writing infrastructure to fix a tool whose entire purpose was to reduce infrastructure.
 
@@ -37,7 +35,6 @@ WordPress stores content in MySQL. Not in files. Not in Git. In a database that 
 
 The builder was supposed to be the answer to the complexity. Instead it was revealing the complexity that was always there — the complexity I had accepted as the cost of doing business on WordPress.
 
----
 
 ## The problem was never Etch.
 
@@ -53,7 +50,6 @@ For that problem, a database is the wrong substrate. I had been solving the wron
 
 *The problem is rarely the problem.* I've said that to clients for years. It turns out it applies to your own stack too.
 
----
 
 ## The architecture that emerged.
 
@@ -67,7 +63,6 @@ The content is just files. Diffable. Taggable. Readable in any editor, on any de
 
 Every "solution" I had been stacking on WordPress to achieve these properties — backup plugins, migration tools, version control workarounds, REST API patches — simply disappears. Not because I solved them. Because I removed the substrate that made them necessary.
 
----
 
 ## Etch didn't fail me. It diagnosed me.
 

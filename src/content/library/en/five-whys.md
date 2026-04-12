@@ -1,13 +1,27 @@
 ---
 title: "Five Whys"
-category: mental-model
+type: method
 og_title: "Five Whys"
 summary: "A root cause analysis technique that iterates through causal layers by asking 'why' five times — useful for separating symptoms from structural causes."
 last_updated: 2025-09-15
-related_concepts: []
-related_entries: []
-related_use_cases: []
+definition: "The tendency to search for, interpret, and remember information that confirms what we already believe — while filtering out, dismissing, or forgetting anything that contradicts it."
+
+first_described: "Wason, 1960"
+applies_to: "Individuals & organisations"
+risk_level: "High — compounds silently"
+tags: ["Decision-making", "Strategy", "Leadership", "Research"]
+related_entries:
+  - "motivated-reasoning"
+  - "anchoring-bias"
+  - "cognitive-dissonance"
+  - "availability-heuristic"
+in_practice:
+  - type: use-case
+    slug: cybersecurity-human-problem
+    title: "The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem"
+    note: "Organisations confirm the belief that cybersecurity is a technical problem — selectively reading threat data."
 ---
+
 
 The Five Whys is a root cause analysis technique developed within the Toyota Production System. The method involves iterating through causal chains by asking "why" five times in succession — each answer forming the basis of the next question — until a root cause is identified.
 

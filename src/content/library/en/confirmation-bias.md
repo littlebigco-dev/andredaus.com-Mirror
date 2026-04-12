@@ -1,12 +1,23 @@
 ---
 title: "Confirmation Bias"
-category: bias
-og_title: "Confirmation Bias"
-summary: "The tendency to search for, interpret, and recall information in a way that confirms pre-existing beliefs — the most common reason strategies fail to adapt."
-last_updated: 2025-10-01
-related_concepts: []
-related_entries: []
-related_use_cases: []
+type: bias
+definition: "The tendency to search for, interpret, and remember information that confirms what we already believe — while filtering out, dismissing, or forgetting anything that contradicts it."
+summary: "One of the most consequential and least visible thinking errors in organisational decision-making."
+first_described: "Wason, 1960"
+applies_to: "Individuals & organisations"
+risk_level: "High — compounds silently"
+tags: ["Decision-making", "Strategy", "Leadership", "Research"]
+related_entries:
+  - "motivated-reasoning"
+  - "anchoring-bias"
+  - "cognitive-dissonance"
+  - "availability-heuristic"
+in_practice:
+  - type: use-case
+    slug: cybersecurity-human-problem
+    title: "The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem"
+    note: "Organisations confirm the belief that cybersecurity is a technical problem — selectively reading threat data."
+og_title: "Confirmation Bias — Library · André Daus"
 ---
 
 Confirmation bias is the tendency to search for, interpret, favour, and recall information in a way that confirms or supports one's prior beliefs or values. It is one of the most pervasive cognitive biases in strategic decision-making and one of the most difficult to correct.

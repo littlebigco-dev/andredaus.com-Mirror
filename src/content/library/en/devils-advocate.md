@@ -1,12 +1,28 @@
 ---
 title: "Devil's Advocate"
-category: liberating-structure
+type: structure
 og_title: "Devil's Advocate"
+definition: "The tendency to search for, interpret, and remember information that confirms what we already believe — while filtering out, dismissing, or forgetting anything that contradicts it."
 summary: "A structured facilitation role that assigns one person to argue against the prevailing position — creating productive opposition without requiring genuine dissent."
 last_updated: 2025-09-20
-related_concepts: []
-related_entries: []
-related_use_cases: []
+first_described: "Wason, 1960"
+applies_to: "Individuals & organisations"
+risk_level: "High — compounds silently"
+tags: ["Decision-making", "Strategy", "Leadership", "Research"]
+related_entries:
+  - "authority-bias"
+  - "devils-advocate"
+  - "confirmation-bias"
+  - "availability-heuristic"
+in_practice:
+  - type: use-case
+    slug: consensus-trap
+    title: "The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem"
+    note: "Organisations confirm the belief that cybersecurity is a technical problem — selectively reading threat data."
+  - type: insight
+    slug: etch-builder-astro-architecture
+    title: "How the Most Promising Builder Gave Me an Architecture That Needs No Builder at All"
+    note: "See it in action."
 ---
 
 The Devil's Advocate is a structured facilitation role in which one or more participants are explicitly tasked with arguing against the prevailing position, regardless of their own views. The term originates from the Catholic Church's formal process for evaluating candidates for sainthood, where an advocate was assigned to argue against canonization.
@@ -39,3 +55,14 @@ The more fundamental issue is that genuine strategic risk often doesn't come fro
 Devil's Advocate facilitation is most useful in groups with established social norms that suppress overt disagreement — teams with strong hierarchical dynamics, long-tenured leadership, or cultures that conflate cohesion with correctness.
 
 It is less useful in groups that already have high tolerance for dissent, and actively counterproductive if the role is deployed defensively — as a way of appearing to have challenged a decision that was effectively predetermined.
+
+:::note{label="Why this is a Strategic Opposition concern" heading="The organisation cannot fix its own bias from the inside."}
+People doing the wrong things.
+:::
+
+## Related Concepts
+
+bla bla bla
+
+> "This is a pullquote"
+

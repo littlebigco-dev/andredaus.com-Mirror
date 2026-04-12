@@ -1,13 +1,25 @@
 ---
 title: "Authority Bias"
-category: bias
+type: bias
+definition: "The tendency to search for, interpret, and remember information that confirms what we already believe — while filtering out, dismissing, or forgetting anything that contradicts it."
 og_title: "Authority Bias"
 summary: "The tendency to assign accuracy to an opinion based on who holds it rather than what they're saying — and why high-stakes decisions are where this costs the most."
 last_updated: 2026-04-10
-related_concepts: []
-related_entries: []
-related_use_cases: []
+rapplies_to: "Individuals & organisations"
+risk_level: "High — compounds silently"
+tags: ["Decision-making", "Strategy", "Leadership", "Research"]
+related_entries:
+  - "motivated-reasoning"
+  - "anchoring-bias"
+  - "cognitive-dissonance"
+  - "availability-heuristic"
+in_practice:
+  - type: use-case
+    slug: cybersecurity-human-problem
+    title: "The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem"
+    note: "Organisations confirm the belief that cybersecurity is a technical problem — selectively reading threat data."
 ---
+
 
 # Authority Bias
 

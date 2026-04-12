@@ -11,503 +11,688 @@ const entries = allEntries
   .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/'))
   .sort((a, b) => a.data.title.localeCompare(b.data.title, isDE ? 'de' : 'en'));
 
-// All entries serialised for client-side filtering
+// Counts by type
+const countBias      = entries.filter(e => e.data.type === 'bias').length;
+const countStructure = entries.filter(e => e.data.type === 'structure').length;
+const countMethod    = entries.filter(e => e.data.type === 'method').length;
+
+// Serialize for client-side search + filter
 const entriesJSON = JSON.stringify(entries.map(e => ({
-  id: e.id,
-  title: e.data.title,
-  category: e.data.category,
-  summary: e.data.summary ?? '',
-  slug: e.id.replace(/^(en|de)\//, '').replace(/\.md$/, ''),
-  letter: e.data.title[0].toUpperCase(),
+  slug:       e.id.replace(/^(en|de)\//, '').replace(/\.md$/, ''),
+  letter:     e.data.title[0].toUpperCase(),
+  type:       e.data.type,
+  name:       e.data.title,
+  def:        e.data.definition,
+  tags:       e.data.tags ?? [],
 })));
 
-// All letters present in the full set
-const allLetters = Array.from(new Set(entries.map(e => e.data.title[0].toUpperCase()))).sort();
-
-const categoryLabels: Record<string, { en: string; de: string }> = {
-  bias: { en: 'Cognitive Bias', de: 'Kognitive Verzerrung' },
-  'liberating-structure': { en: 'Liberating Structure', de: 'Liberating Structure' },
-  'mental-model': { en: 'Mental Model', de: 'Mentales Modell' },
-};
+// Type label lookup
+function typeLabel(type: string, lang: boolean): string {
+  const map: Record<string, [string, string]> = {
+    bias:      ['Cognitive Bias',         'Kognitive Verzerrung'],
+    structure: ['Liberating Structure',   'Liberating Structure'],
+    method:    ['Method',                 'Methode'],
+  };
+  return (map[type] ?? [type, type])[lang ? 1 : 0];
+}
 ---
 
 <Base
   title={isDE ? 'Bibliothek — André Daus' : 'Library — André Daus'}
   description={isDE
-    ? 'Kognitive Verzerrungen, Liberating Structures und mentale Modelle — Referenzeinträge für strategisches Denken.'
-    : 'Cognitive biases, liberating structures, and mental models — reference entries for strategic thinking.'}
+    ? 'Kognitive Verzerrungen, Liberating Structures und Denkwerkzeuge — das intellektuelle Fundament von Strategic Opposition.'
+    : 'Cognitive biases, liberating structures, and thinking methods — the intellectual foundation of Strategic Opposition.'}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- HERO -->
-  <header class="coll-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- ── PAGE HERO ──────────────────────────────────────────────────────── -->
+  <header class="page-hero" aria-labelledby="page-heading">
+    <div class="page-hero__grid" aria-hidden="true"></div>
     <div class="container">
-      <p class="label">{isDE ? 'Bibliothek' : 'Library'}</p>
-      <h1 class="coll-hero__heading">
-        {isDE
-          ? <Fragment>Das Vokabular des <em>strategischen Denkens.</em></Fragment>
-          : <Fragment>The vocabulary of <em>strategic thinking.</em></Fragment>}
-      </h1>
-      <p class="coll-hero__sub">
-        {isDE
-          ? 'Kognitive Verzerrungen, Liberating Structures und mentale Modelle — immergrüne Referenzeinträge für Führungskräfte, die besser denken wollen.'
-          : 'Cognitive biases, liberating structures, and mental models — evergreen reference entries for leaders who want to think more clearly.'}
-      </p>
+      <div class="page-hero__inner">
+        <div>
+          <p class="label page-hero__label">
+            {isDE ? 'Referenz' : 'Reference'}
+          </p>
+          <h1 class="page-hero__heading" id="page-heading">
+            {isDE
+              ? <Fragment>Das intellektuelle<br><em>Fundament.</em></Fragment>
+              : <Fragment>The intellectual<br><em>foundation.</em></Fragment>}
+          </h1>
+          <p class="page-hero__lede">
+            {isDE
+              ? 'Kognitive Verzerrungen, Liberating Structures und Denkmethoden — dokumentiert und verknüpft. Die Evidenzbasis dafür, warum das Hinterfragen von Annahmen kein Beratungsstil ist, sondern eine Reaktion darauf, wie Köpfe und Organisationen tatsächlich funktionieren.'
+              : 'Cognitive biases, liberating structures, and thinking methods — documented and cross-referenced. The evidence base for why assumption-challenging isn\'t a style of consulting. It\'s a response to how minds and organisations actually work.'}
+          </p>
+        </div>
+
+        <!-- Counts aside -->
+        <aside class="counts-aside" aria-label={isDE ? 'Bibliotheksübersicht' : 'Library collection summary'}>
+          <p class="counts-aside__heading">
+            {isDE ? 'Was hier drin ist' : 'What\'s in here'}
+          </p>
+          <div class="count-rows">
+            <div class="count-row">
+              <span class="count-dot count-dot--bias" aria-hidden="true"></span>
+              <div class="count-info">
+                <span class="count-label">{isDE ? 'Kognitive Verzerrungen' : 'Cognitive Biases'}</span>
+                <strong class="count-n" id="count-bias">{countBias}</strong>
+              </div>
+            </div>
+            <div class="count-row">
+              <span class="count-dot count-dot--structure" aria-hidden="true"></span>
+              <div class="count-info">
+                <span class="count-label">Liberating Structures</span>
+                <strong class="count-n" id="count-structure">{countStructure}</strong>
+              </div>
+            </div>
+            <div class="count-row">
+              <span class="count-dot count-dot--method" aria-hidden="true"></span>
+              <div class="count-info">
+                <span class="count-label">{isDE ? 'Methoden' : 'Methods'}</span>
+                <strong class="count-n" id="count-method">{countMethod}</strong>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   </header>
 
-  <!-- CONTROLS -->
-  <div class="library-controls" id="library-controls">
+  <!-- ── FILTER BAR: type tabs + search ────────────────────────────────── -->
+  <div
+    class="filter-bar"
+    role="search"
+    aria-label={isDE ? 'Bibliothek filtern und durchsuchen' : 'Filter and search the library'}
+  >
     <div class="container">
-      <div class="controls-inner">
-
-        <!-- Category tabs -->
-        <div class="cat-tabs" role="group" aria-label={isDE ? 'Nach Kategorie filtern' : 'Filter by category'}>
-          <button class="cat-tab is-active" data-cat="all" aria-pressed="true">
+      <div class="filter-bar__inner">
+        <nav class="type-tabs" aria-label={isDE ? 'Nach Typ filtern' : 'Filter by type'}>
+          <button class="cat-btn is-active" data-cat="all" aria-pressed="true">
             {isDE ? 'Alle' : 'All'}
           </button>
-          {(['bias', 'liberating-structure', 'mental-model'] as const).map(cat => (
-            <button class="cat-tab" data-cat={cat} aria-pressed="false">
-              {isDE ? categoryLabels[cat].de : categoryLabels[cat].en}
-            </button>
-          ))}
-        </div>
-
-        <!-- Search (scaffolded for Pagefind in Phase 5) -->
-        <div class="library-search" role="search">
-          <label for="library-search-input" class="sr-only">
-            {isDE ? 'Bibliothek durchsuchen' : 'Search library'}
+          <button class="cat-btn" data-cat="bias" aria-pressed="false">
+            {isDE ? 'Kognitive Verzerrungen' : 'Cognitive Biases'}
+          </button>
+          <button class="cat-btn" data-cat="structure" aria-pressed="false">
+            Liberating Structures
+          </button>
+          <button class="cat-btn" data-cat="method" aria-pressed="false">
+            {isDE ? 'Methoden' : 'Methods'}
+          </button>
+        </nav>
+        <div class="search-wrap">
+          <label for="lib-search" class="sr-only">
+            {isDE ? 'Bibliothek durchsuchen' : 'Search the library'}
           </label>
           <input
             type="search"
-            id="library-search-input"
+            id="lib-search"
             class="search-input"
-            placeholder={isDE ? 'Suchen…' : 'Search…'}
+            placeholder={isDE ? 'Einträge suchen…' : 'Search entries…'}
             autocomplete="off"
+            spellcheck="false"
           />
-          <span class="search-icon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-          </span>
         </div>
-
       </div>
     </div>
   </div>
 
-  <!-- ALPHA INDEX + GRID -->
-  <section class="section library-section" aria-label={isDE ? 'Bibliothekseinträge' : 'Library entries'}>
-    <div class="container library-layout">
-
-      <!-- Alphabetical sidebar index -->
-      <nav class="alpha-index" aria-label={isDE ? 'Alphabetischer Index' : 'Alphabetical index'} id="alpha-nav">
-        {allLetters.map(letter => (
-          <a href={`#letter-${letter}`} class="alpha-link" data-letter={letter}>
-            {letter}
-          </a>
-        ))}
-      </nav>
-
-      <!-- Entry list -->
-      <div class="library-list" id="library-list" aria-live="polite">
-        {allLetters.map(letter => (
-          <div class="alpha-group" data-letter={letter} id={`letter-${letter}`}>
-            <h2 class="alpha-group__heading" aria-label={`${isDE ? 'Einträge unter' : 'Entries under'} ${letter}`}>
-              {letter}
-            </h2>
-            <ul class="alpha-group__list">
-              {entries
-                .filter(e => e.data.title[0].toUpperCase() === letter)
-                .map(entry => {
-                  const slug = entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-                  return (
-                    <li class="lib-entry" data-category={entry.data.category} data-title={entry.data.title.toLowerCase()}>
-                      <a href={`${prefix}/library/${slug}`} class="lib-entry__link">
-                        <div class="lib-entry__inner">
-                          <div class="lib-entry__text">
-                            <h3 class="lib-entry__title">{entry.data.title}</h3>
-                            {entry.data.summary && (
-                              <p class="lib-entry__summary">{entry.data.summary}</p>
-                            )}
-                          </div>
-                          <span class="lib-entry__cat">
-                            {isDE ? categoryLabels[entry.data.category]?.de : categoryLabels[entry.data.category]?.en}
-                          </span>
-                        </div>
-                      </a>
-                    </li>
-                  );
-                })
-              }
-            </ul>
-          </div>
-        ))}
-
-        <p class="no-results" id="no-results" hidden>
-          {isDE ? 'Keine Einträge gefunden.' : 'No entries found.'}
-        </p>
+  <!-- ── ALPHABET BAR (JS-generated) ───────────────────────────────────── -->
+  <div class="alpha-bar" aria-label={isDE ? 'Zum Buchstabenabschnitt springen' : 'Jump to letter section'}>
+    <div class="container">
+      <div class="alpha-bar__inner" id="alpha-bar" role="list">
+        <!-- Populated by JS -->
       </div>
+    </div>
+  </div>
 
+  <!-- ── LIBRARY BODY ───────────────────────────────────────────────────── -->
+  <section class="library" aria-labelledby="library-heading">
+    <h2 class="sr-only" id="library-heading">
+      {isDE ? 'Bibliothekseinträge' : 'Library entries'}
+    </h2>
+    <div class="container">
+      <div class="library-inner">
+
+        <!-- Left: sticky index panel -->
+        <nav class="index-panel" aria-label={isDE ? 'Schnellnavigation nach Typ' : 'Quick navigation by type'}>
+          <p class="index-panel__heading">
+            {isDE ? 'Nach Typ' : 'Browse by type'}
+          </p>
+          <div class="index-list">
+            <button class="index-item is-active" data-cat="all">
+              <span class="index-dot" style="background:var(--gold)" aria-hidden="true"></span>
+              {isDE ? 'Alle Einträge' : 'All entries'}
+              <span class="index-count" id="idx-all">{entries.length}</span>
+            </button>
+            <button class="index-item" data-cat="bias">
+              <span class="index-dot index-dot--bias" aria-hidden="true"></span>
+              {isDE ? 'Kognitive Verzerrungen' : 'Cognitive Biases'}
+              <span class="index-count" id="idx-bias">{countBias}</span>
+            </button>
+            <button class="index-item" data-cat="structure">
+              <span class="index-dot index-dot--structure" aria-hidden="true"></span>
+              Liberating Structures
+              <span class="index-count" id="idx-structure">{countStructure}</span>
+            </button>
+            <button class="index-item" data-cat="method">
+              <span class="index-dot index-dot--method" aria-hidden="true"></span>
+              {isDE ? 'Methoden' : 'Methods'}
+              <span class="index-count" id="idx-method">{countMethod}</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- Right: entry list (JS-rendered) -->
+        <div id="entry-list" role="list" aria-live="polite" aria-label={isDE ? 'Bibliothekseinträge' : 'Library entries'}>
+          <!-- Empty state -->
+          <div class="empty-state" id="empty-state" role="status" aria-live="polite">
+            <span class="empty-state__icon" aria-hidden="true">◎</span>
+            <p class="empty-state__heading">
+              {isDE ? 'Keine Einträge gefunden' : 'No entries found'}
+            </p>
+            <p class="empty-state__body">
+              {isDE ? 'Anderen Suchbegriff oder Filter verwenden.' : 'Try a different search term or filter.'}
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WHAT IS THIS BAND ─────────────────────────────────────────────── -->
+  <section class="what-band" aria-labelledby="what-heading">
+    <div class="container">
+      <div class="what-band__inner">
+        <div>
+          <p class="label" style="margin-bottom:1.25rem">
+            {isDE ? 'Über diese Bibliothek' : 'About this library'}
+          </p>
+          <h2 class="what-band__heading" id="what-heading">
+            {isDE
+              ? 'Referenzmaterial für Denken, das sich nicht selbst schmeichelt.'
+              : 'Reference material for thinking that doesn\'t flatter itself.'}
+          </h2>
+          <div class="what-band__body">
+            <p>
+              {isDE
+                ? 'Strategic Opposition ist keine proprietäre Methodik, die auf erfundener Terminologie aufbaut. Sie stützt sich auf Jahrzehnte kognitiver Wissenschaft, Facilitationsforschung und Entscheidungsliteratur — kumulierte Evidenz dafür, warum intelligente Menschen und gut geführte Organisationen konsequent falsch liegen.'
+                : 'Strategic Opposition isn\'t a proprietary methodology built on invented terminology. It draws on decades of cognitive science, facilitation research, and decision-making literature — accumulated evidence for why intelligent people and well-run organisations get things consistently wrong.'}
+            </p>
+            <p>
+              {isDE
+                ? 'Diese Bibliothek ist das dokumentierte Fundament. Jeder Eintrag erklärt ein Konzept, verweist auf verwandte und verknüpft mit Use Cases und Engagements, wo das Konzept in der Praxis erscheint.'
+                : 'This library is the documented foundation. Each entry explains a concept, cross-references related ones, and links to use cases and engagements where the concept appears in practice.'}
+            </p>
+          </div>
+        </div>
+        <div>
+          <div class="type-explanations" aria-label={isDE ? 'Eintragstypen' : 'Types of entries in the library'}>
+            <div class="type-exp">
+              <div class="type-exp__icon type-exp__icon--bias" aria-hidden="true">CB</div>
+              <div>
+                <p class="type-exp__title">{isDE ? 'Kognitive Verzerrungen' : 'Cognitive Biases'}</p>
+                <p class="type-exp__body">
+                  {isDE
+                    ? 'Systematische Denkfehler — Muster, bei denen die Abkürzungen des Geistes zuverlässig falsche Ergebnisse liefern. Keine Eigenheiten irrationaler Menschen. Standardfunktionen intelligenter Köpfe unter realen Bedingungen.'
+                    : 'Systematic errors in thinking — patterns where the mind\'s shortcuts produce reliably wrong outputs. Not quirks of irrational people. Default features of intelligent minds under real conditions.'}
+                </p>
+              </div>
+            </div>
+            <div class="type-exp">
+              <div class="type-exp__icon type-exp__icon--structure" aria-hidden="true">LS</div>
+              <div>
+                <p class="type-exp__title">Liberating Structures</p>
+                <p class="type-exp__body">
+                  {isDE
+                    ? 'Facilitation-Methoden zur Verteilung von Beteiligung und zum Aufdecken von Ideen, die konventionelle Besprechungsformate unterdrücken.'
+                    : 'Facilitation methods designed to distribute participation and surface ideas that conventional meeting formats suppress.'}
+                </p>
+              </div>
+            </div>
+            <div class="type-exp">
+              <div class="type-exp__icon type-exp__icon--method" aria-hidden="true">M</div>
+              <div>
+                <p class="type-exp__title">{isDE ? 'Methoden' : 'Methods'}</p>
+                <p class="type-exp__body">
+                  {isDE
+                    ? 'Denkrahmen und analytische Ansätze — Pre-Mortem, Red-Teaming, Inversion und andere — die strukturierte Herausforderung schaffen, wo unstrukturiertes Denken Bestätigung produzieren würde.'
+                    : 'Thinking frameworks and analytical approaches — pre-mortem, red teaming, inversion, and others — that create structured challenge where unstructured thinking would produce confirmation.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Von der Theorie zur Praxis' : 'From reference to practice'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Das Vorhandensein der Verzerrung zu kennen<br>ist nicht dasselbe wie <em>sie im Raum zu ertappen.</em></Fragment>
+          : <Fragment>Knowing the bias exists<br>is not the same as <em>catching it in the room.</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Dafür sind Engagements da. Ein Discovery Call zeigt, welche davon gerade die Entscheidungen Ihrer Organisation prägen.'
+          : 'That\'s what engagements are for. A discovery call is where we find which of these are running in your organisation right now.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`}    class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/use-cases`}  class="btn btn--outline">
+          {isDE ? 'Use Cases ansehen' : 'See Use Cases'}
+        </a>
+      </div>
     </div>
   </section>
 
 </Base>
 
-<script define:vars={{ entriesJSON, prefix }}>
-  const entries = JSON.parse(entriesJSON);
-  const catTabs = document.querySelectorAll('.cat-tab');
-  const searchInput = document.getElementById('library-search-input');
-  const alphaLinks = document.querySelectorAll('.alpha-link');
-  const noResults = document.getElementById('no-results');
+<script define:vars={{ ENTRIES: JSON.parse(entriesJSON), isDE }}>
+(function () {
+  'use strict';
 
-  let activeCat = 'all';
-  // Pagefind: null = no search active (show all), Set = show only matched slugs
-  let pagefindSlugs = null;
-  let pagefind = null;
+  const prefix = isDE ? '/de' : '';
 
-  // Load Pagefind lazily on first keypress
-  async function loadPagefind() {
-    if (pagefind) return pagefind;
-    try {
-      pagefind = await import('/_pagefind/pagefind.js');
-      await pagefind.options({ baseUrl: '/' });
-    } catch {
-      // Pagefind not available in dev mode — fall back to client-side matching
-      pagefind = null;
-    }
-    return pagefind;
-  }
+  // Type labels
+  const TYPE_LABEL = {
+    bias:      isDE ? 'Kognitive Verzerrung' : 'Cognitive Bias',
+    structure: 'Liberating Structure',
+    method:    isDE ? 'Methode' : 'Method',
+  };
 
-  function pushCategoryParam(cat) {
-    const url = new URL(window.location.href);
-    if (cat === 'all') {
-      url.searchParams.delete('category');
-    } else {
-      url.searchParams.set('category', cat);
-    }
-    history.replaceState(null, '', url.toString());
-  }
+  // ── Build alphabet bar ────────────────────────────────────────────────────
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const activeLetters = new Set(ENTRIES.map(function(e) { return e.letter; }));
+  const alphaBar = document.getElementById('alpha-bar');
 
-  function applyFilters() {
-    const rawTerm = searchInput?.value.toLowerCase().trim() ?? '';
-
-    const filtered = entries.filter(e => {
-      const catMatch = activeCat === 'all' || e.category === activeCat;
-      // If Pagefind returned a result set, use it; otherwise match client-side
-      const searchMatch = pagefindSlugs !== null
-        ? pagefindSlugs.has(e.slug)
-        : (!rawTerm || e.title.toLowerCase().includes(rawTerm) || e.summary.toLowerCase().includes(rawTerm));
-      return catMatch && searchMatch;
-    });
-
-    const filteredSlugs = new Set(filtered.map(e => e.slug));
-    const filteredLetters = new Set(filtered.map(e => e.letter));
-
-    document.querySelectorAll('.lib-entry').forEach(el => {
-      const link = el.querySelector('a');
-      const href = link?.getAttribute('href') || '';
-      const slug = href.split('/').pop();
-      el.hidden = !filteredSlugs.has(slug);
-    });
-
-    document.querySelectorAll('.alpha-group').forEach(group => {
-      const letter = group.dataset.letter;
-      group.hidden = !filteredLetters.has(letter);
-    });
-
-    alphaLinks.forEach(link => {
-      const letter = link.dataset.letter;
-      link.classList.toggle('is-dimmed', !filteredLetters.has(letter));
-    });
-
-    noResults.hidden = filtered.length > 0;
-  }
-
-  // Category tabs
-  catTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      activeCat = tab.dataset.cat;
-      catTabs.forEach(t => {
-        t.classList.toggle('is-active', t === tab);
-        t.setAttribute('aria-pressed', t === tab ? 'true' : 'false');
+  if (alphaBar) {
+    alphabet.forEach(function(l) {
+      const btn = document.createElement('button');
+      const has = activeLetters.has(l);
+      btn.className = 'alpha-btn' + (has ? ' has-entries' : '');
+      btn.textContent = l;
+      btn.setAttribute('role', 'listitem');
+      btn.setAttribute('aria-label', (isDE ? 'Zum Buchstaben ' : 'Jump to letter ') + l);
+      if (!has) btn.setAttribute('disabled', '');
+      btn.addEventListener('click', function() {
+        const sec = document.getElementById('letter-' + l);
+        if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
-      pushCategoryParam(activeCat);
-      applyFilters();
+      alphaBar.appendChild(btn);
     });
-  });
+  }
 
-  // Search — Pagefind with client-side fallback
-  let searchDebounce;
-  searchInput?.addEventListener('input', async () => {
-    clearTimeout(searchDebounce);
-    const term = searchInput.value.trim();
+  // ── Render entries ────────────────────────────────────────────────────────
+  function renderEntries(filter, search) {
+    const entryList = document.getElementById('entry-list');
+    entryList.querySelectorAll('.entry-section').forEach(function(s) { s.remove(); });
 
-    if (!term) {
-      pagefindSlugs = null;
-      applyFilters();
+    const q = search.toLowerCase();
+    const filtered = ENTRIES.filter(function(e) {
+      const matchType = filter === 'all' || e.type === filter;
+      const matchSearch = !q ||
+        e.name.toLowerCase().includes(q) ||
+        e.def.toLowerCase().includes(q) ||
+        e.tags.some(function(t) { return t.toLowerCase().includes(q); });
+      return matchType && matchSearch;
+    });
+
+    const emptyState = document.getElementById('empty-state');
+
+    // Group by first letter
+    const byLetter = {};
+    filtered.forEach(function(e) {
+      if (!byLetter[e.letter]) byLetter[e.letter] = [];
+      byLetter[e.letter].push(e);
+    });
+    const letters = Object.keys(byLetter).sort();
+
+    if (letters.length === 0) {
+      emptyState.classList.add('visible');
+      updateCounts(filtered);
       return;
     }
+    emptyState.classList.remove('visible');
 
-    searchDebounce = setTimeout(async () => {
-      const pf = await loadPagefind();
-      if (pf) {
-        const search = await pf.search(term);
-        const results = await Promise.all(search.results.map(r => r.data()));
-        // Extract slug from Pagefind result URL: /library/slug or /de/library/slug
-        pagefindSlugs = new Set(
-          results.map(r => r.url.replace(/\/$/, '').split('/').pop())
-        );
-      } else {
-        // No Pagefind (dev mode) — rely on client-side matching in applyFilters
-        pagefindSlugs = null;
-      }
-      applyFilters();
-    }, 200);
+    letters.forEach(function(l) {
+      const section = document.createElement('div');
+      section.className = 'entry-section fade-up visible';
+      section.id = 'letter-' + l;
+      section.setAttribute('data-letter', l);
+
+      const items = byLetter[l];
+      const countText = items.length + ' ' + (items.length === 1
+        ? (isDE ? 'Eintrag' : 'entry')
+        : (isDE ? 'Einträge' : 'entries'));
+
+      section.innerHTML =
+        '<div class="entry-section__letter" aria-hidden="true">' +
+          l + ' <span>' + countText + '</span>' +
+        '</div>' +
+        '<ul class="entry-list" role="list"></ul>';
+
+      const ul = section.querySelector('ul');
+
+      items.forEach(function(e) {
+        const dotClass  = 'entry-type-dot--' + e.type;
+        const tagClass  = 'entry-tag--' + e.type;
+        const typeLabel = TYPE_LABEL[e.type] || e.type;
+        const tagsHtml  = e.tags.map(function(tag, i) {
+          return '<span class="entry-tag ' + (i === 0 ? tagClass : 'entry-tag--neutral') + '">' + tag + '</span>';
+        }).join('');
+
+        const li = document.createElement('li');
+        li.setAttribute('role', 'listitem');
+        li.setAttribute('data-type', e.type);
+        li.setAttribute('data-name', e.name.toLowerCase());
+        li.innerHTML =
+          '<a href="' + prefix + '/library/' + e.slug + '" class="entry-row">' +
+            '<span class="entry-type-dot ' + dotClass + '" title="' + typeLabel + '" aria-label="Type: ' + typeLabel + '"></span>' +
+            '<div class="entry-main">' +
+              '<p class="entry-name">' + e.name + '</p>' +
+              '<p class="entry-def">' + e.def + '</p>' +
+              '<div class="entry-tags" aria-label="' + (isDE ? 'Kategorien' : 'Categories') + '">' + tagsHtml + '</div>' +
+            '</div>' +
+            '<span class="entry-arrow" aria-hidden="true">\u2192</span>' +
+          '</a>';
+        ul.appendChild(li);
+      });
+
+      entryList.insertBefore(section, emptyState);
+    });
+
+    updateCounts(filtered);
+  }
+
+  function updateCounts(filtered) {
+    let bias = 0, structure = 0, method = 0;
+    filtered.forEach(function(e) {
+      if (e.type === 'bias') bias++;
+      else if (e.type === 'structure') structure++;
+      else if (e.type === 'method') method++;
+    });
+    const total = filtered.length;
+    function set(id, n) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = String(n);
+    }
+    set('count-bias', bias);
+    set('count-structure', structure);
+    set('count-method', method);
+    set('idx-all', total);
+    set('idx-bias', bias);
+    set('idx-structure', structure);
+    set('idx-method', method);
+  }
+
+  // ── Filter state ──────────────────────────────────────────────────────────
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  function setFilter(cat) {
+    currentFilter = cat;
+    document.querySelectorAll('.cat-btn').forEach(function(b) {
+      const active = b.dataset.cat === cat;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+    document.querySelectorAll('.index-item').forEach(function(b) {
+      b.classList.toggle('is-active', b.dataset.cat === cat);
+    });
+    renderEntries(currentFilter, currentSearch);
+  }
+
+  document.querySelectorAll('.cat-btn, .index-item').forEach(function(btn) {
+    btn.addEventListener('click', function() { setFilter(btn.dataset.cat || 'all'); });
   });
 
-  // Initialise from URL param
-  const initCat = new URLSearchParams(window.location.search).get('category') || 'all';
-  if (initCat !== 'all') {
-    const matchTab = document.querySelector(`.cat-tab[data-cat="${initCat}"]`);
-    if (matchTab) {
-      activeCat = initCat;
-      catTabs.forEach(t => {
-        t.classList.toggle('is-active', t === matchTab);
-        t.setAttribute('aria-pressed', t === matchTab ? 'true' : 'false');
-      });
-      applyFilters();
-    }
+  const searchInput = document.getElementById('lib-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      currentSearch = searchInput.value.toLowerCase().trim();
+      renderEntries(currentFilter, currentSearch);
+    });
   }
+
+  // ── Initial render ────────────────────────────────────────────────────────
+  renderEntries('all', '');
+})();
 </script>
 
 <style>
-  /* Hero */
-  .coll-hero {
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+
+  /* ── Token extensions for type colors ──────────────────────────────────── */
+  :root {
+    --accent-bias:      #c49a3c;
+    --accent-structure: #6ba3c8;
+    --accent-method:    #7ab648;
+    --tint-bias:        rgba(196,154,60,.08);
+    --tint-structure:   rgba(74,144,186,.08);
+    --tint-method:      rgba(106,168,100,.08);
+  }
+
+  /* ── Page hero ─────────────────────────────────────────────────────────── */
+  .page-hero {
+    padding-top: 68px;
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+    border-bottom: 1px solid var(--border-light);
     position: relative;
-    padding: calc(68px + var(--section)) 0 var(--section);
     overflow: hidden;
   }
-  .hero-grid {
+  .page-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
-  .coll-hero .label { margin-bottom: 1.25rem; }
-  .coll-hero__heading {
+  .page-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 4rem;
+    align-items: end;
+    padding-block: clamp(4rem, 8vw, 6.5rem) clamp(3rem, 5vw, 4rem);
+  }
+  .page-hero__label { margin-bottom: 1.5rem; }
+  .page-hero__heading {
     font-family: var(--serif);
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-size: clamp(2.4rem, 5vw, 4rem);
     font-weight: 400;
     line-height: 1.1;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
   }
-  .coll-hero__heading em { font-style: italic; color: var(--gold); }
-  .coll-hero__sub {
-    max-width: 52ch;
+  .page-hero__heading em { font-style: italic; color: var(--gold); }
+  .page-hero__lede {
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
     color: var(--text-secondary);
-    font-size: var(--text-lg);
+    line-height: 1.85;
+    margin-top: 1.25rem;
+    max-width: 52ch;
   }
 
-  /* Controls bar */
-  .library-controls {
+  /* Counts aside */
+  .counts-aside {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-self: end;
+  }
+  .counts-aside__heading { font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold) }
+  .count-rows { display:flex;flex-direction:column;gap:.875rem }
+  .count-row { display:flex;align-items:center;gap:1rem;padding:.75rem 1rem;background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px }
+  .count-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0 }
+  .count-dot--bias { background:var(--accent-bias) }
+  .count-dot--structure { background:var(--accent-structure) }
+  .count-dot--method { background:var(--accent-method) }
+  .count-info { flex:1 }
+  .count-label { font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary) }
+  .count-n { font-family:var(--serif);font-style:italic;font-size:1.4rem;color:var(--text-primary);line-height:1;display:block;margin-bottom:2px }
+
+  @media (max-width: 820px) {
+    .page-hero__inner { grid-template-columns: 1fr; }
+    .counts-aside { display: none; }
+  }
+
+  /* ── Filter bar ────────────────────────────────────────────────────────── */
+  .filter-bar {
     background: var(--bg-surface);
-    border-top: 1px solid var(--border-light);
     border-bottom: 1px solid var(--border-light);
-    padding: 1rem 0;
     position: sticky;
     top: 68px;
-    z-index: 10;
+    z-index: 50;
   }
-  .controls-inner {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
+  .filter-bar__inner { display:flex;align-items:stretch;gap:0;justify-content:space-between }
+  .type-tabs { display:flex;overflow-x:auto;scrollbar-width:none;flex:1 }
+  .type-tabs::-webkit-scrollbar { display:none }
+  .cat-btn { font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:1.1rem 1.4rem;color:var(--text-secondary);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;min-height:44px }
+  .cat-btn:hover { color:var(--text-primary) }
+  .cat-btn.is-active { color:var(--gold);border-bottom-color:var(--gold) }
+  .cat-btn[data-cat="bias"].is-active   { color:var(--accent-bias);border-bottom-color:var(--accent-bias) }
+  .cat-btn[data-cat="structure"].is-active { color:var(--accent-structure);border-bottom-color:var(--accent-structure) }
+  .cat-btn[data-cat="method"].is-active { color:var(--accent-method);border-bottom-color:var(--accent-method) }
+  .cat-btn:focus-visible { outline:3px solid var(--gold);outline-offset:-3px }
 
-  /* Category tabs */
-  .cat-tabs {
-    display: flex;
-    gap: 0.375rem;
-    flex-wrap: wrap;
-  }
-  .cat-tab {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 6px 14px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    background: transparent;
-    color: var(--text-subtle);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    white-space: nowrap;
-  }
-  .cat-tab:hover,
-  .cat-tab.is-active {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: var(--gold-trans);
-  }
+  .search-wrap { display:flex;align-items:center;padding:.625rem var(--gutter) .625rem .75rem;border-left:1px solid var(--border-light);flex-shrink:0 }
+  .search-input { background:var(--bg-card);border:1px solid var(--border-light);border-radius:3px;padding:.5rem .875rem;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--text-primary);width:220px;outline:none;transition:border-color .2s;min-height:44px }
+  .search-input::placeholder { color:var(--text-subtle) }
+  .search-input:focus { border-color:var(--gold) }
+  .search-input:focus-visible { outline:3px solid var(--gold);outline-offset:2px }
+  @media (max-width:680px) { .search-wrap { display:none } }
 
-  /* Search */
-  .library-search {
-    position: relative;
-    margin-left: auto;
-  }
-  .search-input {
-    font-family: var(--sans);
-    font-size: var(--text-sm);
-    color: var(--text-primary);
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 7px 12px 7px 36px;
-    width: 220px;
-    transition: border-color var(--transition-fast);
-  }
-  .search-input::placeholder { color: var(--text-muted); }
-  .search-input:focus { outline: none; border-color: var(--gold); }
-  .search-icon {
-    position: absolute;
-    left: 11px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    pointer-events: none;
-    display: flex;
-  }
+  /* ── Alphabet bar ──────────────────────────────────────────────────────── */
+  .alpha-bar { background:var(--bg-elevated);border-bottom:1px solid var(--border-light) }
+  .alpha-bar__inner { display:flex;flex-wrap:wrap;gap:0;padding-block:.375rem }
 
-  /* Library layout */
-  .library-section { padding-top: 3rem; }
-  .library-layout {
-    display: grid;
-    grid-template-columns: 56px 1fr;
-    gap: 3rem;
-    align-items: start;
-  }
+  /* ── Library body ──────────────────────────────────────────────────────── */
+  .library { padding-block: var(--section); }
+  .library-inner { display:grid;grid-template-columns:220px 1fr;gap:3rem;align-items:start }
 
-  /* Alpha index */
-  .alpha-index {
+  /* Left index panel */
+  .index-panel {
     position: sticky;
-    top: calc(68px + 60px + 2rem);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    top: calc(68px + 108px + 2rem); /* below filter+alpha */
   }
-  .alpha-link {
-    font-family: var(--mono);
+  .index-panel__heading { font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;padding-bottom:.625rem;border-bottom:1px solid var(--border-light) }
+  .index-list { display:flex;flex-direction:column;gap:0 }
+  .index-item { display:flex;align-items:center;gap:.625rem;padding:.625rem .75rem;border-radius:3px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary);cursor:pointer;transition:all .15s ease;background:none;border:none;text-align:left;min-height:44px;width:100% }
+  .index-item:hover { color:var(--text-primary);background:var(--bg-elevated) }
+  .index-item.is-active { color:var(--gold);background:var(--gold-trans) }
+  .index-dot { width:6px;height:6px;border-radius:50%;flex-shrink:0 }
+  .index-dot--bias { background:var(--accent-bias) }
+  .index-dot--structure { background:var(--accent-structure) }
+  .index-dot--method { background:var(--accent-method) }
+  .index-count { font-size:10px;color:var(--text-subtle);margin-left:auto }
+
+  @media (max-width:900px) { .library-inner { grid-template-columns:1fr } .index-panel { display:none } }
+
+  /* ── What-band ─────────────────────────────────────────────────────────── */
+  .what-band { background:var(--navy);border-top:1px solid rgba(29,45,68,.8);border-bottom:1px solid rgba(29,45,68,.8);padding-block:4rem }
+  .what-band__inner { display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start }
+  .what-band__heading { font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;line-height:1.25;color:var(--text-primary);margin-bottom:1rem }
+  .what-band__body { font-size:14px;line-height:1.85;color:var(--text-secondary) }
+  .what-band__body p + p { margin-top:.875rem }
+  .type-explanations { display:flex;flex-direction:column;gap:1rem }
+  .type-exp { display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;padding:1.25rem;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.05);border-radius:3px }
+  .type-exp__icon { width:2rem;height:2rem;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;color:#080a10 }
+  .type-exp__icon--bias      { background:var(--accent-bias) }
+  .type-exp__icon--structure { background:var(--accent-structure) }
+  .type-exp__icon--method    { background:var(--accent-method) }
+  .type-exp__title { font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:3px }
+  .type-exp__body { font-size:13px;line-height:1.7;color:var(--text-secondary) }
+  @media (max-width:760px) { .what-band__inner { grid-template-columns:1fr } }
+
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band__inner { position:relative;z-index:1 }
+  .cta-band__label { margin-bottom:1.5rem;justify-content:center }
+  .cta-band__label::before { display:none }
+  .cta-band__heading { font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem }
+  .cta-band__heading em { font-style:italic;color:var(--gold) }
+  .cta-band__sub { font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem }
+  .cta-band__actions { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap }
+
+  /* ── Shared ────────────────────────────────────────────────────────────── */
+  .fade-up { opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease }
+  .fade-up.visible { opacity:1;transform:translateY(0) }
+</style>
+
+<!-- Styles for JS-created elements — must be global (no scoping attribute at runtime) -->
+<style is:global>
+  /* Entry sections & rows */
+  .entry-section { margin-bottom:3.5rem;scroll-margin-top:180px }
+  .entry-section:last-child { margin-bottom:0 }
+  .entry-section__letter { font-family:var(--serif, 'Instrument Serif', Georgia, serif);font-style:italic;font-size:3rem;color:var(--gold, #c49a3c);line-height:1;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-light, rgba(255,255,255,.06));display:flex;align-items:baseline;gap:1rem }
+  .entry-section__letter span { font-family:var(--mono, 'DM Mono', monospace);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle, #7d8799);font-style:normal }
+  .entry-list { display:flex;flex-direction:column;gap:.75rem }
+  .entry-row { display:grid;grid-template-columns:28px 1fr auto;gap:1.25rem;align-items:start;background:var(--bg-card-alt, #0f1520);border:1px solid var(--border-light, rgba(255,255,255,.06));border-radius:3px;padding:1.25rem 1.5rem;text-decoration:none;color:inherit;transition:border-color .2s,background .2s }
+  .entry-row:hover { border-color:rgba(196,154,60,.25);background:var(--bg-card, #141c2c) }
+  .entry-type-dot { width:8px;height:8px;border-radius:50%;margin-top:.55rem;flex-shrink:0 }
+  .entry-type-dot--bias      { background:var(--accent-bias, #c49a3c) }
+  .entry-type-dot--structure { background:var(--accent-structure, #6ba3c8) }
+  .entry-type-dot--method    { background:var(--accent-method, #7ab648) }
+  .entry-main {}
+  .entry-name { font-family:var(--serif, 'Instrument Serif', Georgia, serif);font-size:1.1rem;font-weight:400;line-height:1.25;color:var(--text-primary, #ede8dc);margin-bottom:.375rem;transition:color .2s }
+  .entry-row:hover .entry-name { color:var(--gold-light, #d4aa52) }
+  .entry-def { font-size:13px;line-height:1.7;color:var(--text-secondary, #96a0b0);max-width:68ch }
+  .entry-tags { display:flex;gap:.375rem;flex-wrap:wrap;margin-top:.625rem }
+  .entry-tag { font-family:var(--mono, 'DM Mono', monospace);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px }
+  .entry-tag--bias      { background:rgba(196,154,60,.08);color:#c49a3c;border:1px solid rgba(196,154,60,.15) }
+  .entry-tag--structure { background:rgba(74,144,186,.08);color:#6ba3c8;border:1px solid rgba(74,144,186,.15) }
+  .entry-tag--method    { background:rgba(106,168,100,.08);color:#7ab648;border:1px solid rgba(106,168,100,.15) }
+  .entry-tag--neutral   { background:var(--bg-elevated, #111828);color:var(--text-subtle, #7d8799);border:1px solid var(--border-light, rgba(255,255,255,.06)) }
+  .entry-arrow { font-family:var(--mono, 'DM Mono', monospace);font-size:12px;color:var(--gold, #c49a3c);display:flex;align-items:center;align-self:center;transition:transform .2s;flex-shrink:0 }
+  .entry-row:hover .entry-arrow { transform:translateX(4px) }
+
+  /* Empty state */
+  .empty-state { display:none;text-align:center;padding:5rem 1rem;color:var(--text-subtle, #7d8799) }
+  .empty-state.visible { display:block }
+  .empty-state__icon { font-size:2rem;opacity:.3;display:block;margin-bottom:1rem }
+  .empty-state__heading { font-family:var(--serif, 'Instrument Serif', Georgia, serif);font-style:italic;font-size:1.4rem;color:var(--text-secondary, #96a0b0);margin-bottom:.5rem }
+  .empty-state__body { font-size:14px;line-height:1.7 }
+
+  /* Alpha bar buttons */
+  .alpha-btn {
+    font-family: var(--mono, 'DM Mono', monospace);
     font-size: 11px;
-    font-weight: 500;
-    color: var(--text-subtle);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--text-subtle, #7d8799);
+    padding: 0.5rem 0.625rem;
+    cursor: pointer;
+    min-width: 36px;
+    min-height: 36px;
     text-align: center;
-    padding: 4px;
-    text-decoration: none;
-    border-radius: 2px;
-    transition: color var(--transition-fast);
-  }
-  .alpha-link:hover { color: var(--gold); }
-  .alpha-link.is-dimmed { color: var(--text-muted); opacity: 0.4; pointer-events: none; }
-
-  /* Alpha groups */
-  .alpha-group { margin-bottom: 3rem; }
-  .alpha-group__heading {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--border-light);
-  }
-  .alpha-group__list {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-  }
-
-  /* Library entries */
-  .lib-entry {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    transition: border-color var(--transition-fast);
-    margin-bottom: 2px;
-  }
-  .lib-entry:hover { border-color: var(--border); }
-
-  .lib-entry__link {
-    display: block;
-    padding: 1.25rem 1.5rem;
-    text-decoration: none;
-    color: inherit;
-  }
-  .lib-entry__inner {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    justify-content: space-between;
-  }
-  .lib-entry__text { flex: 1; min-width: 0; }
-
-  .lib-entry__title {
-    font-family: var(--sans);
-    font-size: var(--text-base);
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-  }
-  .lib-entry__summary {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .lib-entry__cat {
-    font-family: var(--mono);
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    white-space: nowrap;
-    flex-shrink: 0;
-    padding: 3px 8px;
-    border: 1px solid var(--border-light);
+    transition: color 0.15s;
     border-radius: 2px;
   }
-
-  .no-results {
-    color: var(--text-subtle);
-    font-style: italic;
-    padding: 3rem 0;
-  }
-
-  @media (max-width: 700px) {
-    .library-layout { grid-template-columns: 1fr; }
-    .alpha-index {
-      position: static;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-    .library-search { margin-left: 0; width: 100%; }
-    .search-input { width: 100%; }
-    .lib-entry__inner { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-  }
+  .alpha-btn.has-entries { color: var(--text-secondary, #96a0b0); }
+  .alpha-btn.has-entries:hover { color: var(--gold, #c49a3c); }
+  .alpha-btn:focus-visible { outline: 3px solid var(--gold, #c49a3c); outline-offset: 1px; }
+  .alpha-btn[disabled] { opacity: 0.25; cursor: default; pointer-events: none; }
 </style>

@@ -1,5 +1,5 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
 export async function getStaticPaths() {
@@ -8,7 +8,7 @@ export async function getStaticPaths() {
     .filter(e => e.id.startsWith('en/'))
     .map(entry => ({
       params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
-      props: { entry },
+      props:  { entry },
     }));
 }
 
@@ -19,328 +19,734 @@ const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
 
-// Resolve related entries
-const relatedConcepts = await Promise.all(
-  entry.data.related_concepts.map(ref => getEntry(ref))
-);
-const relatedEntries = await Promise.all(
-  entry.data.related_entries.map(ref => getEntry(ref))
-);
-const relatedUseCases = await Promise.all(
-  entry.data.related_use_cases.map(ref => getEntry(ref))
-);
+const {
+  title, type, definition, tags, summary,
+  first_described, applies_to, risk_level,
+  related_entries, in_practice, og_title,
+} = entry.data;
 
-const categoryLabels: Record<string, { en: string; de: string }> = {
-  bias: { en: 'Cognitive Bias', de: 'Kognitive Verzerrung' },
-  'liberating-structure': { en: 'Liberating Structure', de: 'Liberating Structure' },
-  'mental-model': { en: 'Mental Model', de: 'Mentales Modell' },
+// Type color/label mapping
+const TYPE_MAP: Record<string, { label: string; labelDE: string; color: string }> = {
+  bias:      { label: 'Cognitive Bias',       labelDE: 'Kognitive Verzerrung', color: '#c49a3c' },
+  structure: { label: 'Liberating Structure', labelDE: 'Liberating Structure', color: '#6ba3c8' },
+  method:    { label: 'Method',               labelDE: 'Methode',              color: '#7ab648' },
 };
+const typeInfo = TYPE_MAP[type] ?? TYPE_MAP['bias'];
+const typeLabel = isDE ? typeInfo.labelDE : typeInfo.label;
 
-function formatDate(d: Date) {
-  return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+// Helper: strip locale prefix and extension from a collection entry id
+function entrySlug(id: string) {
+  return id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
 }
+
+// Look up related library entries — title/type/definition come from their own files
+const allLibrary = await getCollection('library');
+const related = (related_entries ?? [])
+  .map(slug => allLibrary.find(e =>
+    e.id.startsWith(isDE ? 'de/' : 'en/') && entrySlug(e.id) === slug
+  ))
+  .filter((e): e is NonNullable<typeof e> => e !== undefined)
+  .slice(0, 3);
+
+// Look up in_practice entries — title comes from the use-case or insight file
+const allUseCases = await getCollection('use-cases');
+const allInsights  = await getCollection('insights');
+
+type PracticeItem = { type: string; slug: string; note?: string };
+const inPracticeResolved = (in_practice ?? [] as PracticeItem[]).map((item: PracticeItem) => {
+  const coll = item.type === 'use-case' ? allUseCases : allInsights;
+  const found = coll.find(e =>
+    e.id.startsWith(isDE ? 'de/' : 'en/') && entrySlug(e.id) === item.slug
+  );
+  if (!found) return null;
+  return { ...item, title: found.data.title };
+}).filter((x): x is NonNullable<typeof x> => x !== null);
+
+const firstLetter = title[0].toUpperCase();
+const shareUrl = `https://andredaus.com${prefix}/library/${entrySlug(entry.id)}`;
 ---
 
 <Base
-  title={`${entry.data.title} — André Daus Library`}
-  description={entry.data.summary}
-  ogImage={entry.data.og_image}
+  title={`${og_title ?? title} — Library · André Daus`}
+  description={definition}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- HERO -->
-  <header class="lib-entry-hero" data-pagefind-ignore>
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- ── BREADCRUMB ─────────────────────────────────────────────────────── -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
     <div class="container">
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href={`${prefix}/library`}>{isDE ? 'Bibliothek' : 'Library'}</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">
-          {isDE ? categoryLabels[entry.data.category]?.de : categoryLabels[entry.data.category]?.en}
-        </span>
-      </nav>
+      <ol class="breadcrumb__inner">
+        <li><a href={`${prefix}/`} class="breadcrumb__link">{isDE ? 'Start' : 'Home'}</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><a href={`${prefix}/library`} class="breadcrumb__link">{isDE ? 'Bibliothek' : 'Library'}</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li>
+          <a href={`${prefix}/library#letter-${firstLetter}`} class="breadcrumb__link">
+            {firstLetter}
+          </a>
+        </li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><span class="breadcrumb__current" aria-current="page">{title}</span></li>
+      </ol>
+    </div>
+  </nav>
 
-      <div class="lib-entry-hero__meta">
-        <span class="entry-cat">
-          {isDE ? categoryLabels[entry.data.category]?.de : categoryLabels[entry.data.category]?.en}
+  <!-- ── ENTRY HERO ─────────────────────────────────────────────────────── -->
+  <header class="entry-hero" aria-labelledby="entry-name">
+    <div class="entry-hero__grid" aria-hidden="true"></div>
+    <div class="container">
+      <div class="entry-hero__inner">
+
+        <!-- Type badge -->
+        <span
+          class="type-badge"
+          style={`background:${typeInfo.color}`}
+          aria-label={`${isDE ? 'Eintragstyp' : 'Entry type'}: ${typeLabel}`}
+        >
+          {typeLabel}
         </span>
-        <span class="entry-updated">
-          {isDE ? 'Zuletzt aktualisiert' : 'Last updated'}:
-          <time datetime={entry.data.last_updated.toISOString()}>
-            {formatDate(entry.data.last_updated)}
-          </time>
-        </span>
+
+        <!-- Large entry name — can break to two lines -->
+        <h1 class="entry-hero__name" id="entry-name">
+          {title.includes(' ')
+            ? <Fragment set:html={title.replace(' ', '<br>')} />
+            : title}
+        </h1>
+
+        <!-- Anchor definition — italic gold with left border -->
+        <p class="entry-hero__def">{definition}</p>
+
+        <!-- Tags meta row -->
+        {tags.length > 0 && (
+          <div class="entry-hero__meta" role="list" aria-label={isDE ? 'Eintrags-Tags' : 'Entry tags'}>
+            {tags.map(tag => (
+              <span class="entry-hero__meta-tag" role="listitem">{tag}</span>
+            ))}
+          </div>
+        )}
+
       </div>
-
-      <h1 class="lib-entry-hero__title">{entry.data.title}</h1>
-
-      {entry.data.summary && (
-        <p class="lib-entry-hero__summary">{entry.data.summary}</p>
-      )}
     </div>
   </header>
 
-  <!-- BODY -->
-  <div class="article-layout container">
-    <article class="article-body prose" data-pagefind-body>
-      <h1 data-pagefind-meta="title" hidden>{entry.data.title}</h1>
-      <Content />
-    </article>
+  <!-- ── ENTRY BODY + SIDEBAR ───────────────────────────────────────────── -->
+  <div class="container">
+    <div class="entry-layout">
 
-    <aside class="article-aside" data-pagefind-ignore>
-      <!-- Related concepts (cross-category) -->
-      {relatedConcepts.filter(Boolean).length > 0 && (
-        <div class="aside-card">
-          <p class="label" style="margin-bottom:1rem">
-            {isDE ? 'Verwandte Konzepte' : 'Related Concepts'}
+      <article class="entry-body" aria-label={isDE ? 'Eintragsinhalt' : 'Entry content'}>
+        <Content />
+
+        <!-- Related concepts — resolved from library collection -->
+<!--         
+        {related.length > 0 && (
+          <div class="related-concepts" role="list" aria-label={isDE ? 'Verwandte Konzepte' : 'Related concepts'}>
+            {related.map(rel => (
+              <a href={`${prefix}/library/${entrySlug(rel.id)}`} class="concept-row" role="listitem">
+                <span
+                  class="concept-dot"
+                  style={`background:${(TYPE_MAP[rel.data.type] ?? TYPE_MAP['bias']).color}`}
+                  aria-hidden="true"
+                ></span>
+                <div class="concept-info">
+                  <p class="concept-name">{rel.data.title}</p>
+                  <p class="concept-desc">{rel.data.definition}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+-->
+        <!-- In Practice — resolved from use-cases / insights collections -->
+        {inPracticeResolved.length > 0 && (
+          <div class="wild-grid" role="list" aria-label={isDE ? 'In der Praxis' : 'In practice'}>
+            {inPracticeResolved.map(item => (
+              <a
+                href={`${prefix}/${item.type === 'use-case' ? 'use-cases' : 'insights'}/${item.slug}`}
+                class="wild-card"
+                role="listitem"
+              >
+                <span class={`wild-card__type wild-card__type--${item.type === 'use-case' ? 'usecase' : 'insight'}`}>
+                  {item.type === 'use-case' ? (isDE ? 'Praxisbeispiel' : 'Use Case') : 'Insight'}
+                </span>
+                <div class="wild-card__info">
+                  <p class="wild-card__title">{item.title}</p>
+                  {item.note && <p class="wild-card__note">{item.note}</p>}
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+      </article>
+
+      <!-- Sticky sidebar -->
+      <aside class="entry-sidebar" aria-label={isDE ? 'Eintrags-Navigation und -Metadaten' : 'Entry navigation and metadata'}>
+
+        <!-- TOC — built from H2s by JS -->
+        <nav class="toc" aria-label={isDE ? 'Inhaltsverzeichnis' : 'Table of contents'}>
+          <p class="toc__heading" id="toc-label">
+            {isDE ? 'In diesem Eintrag' : 'In this entry'}
           </p>
-          <ul class="aside-related">
-            {relatedConcepts.filter(Boolean).map(rel => {
-              if (!rel) return null;
-              const relSlug = rel.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-              return (
-                <li>
-                  <a href={`${prefix}/library/${relSlug}`} class="aside-rel-link">
-                    <span class="aside-rel-cat">
-                      {isDE ? categoryLabels[rel.data.category]?.de : categoryLabels[rel.data.category]?.en}
-                    </span>
-                    {rel.data.title}
-                  </a>
-                </li>
-              );
-            })}
+          <ul class="toc__list" id="toc-list" aria-labelledby="toc-label">
+            <!-- JS populates this -->
           </ul>
-        </div>
-      )}
+        </nav>
 
-      <!-- Related entries (same category) -->
-      {relatedEntries.filter(Boolean).length > 0 && (
-        <div class="aside-card" style="margin-top:1.5rem">
-          <p class="label" style="margin-bottom:1rem">
-            {isDE ? 'Weitere Einträge' : 'More Entries'}
+        <!-- Meta card -->
+        <div class="meta-card" aria-label={isDE ? 'Eintragsdetails' : 'Entry details'}>
+          <div class="meta-row">
+            <span class="meta-key">{isDE ? 'Typ' : 'Type'}</span>
+            <span class="meta-val">{typeLabel}</span>
+          </div>
+          {first_described && (
+            <div class="meta-row">
+              <span class="meta-key">{isDE ? 'Erstbeschrieben' : 'First described'}</span>
+              <span class="meta-val">{first_described}</span>
+            </div>
+          )}
+          {applies_to && (
+            <div class="meta-row">
+              <span class="meta-key">{isDE ? 'Gilt für' : 'Applies to'}</span>
+              <span class="meta-val">{applies_to}</span>
+            </div>
+          )}
+          {risk_level && (
+            <div class="meta-row">
+              <span class="meta-key">{isDE ? 'Risikostufe' : 'Risk level'}</span>
+              <span class="meta-val" style="color:var(--gold)">{risk_level}</span>
+            </div>
+          )}
+        </div>
+
+        <!-- CTA card -->
+        <div class="sidebar-cta">
+          <p class="sidebar-cta__label">
+            {isDE ? 'In der Praxis sehen' : 'See it in practice'}
           </p>
-          <ul class="aside-related">
-            {relatedEntries.filter(Boolean).map(rel => {
-              if (!rel) return null;
-              const relSlug = rel.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-              return (
-                <li>
-                  <a href={`${prefix}/library/${relSlug}`} class="aside-rel-link">
-                    {rel.data.title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      <!-- Related use cases -->
-      {relatedUseCases.filter(Boolean).length > 0 && (
-        <div class="aside-card" style="margin-top:1.5rem">
-          <p class="label" style="margin-bottom:1rem">
-            {isDE ? 'In der Praxis' : 'In Practice'}
+          <h2 class="sidebar-cta__heading">
+            {isDE
+              ? 'Das läuft gerade in Ihrer Organisation.'
+              : 'This is running in your organisation right now.'}
+          </h2>
+          <p class="sidebar-cta__body">
+            {isDE
+              ? 'Ein Discovery Call zeigt, welche Annahmen es schützt — und welche Entscheidungen von diesen Annahmen abhängen.'
+              : 'A discovery call surfaces which assumptions it\'s protecting — and which decisions depend on those assumptions staying unchallenged.'}
           </p>
-          <ul class="aside-related">
-            {relatedUseCases.filter(Boolean).map(uc => {
-              if (!uc) return null;
-              const ucSlug = uc.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-              return (
-                <li>
-                  <a href={`${prefix}/use-cases/${ucSlug}`} class="aside-rel-link">
-                    <span class="aside-rel-cat">{isDE ? 'Praxisbeispiel' : 'Use Case'}</span>
-                    {uc.data.title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+          <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+            {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+          </a>
+          <a href={`${prefix}/use-cases`} class="btn btn--ghost">
+            {isDE ? 'Use Cases ansehen' : 'Browse Use Cases'}
+          </a>
         </div>
-      )}
 
-      <!-- CTA -->
-      <div class="aside-card aside-card--cta" style="margin-top:1.5rem">
-        <p class="label" style="margin-bottom:1rem">{isDE ? 'In Ihrer Praxis' : 'In Your Practice'}</p>
-        <p class="aside-card__text">
-          {isDE
-            ? 'Dieses Konzept erscheint in realen Entscheidungsprozessen. Ein Discovery Call zeigt, wie es in Ihrer Situation relevant ist.'
-            : 'This concept appears in real decision processes. A discovery call shows how it\'s relevant in your situation.'}
+        <!-- Share -->
+        <div>
+          <p class="share-label" style="margin-bottom:.75rem">
+            {isDE ? 'Teilen' : 'Share'}
+          </p>
+          <div class="share-row">
+            <button
+              class="share-btn"
+              id="copy-link-btn"
+              data-url={shareUrl}
+              aria-label={isDE ? 'Link kopieren' : 'Copy link to clipboard'}
+              title={isDE ? 'Link kopieren' : 'Copy link'}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+            <a
+              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(title + ' — Library @andredaus')}&url=${encodeURIComponent(shareUrl)}`}
+              class="share-btn"
+              aria-label={isDE ? 'Auf X teilen' : 'Share on X'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="14" height="14" viewBox="0 0.25 500 452" fill="currentColor" aria-hidden="true">
+                <path d="M394.033.25h76.67L303.202 191.693l197.052 260.511h-154.29L225.118 294.205 86.844 452.204H10.127l179.16-204.77L.254.25H158.46l109.234 144.417zm-26.908 406.063h42.483L135.377 43.73h-45.59z"/>
+              </svg>
+            </a>
+            <a
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+              class="share-btn"
+              aria-label={isDE ? 'Auf LinkedIn teilen' : 'Share on LinkedIn'}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="14" height="14" viewBox="0 5 1036 990" fill="currentColor" aria-hidden="true">
+                <path d="M0 120c0-33.334 11.667-60.834 35-82.5C58.333 15.833 88.667 5 126 5c36.667 0 66.333 10.666 89 32 23.333 22 35 50.666 35 86 0 32-11.333 58.666-34 80-23.333 22-54 33-92 33h-1c-36.667 0-66.333-11-89-33S0 153.333 0 120zm13 875V327h222v668H13zm345 0h222V622c0-23.334 2.667-41.334 8-54 9.333-22.667 23.5-41.834 42.5-57.5 19-15.667 42.833-23.5 71.5-23.5 74.667 0 112 50.333 112 151v357h222V612c0-98.667-23.333-173.5-70-224.5S857.667 311 781 311c-86 0-153 37-201 111v2h-1l1-2v-95H358c1.333 21.333 2 87.666 2 199 0 111.333-.667 267.666-2 469z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- Mobile sticky CTA -->
+  <div class="mobile-cta" aria-label={isDE ? 'Discovery Call buchen' : 'Book a discovery call'}>
+    <a
+      href={`${prefix}/contact`}
+      class="btn btn--primary btn-arrow"
+      style="flex:1;justify-content:center;max-width:320px"
+    >
+      {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+    </a>
+  </div>
+
+  <!-- ── RELATED ENTRIES ────────────────────────────────────────────────── -->
+  {related.length > 0 && (
+    <section class="related" aria-labelledby="related-heading">
+      <div class="container">
+        <p class="label" style="margin-bottom:1.25rem">
+          {isDE ? 'Verwandte Einträge' : 'Related entries'}
         </p>
-        <a href={`${prefix}/contact`} class="btn btn--outline" style="margin-top:1.25rem;width:100%;justify-content:center">
+        <h2 class="related__heading" id="related-heading">
+          {isDE ? 'Andere Konzepte in dieser Bibliothek' : 'Other concepts in this library'}
+        </h2>
+        <ul class="related__grid">
+          {related.map(rel => (
+            <li>
+              <a href={`${prefix}/library/${entrySlug(rel.id)}`} class="related-card">
+                <span
+                  class="related-card__badge"
+                  style={`color:${(TYPE_MAP[rel.data.type] ?? TYPE_MAP['bias']).color};background:transparent;border-color:rgba(196,154,60,.2)`}
+                >
+                  {isDE
+                    ? (TYPE_MAP[rel.data.type] ?? TYPE_MAP['bias']).labelDE
+                    : (TYPE_MAP[rel.data.type] ?? TYPE_MAP['bias']).label}
+                </span>
+                <p class="related-card__name">{rel.data.title}</p>
+                <p class="related-card__def">{rel.data.definition}</p>
+                <span class="related-card__read">
+                  {isDE ? 'Eintrag ansehen' : 'View entry'}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Von der Theorie zur Praxis' : 'From reference to practice'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Das Vorhandensein der Verzerrung zu kennen<br>ist nicht dasselbe wie <em>sie im Raum zu ertappen.</em></Fragment>
+          : <Fragment>Knowing the bias exists<br>is not the same as <em>catching it in the room.</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein Discovery Call zeigt, welche davon gerade die Entscheidungen Ihrer Organisation aktiv prägen.'
+          : 'A discovery call is where we find which of these are actively shaping your organisation\'s decisions right now.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
           {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
         </a>
-      </div>
-
-      <div class="aside-card" style="margin-top:1.5rem">
-        <a href={`${prefix}/library`} class="back-link">
-          {isDE ? '← Bibliothek' : '← Library'}
+        <a href={`${prefix}/library`} class="btn btn--outline">
+          {isDE ? 'Zurück zur Bibliothek' : 'Back to Library'}
         </a>
       </div>
-    </aside>
-  </div>
+    </div>
+  </section>
 
 </Base>
 
+<script>
+  (function () {
+    // ── Reading progress ─────────────────────────────────────────────────
+    const bar = document.getElementById('reading-progress');
+    if (bar && !window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      function upd() {
+        const s = document.documentElement.scrollTop;
+        const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const p = h > 0 ? Math.round((s / h) * 100) : 0;
+        (bar as HTMLElement).style.width = p + '%';
+        bar.setAttribute('aria-valuenow', String(p));
+      }
+      window.addEventListener('scroll', upd, { passive: true });
+      upd();
+    }
+
+    // ── Build TOC from H2 headings ────────────────────────────────────────
+    const article = document.querySelector<HTMLElement>('.entry-body');
+    const tocList  = document.getElementById('toc-list');
+    if (!article || !tocList) return;
+
+    const headings = Array.from(article.querySelectorAll<HTMLHeadingElement>('h2'));
+    headings.forEach((h, i) => {
+      if (!h.id) {
+        h.id = h.textContent!
+          .toLowerCase().trim()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .slice(0, 60);
+      }
+      h.style.scrollMarginTop = '90px';
+
+      const li = document.createElement('li');
+      const a  = document.createElement('a');
+      a.href      = `#${h.id}`;
+      a.className = i === 0 ? 'toc__link is-active' : 'toc__link';
+      a.textContent = h.textContent;
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+
+    // Scroll-spy
+    const tocLinks = Array.from(tocList.querySelectorAll<HTMLAnchorElement>('.toc__link'));
+    function setActive() {
+      const y = window.scrollY + 90;
+      let active = 0;
+      headings.forEach((h, i) => { if (h.offsetTop <= y) active = i; });
+      tocLinks.forEach((l, i) => l.classList.toggle('is-active', i === active));
+    }
+    window.addEventListener('scroll', setActive, { passive: true });
+    setActive();
+
+    // ── Copy link ────────────────────────────────────────────────────────
+    document.getElementById('copy-link-btn')?.addEventListener('click', async (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      const url = btn.dataset.url ?? window.location.href;
+      try {
+        await navigator.clipboard.writeText(url);
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c49a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+        btn.setAttribute('aria-label', 'Copied!');
+        setTimeout(() => { btn.innerHTML = orig; btn.setAttribute('aria-label', 'Copy link to clipboard'); }, 2000);
+      } catch {}
+    });
+  })();
+</script>
+
 <style>
-  .lib-entry-hero {
-    position: relative;
-    padding: calc(68px + 4rem) 0 4rem;
-    background: var(--bg-surface);
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+
+  /* ── Token extensions ──────────────────────────────────────────────────── */
+  :root {
+    --accent-bias:      #c49a3c;
+    --accent-structure: #6ba3c8;
+    --accent-method:    #7ab648;
+    --tint-bias:        rgba(196,154,60,.08);
+    --tint-structure:   rgba(74,144,186,.08);
+    --tint-method:      rgba(106,168,100,.08);
+  }
+
+  /* ── Breadcrumb ────────────────────────────────────────────────────────── */
+  .breadcrumb { padding-top:68px;background:var(--bg-surface);border-bottom:1px solid var(--border-light) }
+  .breadcrumb__inner { display:flex;align-items:center;gap:.625rem;flex-wrap:wrap;padding-block:.875rem;font-family:var(--mono);font-size:11px;letter-spacing:.08em }
+  .breadcrumb__link { color:var(--text-secondary);transition:color .2s;text-decoration:none;min-height:24px;display:inline-flex;align-items:center }
+  .breadcrumb__link:hover { color:var(--gold) }
+  .breadcrumb__sep { color:var(--text-subtle);user-select:none;padding-inline:.125rem }
+  .breadcrumb__current { color:var(--text-primary) }
+
+  /* ── Entry hero ────────────────────────────────────────────────────────── */
+  .entry-hero {
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 60%);
     border-bottom: 1px solid var(--border-light);
+    position: relative;
     overflow: hidden;
   }
-  .hero-grid {
+  .entry-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
-  .breadcrumb {
-    display: flex;
+  .entry-hero__inner {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  }
+
+  .type-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.625rem;
     font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #080a10;
+    padding: 5px 12px;
+    border-radius: 2px;
     margin-bottom: 1.5rem;
   }
-  .breadcrumb a { color: var(--gold); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
 
-  .lib-entry-hero__meta {
+  /* Large name — can span two lines */
+  .entry-hero__name {
+    font-family: var(--serif);
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Anchor definition with gold left border */
+  .entry-hero__def {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    line-height: 1.55;
+    color: var(--gold-light);
+    max-width: 60ch;
+    padding: 1.25rem 1.75rem;
+    border-left: 3px solid var(--gold);
+    background: var(--gold-trans);
+    border-radius: 0 3px 3px 0;
+    margin-bottom: 2rem;
+  }
+
+  .entry-hero__meta {
     display: flex;
     align-items: center;
     gap: 1.5rem;
     flex-wrap: wrap;
-    margin-bottom: 1.25rem;
-  }
-  .entry-cat {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-    padding: 3px 8px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-  }
-  .entry-updated {
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
   }
-
-  .lib-entry-hero__title {
-    font-family: var(--serif);
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 400;
-    line-height: 1.1;
-    color: var(--text-primary);
-    margin-bottom: 1.25rem;
-  }
-  .lib-entry-hero__summary {
-    font-size: var(--text-lg);
+  .entry-hero__meta-tag {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    padding: 3px 9px;
+    border-radius: 2px;
     color: var(--text-secondary);
-    max-width: 55ch;
-    line-height: 1.6;
   }
 
-  .article-layout {
+  /* ── Two-column layout ─────────────────────────────────────────────────── */
+  .entry-layout {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 5rem;
-    padding-top: 4rem;
-    padding-bottom: 6rem;
+    grid-template-columns: 1fr 300px;
+    gap: 4rem;
     align-items: start;
+    padding-block: var(--section);
   }
+  .entry-body { min-width: 0; }
 
-  .article-body :global(h2) {
+  /* ── Prose — standard Markdown ─────────────────────────────────────────── */
+  .entry-body :global(h2) {
     font-family: var(--serif);
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
     font-weight: 400;
+    line-height: 1.2;
     color: var(--text-primary);
     margin-top: 3rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
+    scroll-margin-top: 90px;
   }
-  .article-body :global(h3) {
-    font-family: var(--sans);
-    font-size: var(--text-lg);
-    font-weight: 600;
+  .entry-body :global(h2:first-child) { margin-top: 0; }
+  .entry-body :global(h3) {
+    font-family: var(--serif);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.3;
     color: var(--text-primary);
     margin-top: 2rem;
     margin-bottom: 0.75rem;
   }
-  .article-body :global(p) {
+  .entry-body :global(p) {
+    font-size: clamp(15px, 1.15vw, 16.5px);
+    line-height: 1.9;
     color: var(--text-secondary);
-    line-height: 1.8;
     margin-bottom: 1.25rem;
   }
-  .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
-  .article-body :global(em) { font-style: italic; color: var(--text-primary); }
-  .article-body :global(ul), .article-body :global(ol) {
-    padding-left: 1.5rem;
-    margin-bottom: 1.25rem;
-    color: var(--text-secondary);
-    line-height: 1.8;
-  }
-  .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
-  .article-body :global(ol li) { list-style: decimal; }
-  .article-body :global(hr) {
-    border: none;
-    border-top: 1px solid var(--border-light);
-    margin: 3rem 0;
-  }
-  .article-body :global(a) { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+  .entry-body :global(p:last-child) { margin-bottom: 0; }
+  .entry-body :global(strong) { color: var(--text-primary); font-weight: 600; }
+  .entry-body :global(a) { color:var(--gold);text-decoration-thickness:1px }
+  .entry-body :global(a:hover) { color:var(--gold-light) }
+  .entry-body :global(ul),
+  .entry-body :global(ol) { padding-left:1.5rem;margin-bottom:1.25rem;color:var(--text-secondary);line-height:1.85 }
+  .entry-body :global(li) { margin-bottom:.5rem;list-style:disc }
+  .entry-body :global(ol li) { list-style:decimal }
 
-  .article-aside { position: sticky; top: calc(68px + 2rem); }
-  .aside-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
+  /* Blockquote → pull quote */
+  .entry-body :global(blockquote) {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    line-height: 1.5;
+    color: var(--gold-light);
+    border-left: 3px solid var(--gold);
+    padding: 0.875rem 1.75rem;
+    margin-block: 2rem;
+    background: var(--gold-trans);
+    border-radius: 0 3px 3px 0;
   }
-  .aside-card--cta { border-color: var(--border); }
-  .aside-card__text { font-size: var(--text-sm); color: var(--text-secondary); line-height: 1.7; }
+  .entry-body :global(blockquote p) { font-size:inherit;line-height:inherit;color:inherit;margin-bottom:0 }
 
-  .aside-related {
-    display: flex;
-    flex-direction: column;
-    gap: 0.875rem;
+  /* Data table */
+  .entry-body :global(table) { width:100%;border-collapse:collapse;font-size:13px;margin-block:2rem;border:1px solid var(--border-light);border-radius:3px;overflow:hidden }
+  .entry-body :global(thead) { background:var(--bg-card) }
+  .entry-body :global(th) { font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding:.875rem 1.25rem;text-align:left;border-bottom:1px solid var(--border-light);white-space:nowrap }
+  .entry-body :global(td) { padding:.875rem 1.25rem;border-bottom:1px solid var(--border-light);color:var(--text-secondary);line-height:1.6;vertical-align:top }
+  .entry-body :global(tbody tr:last-child td) { border-bottom:none }
+  .entry-body :global(tbody tr:hover td) { background:rgba(196,154,60,.03) }
+  .entry-body :global(td:first-child) { color:var(--text-primary);font-weight:500 }
+
+  /* Horizontal rule */
+  .entry-body :global(hr) { border:none;border-top:1px solid var(--border-light);margin-block:3rem }
+
+  /* Note box — SO signature element (same as insight-box / assumption-box) */
+  .entry-body :global(.note-box) {
+    background: var(--navy);
+    border: 1px solid rgba(196,154,60,.2);
+    border-top: 3px solid var(--gold);
+    border-radius: 3px;
+    padding: 2rem;
+    margin-block: 2.5rem;
   }
-  .aside-rel-link {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    text-decoration: none;
-    line-height: 1.4;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .aside-rel-link:hover { color: var(--gold); }
-  .aside-rel-cat {
+  .entry-body :global(.note-box__label) {
     font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .back-link {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--gold);
+    margin-bottom: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .entry-body :global(.note-box__label::before) { content: '⚑'; font-size: 12px; }
+  .entry-body :global(.note-box__heading) { font-family:var(--serif);font-size:1.05rem;font-weight:400;line-height:1.35;color:var(--text-primary);margin-bottom:.75rem }
+  .entry-body :global(.note-box__body) { font-size:14px;line-height:1.8;color:var(--text-secondary) }
+
+  /* Mechanisms grid — 3-col visual element for bias mechanisms */
+  .entry-body :global(.mechanisms) {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1px;
+    background: var(--border-light);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-block: 2rem;
+  }
+  .entry-body :global(.mechanism) { background:var(--bg-card-alt);padding:1.5rem;display:flex;flex-direction:column;gap:.75rem }
+  .entry-body :global(.mechanism__n) { font-family:var(--serif);font-style:italic;font-size:2.5rem;color:var(--gold);line-height:1 }
+  .entry-body :global(.mechanism__name) { font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold) }
+  .entry-body :global(.mechanism__body) { font-size:13px;line-height:1.7;color:var(--text-secondary) }
+  .entry-body :global(.mechanism__example) { font-size:12px;line-height:1.6;color:var(--text-subtle);border-top:1px solid var(--border-light);padding-top:.75rem;margin-top:.25rem }
+  @media (max-width:600px) { .entry-body :global(.mechanisms) { grid-template-columns:1fr } }
+
+  /* ── Related concepts (rendered from frontmatter) ──────────────────────── */
+  .related-concepts { margin-block: 1.5rem; }
+  .concept-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-light);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s;
+    border-radius: 3px;
+  }
+  .concept-row:first-child { border-top: 1px solid var(--border-light); }
+  .concept-row:hover .concept-name { color: var(--gold-light); }
+  .concept-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:.45rem }
+  .concept-name { font-family:var(--serif);font-size:1rem;font-weight:400;color:var(--text-primary);margin-bottom:.25rem;transition:color .2s;line-height:1.3 }
+  .concept-desc { font-size:13px;line-height:1.7;color:var(--text-secondary) }
+
+  /* ── In Practice cards ─────────────────────────────────────────────────── */
+  .wild-grid { display:flex;flex-direction:column;gap:.75rem;margin-top:1.25rem }
+  .wild-card { display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;text-decoration:none;color:inherit;transition:border-color .2s }
+  .wild-card:hover { border-color:rgba(196,154,60,.25) }
+  .wild-card__type { font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:2px;flex-shrink:0;margin-top:2px }
+  .wild-card__type--usecase { background:var(--gold-trans);color:var(--gold);border:1px solid var(--border) }
+  .wild-card__type--insight  { background:rgba(106,168,100,.08);color:#7ab648;border:1px solid rgba(106,168,100,.15) }
+  .wild-card__title { font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:.25rem;line-height:1.3;transition:color .2s }
+  .wild-card:hover .wild-card__title { color:var(--gold-light) }
+  .wild-card__note { font-size:12px;line-height:1.6;color:var(--text-secondary) }
+
+  /* ── Sticky sidebar ────────────────────────────────────────────────────── */
+  .entry-sidebar { position:sticky;top:calc(68px + 2rem);display:flex;flex-direction:column;gap:1.5rem }
+
+  .toc { background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;overflow:hidden }
+  .toc__heading { font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);padding:1rem 1.25rem;border-bottom:1px solid var(--border-light) }
+  .toc__list { display:flex;flex-direction:column;padding:.5rem 0 }
+
+  .meta-card { background:var(--bg-card);border:1px solid var(--border-light);border-top:2px solid var(--gold-dim);border-radius:3px;overflow:hidden }
+  .meta-row { display:flex;justify-content:space-between;align-items:baseline;gap:.75rem;padding:.875rem 1.25rem;border-bottom:1px solid var(--border-light);font-size:13px }
+  .meta-row:last-child { border-bottom:none }
+  .meta-key { font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle);flex-shrink:0 }
+  .meta-val { color:var(--text-secondary);text-align:right;line-height:1.4 }
+
+  .sidebar-cta { background:var(--bg-card);border:1px solid var(--border-light);border-top:2px solid var(--gold-dim);border-radius:3px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem }
+  .sidebar-cta__label { font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold) }
+  .sidebar-cta__heading { font-family:var(--serif);font-size:1.05rem;font-weight:400;line-height:1.35;color:var(--text-primary) }
+  .sidebar-cta__body { font-size:13px;line-height:1.75;color:var(--text-secondary) }
+  .sidebar-cta .btn { width:100%;justify-content:center }
+
+  .share-label { font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle) }
+  .share-row { display:flex;gap:.75rem;align-items:center }
+  .share-btn { width:44px;height:44px;background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);cursor:pointer;transition:border-color .2s,color .2s;text-decoration:none }
+  .share-btn:hover { border-color:var(--gold-dim);color:var(--gold) }
+
+  @media (max-width:960px) { .entry-layout { grid-template-columns:1fr } .entry-sidebar { display:none } }
+
+  /* ── Mobile CTA ────────────────────────────────────────────────────────── */
+  .mobile-cta { display:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:1.25rem var(--gutter);position:sticky;bottom:0;z-index:50;gap:1rem;justify-content:center;flex-wrap:wrap }
+  @media (max-width:960px) { .mobile-cta { display:flex } }
+
+  /* ── Related entries grid ──────────────────────────────────────────────── */
+  .related { background:var(--bg-surface);border-top:1px solid var(--border-light);padding-block:var(--section) }
+  .related__heading { font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;color:var(--text-primary);margin-bottom:2rem }
+  .related__grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem }
+  .related-card { background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;padding:1.75rem;display:flex;flex-direction:column;gap:.75rem;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s }
+  .related-card:hover { border-color:rgba(196,154,60,.25);transform:translateY(-2px) }
+  .related-card__badge { font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:var(--gold-trans);border:1px solid var(--border);padding:3px 8px;border-radius:2px;width:fit-content }
+  .related-card__name { font-family:var(--serif);font-size:1.1rem;font-weight:400;line-height:1.25;color:var(--text-primary);transition:color .2s }
+  .related-card:hover .related-card__name { color:var(--gold-light) }
+  .related-card__def { font-size:13px;line-height:1.7;color:var(--text-secondary) }
+  .related-card__read { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:.75rem;transition:gap .2s }
+  .related-card:hover .related-card__read { gap:12px }
+  .related-card__read::after { content:'→' }
+  @media (max-width:760px) { .related__grid { grid-template-columns:1fr } }
+
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band__inner { position:relative;z-index:1 }
+  .cta-band__label { margin-bottom:1.5rem;justify-content:center }
+  .cta-band__label::before { display:none }
+  .cta-band__heading { font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem }
+  .cta-band__heading em { font-style:italic;color:var(--gold) }
+  .cta-band__sub { font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem }
+  .cta-band__actions { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap }
+</style>
+
+<!-- TOC link styles — global because JS creates them -->
+<style is:global>
+  .toc__link {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    padding: 0.625rem 1.25rem;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    display: block;
+    border-left: 2px solid transparent;
     text-decoration: none;
   }
-
-  @media (max-width: 900px) {
-    .article-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .article-aside { position: static; }
-  }
+  .toc__link:hover { color: var(--text-primary); background: var(--gold-trans); }
+  .toc__link.is-active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-trans); }
 </style>

@@ -11,6 +11,7 @@ const navLinks = [
   { href: `${prefix}/services`,    label: isDE ? 'Leistungen'   : 'Services' },
   { href: `${prefix}/use-cases`,   label: isDE ? 'Fallstudien'  : 'Use Cases' },
   { href: `${prefix}/insights`,    label: isDE ? 'Einblicke'    : 'Insights' },
+  { href: `${prefix}/library`,     label: isDE ? 'Bibliothek'   : 'Library' },
   { href: `${prefix}/podcast`,     label: 'Podcast' },
   { href: `${prefix}/opposition`,  label: isDE ? 'Methodik'     : 'Opposition' },
   { href: `${prefix}/about`,       label: isDE ? 'Über André'   : 'About' },
@@ -45,9 +46,11 @@ function isActive(href: string) {
     </div>
 
     <!-- Language switcher -->
+    <!--
     <a href={altLangHref} class="nav__lang" aria-label={isDE ? 'Switch to English' : 'Zu Deutsch wechseln'}>
       {isDE ? 'EN' : 'DE'}
     </a>
+  -->
 
     <a href={`${prefix}/contact`} class="nav__cta">
       {isDE ? 'Blinde Flecken finden' : 'Find Your Blind Spots'}
@@ -271,7 +274,7 @@ function isActive(href: string) {
     text-align: center;
   }
 
-  @media (max-width: 820px) {
+  @media (max-width: 1050px) {
     .nav__links { display: none; }
     .nav__lang   { display: none; }
     .nav__cta    { display: none; }

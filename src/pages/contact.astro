@@ -372,8 +372,11 @@ const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
     });
     Cal.ns['discovery-call']('ui', {
       styles: { branding: { brandColor: '#c49a3c' } },
-      hideEventTypeDetails: false,
+      hideEventTypeDetails: true,
       layout: 'month_view',
+      theme: 'dark',
+      useSlotsViewOnSmallScreen: 'true',
+      cssVarsPerTheme: {light:{'cal-brand':'#cd0202'},dark:{'cal-brand':'#c49a3c', 'cal-bg': '#090c14','cal-bg-muted': '#0f1520'}}
     });
   </script>
 )}
