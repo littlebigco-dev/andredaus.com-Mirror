@@ -1,13 +1,27 @@
 ---
-title: "When the Leadership Team Agrees Too Easily"
-date: 2025-10-20
-og_title: "When the Leadership Team Agrees Too Easily"
-summary: "A leadership team that reaches consensus within 20 minutes on every major strategic question isn't aligned — it's suppressing dissent. Here's how one team broke out of the consensus trap."
+title: "The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem"
 status: published
-category: Leadership
-related_service: en/clarity-session
-related_library:
-  - en/confirmation-bias
+date: 2025-03-15
+topic: "Cybersecurity"
+scenario: "A mid-size financial firm invests €2M in security tooling and suffers a breach six months later. The vulnerability wasn't in the code — it was in a finance team member who clicked a convincing email."
+summary: "85% of breaches involve a human component. The security stack isn't the problem. The assumption that it is — that is."
+category: "Security & Risk"
+domain: ["Security & Risk", "Culture & Change"]
+applies_to: "All industries"
+org_size: "Mid-market upward"
+primary_service: "assumption-hunting"
+secondary_service: "burn-the-box"
+stats:
+  - value: "85%"
+    label: "of breaches involve a human component (Verizon DBIR)"
+  - value: "€1.5M"
+    label: "average cost per incident, European organisations"
+  - value: "+150%"
+    label: "ransomware attacks year-on-year"
+  - value: "€10.5T"
+    label: "projected annual cybercrime cost by 2025"
+og_title: "The Hidden Vulnerability: Why Cybersecurity Is Everyone's Problem"
+og_image: "https://your-cdn.com/images/cybersecurity-case.jpg"
 ---
 
 ## The Problem

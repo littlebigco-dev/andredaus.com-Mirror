@@ -1,5 +1,5 @@
 ---
-import { getCollection, getEntry, render } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
 export async function getStaticPaths() {
@@ -8,7 +8,7 @@ export async function getStaticPaths() {
     .filter(e => e.id.startsWith('en/') && e.data.status === 'published')
     .map(entry => ({
       params: { slug: entry.id.replace(/^en\//, '').replace(/\.md$/, '') },
-      props: { entry },
+      props:  { entry },
     }));
 }
 
@@ -19,272 +19,741 @@ const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
 
-// Resolve related service
-const relatedService = await getEntry(entry.data.related_service);
+// Related use cases — same category first, up to 3
+const allUseCases = await getCollection('use-cases');
+const related = allUseCases
+  .filter(e =>
+    e.id.startsWith(isDE ? 'de/' : 'en/') &&
+    e.data.status === 'published' &&
+    e.id !== entry.id
+  )
+  .sort((a, b) => {
+    const aSame = a.data.category === entry.data.category ? 0 : 1;
+    const bSame = b.data.category === entry.data.category ? 0 : 1;
+    return aSame - bSame || b.data.date.getTime() - a.data.date.getTime();
+  })
+  .slice(0, 3);
 
-// Resolve related library entries
-const relatedLibrary = await Promise.all(
-  entry.data.related_library.map(ref => getEntry(ref))
-);
-const validLibrary = relatedLibrary.filter(Boolean);
-
-function formatDate(d: Date) {
-  return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+function slugify(e: typeof related[number]) {
+  return e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
 }
+
+const {
+  title, topic, scenario, summary,
+  category, domain, applies_to, org_size,
+  primary_service, secondary_service,
+  stats, og_image, og_title,
+} = entry.data;
 ---
 
 <Base
-  title={`${entry.data.title} — André Daus`}
-  description={entry.data.summary}
-  ogImage={entry.data.og_image}
+  title={`${og_title ?? title} — André Daus`}
+  description={summary}
+  ogImage={og_image}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- HERO -->
-  <header class="article-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- ── BREADCRUMB ─────────────────────────────────────────────────────── -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
     <div class="container">
-      <nav class="breadcrumb" aria-label="Breadcrumb">
-        <a href={`${prefix}/use-cases`}>{isDE ? 'Praxisbeispiele' : 'Use Cases'}</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">{entry.data.category}</span>
-      </nav>
+      <ol class="breadcrumb__inner">
+        <li><a href={`${prefix}/`} class="breadcrumb__link">{isDE ? 'Start' : 'Home'}</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><a href={`${prefix}/use-cases`} class="breadcrumb__link">{isDE ? 'Praxisbeispiele' : 'Use Cases'}</a></li>
+        <li aria-hidden="true"><span class="breadcrumb__sep">/</span></li>
+        <li><span class="breadcrumb__current" aria-current="page">{title}</span></li>
+      </ol>
+    </div>
+  </nav>
 
-      <div class="article-hero__meta">
-        <span class="article-cat">{entry.data.category}</span>
-        <time datetime={entry.data.date.toISOString()} class="article-date">
-          {formatDate(entry.data.date)}
-        </time>
+  <!-- ── CASE HERO ──────────────────────────────────────────────────────── -->
+  <header class="case-hero" aria-labelledby="case-title">
+    <div class="case-hero__grid" aria-hidden="true"></div>
+    <div class="container">
+      <div class="case-hero__inner">
+
+        <!-- Topic + domain tags -->
+        <div class="case-hero__top">
+          <div class="case-hero__tags" role="list" aria-label={isDE ? 'Thema und Kategorien' : 'Topic and categories'}>
+            <span class="case-tag case-tag--topic" role="listitem">{topic}</span>
+            <span class="case-tag" role="listitem">{category}</span>
+            {(domain ?? []).filter(d => d !== category && d !== topic).map(d => (
+              <span class="case-tag" role="listitem">{d}</span>
+            ))}
+            {applies_to && (
+              <span class="case-tag case-tag--domain" role="listitem">{applies_to}</span>
+            )}
+          </div>
+        </div>
+
+        <!-- Title -->
+        <h1 class="case-hero__title" id="case-title">{title}</h1>
+
+        <!-- Scenario deck -->
+        {scenario && (
+          <p class="case-hero__scenario">{scenario}</p>
+        )}
+
+        <!-- Stats strip -->
+        {stats && stats.length > 0 && (
+          <div class="case-hero__stats" role="list" aria-label={isDE ? 'Wichtige Zahlen' : 'Key figures'}>
+            {stats.map(stat => (
+              <div class="case-stat" role="listitem">
+                <span class="case-stat__value">{stat.value}</span>
+                <span class="case-stat__label">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <!--
+          Section nav — populated entirely by JS scanning article h2 elements.
+          Empty on server render; filled at runtime.
+          aria-label set in JS once populated.
+        -->
+        <nav id="section-nav" aria-label={isDE ? 'Zu Abschnitt springen' : 'Jump to section'}>
+          <div class="section-nav" id="section-nav-inner">
+            <!-- JS populates this -->
+          </div>
+        </nav>
+
       </div>
 
-      <h1 class="article-hero__title">{entry.data.title}</h1>
-
-      {entry.data.summary && (
-        <p class="article-hero__summary">{entry.data.summary}</p>
+      <!-- Hero image — 21:7, only shown when og_image is set -->
+      {og_image && (
+        <div class="case-hero__image" role="img" aria-label={og_title ?? title}>
+          <img
+            src={og_image}
+            alt=""
+            loading="eager"
+            decoding="async"
+            style="width:100%;height:100%;object-fit:cover"
+          />
+        </div>
       )}
+
     </div>
   </header>
 
-  <!-- BODY -->
-  <div class="article-layout container">
-    <article class="article-body prose">
-      <Content />
-    </article>
+  <!-- ── ARTICLE + SIDEBAR ──────────────────────────────────────────────── -->
+  <div class="container">
+    <div class="article-layout">
 
-    <aside class="article-aside">
-      {relatedService && (
-        <div class="aside-card aside-card--service">
-          <p class="label" style="margin-bottom:1rem">{isDE ? 'Relevante Leistung' : 'Relevant Service'}</p>
-          <h3 class="aside-service__title">{relatedService.data.title}</h3>
-          <p class="aside-service__price">{relatedService.data.price}</p>
-          <p class="aside-service__format">{relatedService.data.format}</p>
-          <a
-            href={`${prefix}/services/${relatedService.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')}`}
-            class="btn btn--outline"
-            style="margin-top:1.25rem;width:100%;justify-content:center"
-          >
-            {relatedService.data.cta_label}
+      <!--
+        Article body — rendered from pure Markdown.
+        Authors write standard H2, H3, paragraphs, blockquotes, lists, tables.
+        No HTML wrappers or class attributes needed.
+        JS automatically:
+          - Assigns id attributes to every H2 (slugified from text)
+          - Adds scroll-margin-top so nav links land correctly
+          - Populates the section nav above
+          - Scroll-spies the active section
+      -->
+      <article class="article-body" aria-label={isDE ? 'Fall-Inhalt' : 'Case content'}>
+        <Content />
+      </article>
+
+      <!-- Sticky sidebar -->
+      <aside class="article-sidebar" aria-label={isDE ? 'Falldetails und Aktionen' : 'Case details and actions'}>
+
+        <!-- CTA card -->
+        <div class="sidebar-cta">
+          <p class="sidebar-cta__label">
+            {isDE ? 'Erkennen Sie sich wieder?' : 'Does this resonate?'}
+          </p>
+          <h2 class="sidebar-cta__heading">
+            {isDE ? 'Sprechen wir darüber' : 'Let\'s talk about it'}
+          </h2>
+          <p class="sidebar-cta__body">
+            {isDE
+              ? '30 Minuten. Ich fange dort an, wo die übliche Analyse aufhört — bei den Annahmen, die Ihr Problem erst möglich machen.'
+              : '30 minutes. I start where conventional analysis stops — with the assumptions that make your problem possible.'}
+          </p>
+          <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+            {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
           </a>
+          {primary_service && (
+            <a href={`${prefix}/services/${primary_service}`} class="btn btn--ghost">
+              {isDE ? 'Verwandte Leistung →' : 'Related service →'}
+            </a>
+          )}
         </div>
-      )}
 
-      {validLibrary.length > 0 && (
-        <div class="aside-card" style="margin-top:1.5rem">
-          <p class="label" style="margin-bottom:1rem">{isDE ? 'Verwandte Konzepte' : 'Related Concepts'}</p>
-          <ul class="aside-library">
-            {validLibrary.map(lib => {
-              if (!lib) return null;
-              const libSlug = lib.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-              return (
-                <li>
-                  <a href={`${prefix}/library/${libSlug}`} class="aside-lib-link">
-                    <span class="aside-lib-cat">{lib.data.category}</span>
-                    {lib.data.title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+        <!-- Case metadata -->
+        <div class="sidebar-meta" aria-label={isDE ? 'Falldetails' : 'Case details'}>
+          <div class="sidebar-meta__item">
+            <span class="sidebar-meta__key">{isDE ? 'Thema' : 'Topic'}</span>
+            <span class="sidebar-meta__val">{topic}</span>
+          </div>
+          <div class="sidebar-meta__item">
+            <span class="sidebar-meta__key">{isDE ? 'Kategorie' : 'Category'}</span>
+            <span class="sidebar-meta__val">{category}</span>
+          </div>
+          {applies_to && (
+            <div class="sidebar-meta__item">
+              <span class="sidebar-meta__key">{isDE ? 'Gilt für' : 'Applies to'}</span>
+              <span class="sidebar-meta__val">{applies_to}</span>
+            </div>
+          )}
+          {org_size && (
+            <div class="sidebar-meta__item">
+              <span class="sidebar-meta__key">{isDE ? 'Org-Größe' : 'Org size'}</span>
+              <span class="sidebar-meta__val">{org_size}</span>
+            </div>
+          )}
+          {primary_service && (
+            <div class="sidebar-meta__item">
+              <span class="sidebar-meta__key">{isDE ? 'Leistung' : 'Service'}</span>
+              <span class="sidebar-meta__val">{primary_service}</span>
+            </div>
+          )}
         </div>
-      )}
 
-      <div class="aside-card" style="margin-top:1.5rem">
-        <a href={`${prefix}/use-cases`} class="back-link">
-          {isDE ? '← Alle Praxisbeispiele' : '← All Use Cases'}
+        <!-- Service links -->
+        {primary_service && (
+          <a
+            href={`${prefix}/services/${primary_service}`}
+            class="sidebar-service"
+            aria-label={`${primary_service} — ${isDE ? 'Leistung ansehen' : 'view service'}`}
+          >
+            <span class="sidebar-service__icon" aria-hidden="true">⊕</span>
+            <div>
+              <p class="sidebar-service__label">{isDE ? 'Verwandte Leistung' : 'Related service'}</p>
+              <p class="sidebar-service__name">{primary_service}</p>
+            </div>
+          </a>
+        )}
+        {secondary_service && (
+          <a
+            href={`${prefix}/services/${secondary_service}`}
+            class="sidebar-service"
+            aria-label={`${secondary_service} — ${isDE ? 'Leistung ansehen' : 'view service'}`}
+          >
+            <span class="sidebar-service__icon" aria-hidden="true">⊠</span>
+            <div>
+              <p class="sidebar-service__label">{isDE ? 'Auch relevant' : 'Also relevant'}</p>
+              <p class="sidebar-service__name">{secondary_service}</p>
+            </div>
+          </a>
+        )}
+
+      </aside>
+    </div>
+  </div>
+
+  <!-- Mobile sticky CTA -->
+  <div class="mobile-cta-strip" aria-label={isDE ? 'Discovery Call buchen' : 'Book a discovery call'}>
+    <a
+      href={`${prefix}/contact`}
+      class="btn btn--primary btn-arrow"
+      style="flex:1;justify-content:center;max-width:320px"
+    >
+      {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+    </a>
+  </div>
+
+  <!-- ── RELATED CASES ──────────────────────────────────────────────────── -->
+  {related.length > 0 && (
+    <section class="related" aria-labelledby="related-heading">
+      <div class="container">
+        <p class="label" style="margin-bottom:1.25rem">
+          {isDE ? 'Weitere Fälle' : 'More cases'}
+        </p>
+        <h2 class="related__heading" id="related-heading">
+          {isDE ? 'Anderes Thema, gleicher Ansatz.' : 'Different topic, same starting point.'}
+        </h2>
+        <ul class="related__grid">
+          {related.map(rel => (
+            <li>
+              <a href={`${prefix}/use-cases/${slugify(rel)}`} class="related-card">
+                <span class="related-card__topic">{rel.data.topic}</span>
+                {rel.data.scenario && (
+                  <p class="related-card__scenario">{rel.data.scenario}</p>
+                )}
+                <h3 class="related-card__title">{rel.data.title}</h3>
+                <span class="related-card__read">
+                  {isDE ? 'Diesen Fall lesen' : 'Read this case'}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Nächster Schritt' : 'Next step'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Die teuerste Annahme<br>ist die, die Sie <em>aufgehört haben zu bemerken.</em></Fragment>
+          : <Fragment>The most expensive assumption<br>is the one you <em>stopped noticing.</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein 30-minütiger Discovery Call deckt auf, von welchen Annahmen Ihre aktuelle Strategie abhängt.'
+          : 'A 30-minute discovery call surfaces the assumptions your current strategy is built on.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`}   class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/use-cases`} class="btn btn--outline">
+          {isDE ? 'Alle Praxisbeispiele' : 'All Use Cases'}
         </a>
       </div>
-    </aside>
-  </div>
+    </div>
+  </section>
 
 </Base>
 
+<script>
+  (function () {
+    // ── Reading progress ─────────────────────────────────────────────────
+    const progressBar = document.getElementById('reading-progress');
+    if (progressBar && !window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      function updateProgress() {
+        const scrolled = document.documentElement.scrollTop;
+        const total    = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const pct      = total > 0 ? Math.round((scrolled / total) * 100) : 0;
+        (progressBar as HTMLElement).style.width = pct + '%';
+        progressBar.setAttribute('aria-valuenow', String(pct));
+      }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    }
+
+    // ── Build section nav from H2 headings ───────────────────────────────
+    //
+    // Scans all H2 elements in the article body, assigns slug IDs where
+    // missing, then builds the section nav links in the hero.
+    // Identical approach to the insights detail TOC.
+
+    const article = document.querySelector<HTMLElement>('.article-body');
+    const navInner = document.getElementById('section-nav-inner');
+
+    if (!article || !navInner) return;
+
+    const headings = Array.from(article.querySelectorAll<HTMLHeadingElement>('h2'));
+
+    if (headings.length === 0) {
+      // No H2s — hide the nav entirely so it doesn't show an empty strip
+      const nav = document.getElementById('section-nav');
+      if (nav) nav.style.display = 'none';
+      return;
+    }
+
+    // Assign IDs: slugify the text content
+    headings.forEach(h => {
+      if (!h.id) {
+        h.id = h.textContent!
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .slice(0, 60);
+      }
+      // Ensure scroll-margin-top clears the fixed header + nav
+      h.style.scrollMarginTop = '110px';
+    });
+
+    // Build nav buttons
+    headings.forEach((h, i) => {
+      const btn = document.createElement('a');
+      btn.href      = `#${h.id}`;
+      btn.className = i === 0 ? 'section-nav-btn is-active' : 'section-nav-btn';
+      btn.textContent = h.textContent;
+      btn.dataset.section = h.id;
+      if (i === 0) btn.setAttribute('aria-current', 'true');
+      navInner.appendChild(btn);
+    });
+
+    // ── Scroll-spy active state ──────────────────────────────────────────
+    const navBtns = Array.from(navInner.querySelectorAll<HTMLAnchorElement>('.section-nav-btn'));
+
+    function setActive() {
+      const y = window.scrollY + 130;
+      let active = 0;
+      headings.forEach((h, i) => { if (h.offsetTop <= y) active = i; });
+      navBtns.forEach((btn, i) => {
+        const on = i === active;
+        btn.classList.toggle('is-active', on);
+        if (on) btn.setAttribute('aria-current', 'true');
+        else btn.removeAttribute('aria-current');
+      });
+    }
+
+    window.addEventListener('scroll', setActive, { passive: true });
+    setActive();
+  })();
+</script>
+
 <style>
-  .article-hero {
-    position: relative;
-    padding: calc(68px + 4rem) 0 4rem;
-    background: var(--bg-surface);
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+
+  /* ── Breadcrumb ────────────────────────────────────────────────────────── */
+  .breadcrumb { padding-top:68px;background:var(--bg-surface);border-bottom:1px solid var(--border-light) }
+  .breadcrumb__inner { display:flex;align-items:center;gap:.625rem;flex-wrap:wrap;padding-block:.875rem;font-family:var(--mono);font-size:11px;letter-spacing:.08em }
+  .breadcrumb__link { color:var(--text-secondary);transition:color .2s;text-decoration:none;min-height:24px;display:inline-flex;align-items:center }
+  .breadcrumb__link:hover { color:var(--gold) }
+  .breadcrumb__sep { color:var(--text-subtle);user-select:none;padding-inline:.125rem }
+  .breadcrumb__current { color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:36ch }
+
+  /* ── Case hero ─────────────────────────────────────────────────────────── */
+  .case-hero {
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 60%);
     border-bottom: 1px solid var(--border-light);
+    position: relative;
     overflow: hidden;
   }
-  .hero-grid {
+  .case-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-  }
-  .breadcrumb a { color: var(--gold); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
-  .article-hero__meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  .article-cat {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-    padding: 3px 8px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-  }
-  .article-date { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
-  .article-hero__title {
-    font-family: var(--serif);
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 400;
-    line-height: 1.15;
-    color: var(--text-primary);
-    max-width: 22ch;
-    margin-bottom: 1.25rem;
-  }
-  .article-hero__summary {
-    font-size: var(--text-lg);
-    color: var(--text-secondary);
-    max-width: 55ch;
-    line-height: 1.6;
+  .case-hero__inner {
+    position: relative;
+    z-index: 1;
+    padding-block: clamp(3.5rem, 7vw, 6rem);
   }
 
+  .case-hero__top { display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:2rem }
+  .case-hero__tags { display:flex;gap:.5rem;flex-wrap:wrap }
+
+  .case-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  .case-tag--topic { font-size: 10px; padding: 5px 12px; font-weight: 500; }
+  .case-tag--domain { color:var(--text-secondary);background:transparent;border-color:var(--border-light) }
+
+  .case-hero__title {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    max-width: 22ch;
+    margin-bottom: 1.5rem;
+  }
+
+  .case-hero__scenario {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 60ch;
+    border-left: 3px solid var(--gold-dim);
+    padding-left: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* Stats strip */
+  .case-hero__stats {
+    display: flex;
+    gap: 0;
+    flex-wrap: wrap;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    background: var(--bg-card-alt);
+    margin-bottom: 2.5rem;
+  }
+  .case-stat { flex:1;min-width:180px;padding:1.25rem 1.5rem;border-right:1px solid var(--border-light) }
+  .case-stat:last-child { border-right:none }
+  .case-stat__value {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 2rem;
+    color: var(--gold);
+    line-height: 1;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .case-stat__label { font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-secondary) }
+
+  /* Section nav — JS populates the inner buttons */
+  .section-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  @media (max-width: 760px) {
+    .case-hero__stats { flex-direction:column }
+    .case-stat { border-right:none;border-bottom:1px solid var(--border-light) }
+    .case-stat:last-child { border-bottom:none }
+    .section-nav { width:100% }
+  }
+
+  /* Hero image — 21:7 */
+  .case-hero__image {
+    aspect-ratio: 21/7;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    position: relative;
+    z-index: 1;
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  /* ── Two-column layout ─────────────────────────────────────────────────── */
   .article-layout {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 5rem;
-    padding-top: 4rem;
-    padding-bottom: 6rem;
+    grid-template-columns: 1fr 320px;
+    gap: 4rem;
     align-items: start;
+    padding-block: var(--section);
   }
+  .article-body { min-width: 0; }
+
+  /* ── Prose — standard Markdown elements only ───────────────────────────── */
   .article-body :global(h2) {
     font-family: var(--serif);
-    font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 400;
+    line-height: 1.2;
     color: var(--text-primary);
-    margin-top: 3rem;
-    margin-bottom: 1rem;
+    margin-top: 3.5rem;
+    margin-bottom: 1.25rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    /* scroll-margin-top set in JS to account for fixed nav height */
   }
+  .article-body :global(h2:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
   .article-body :global(h3) {
-    font-family: var(--sans);
-    font-size: var(--text-lg);
-    font-weight: 600;
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2vw, 1.4rem);
+    font-weight: 400;
+    line-height: 1.3;
     color: var(--text-primary);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
+    margin-top: 2.25rem;
+    margin-bottom: 0.875rem;
   }
+
   .article-body :global(p) {
+    font-size: clamp(15px, 1.2vw, 16.5px);
+    line-height: 1.9;
     color: var(--text-secondary);
-    line-height: 1.8;
     margin-bottom: 1.25rem;
   }
+  .article-body :global(p:last-child) { margin-bottom: 0; }
   .article-body :global(strong) { color: var(--text-primary); font-weight: 600; }
-  .article-body :global(em) { font-style: italic; color: var(--text-primary); }
-  .article-body :global(ul), .article-body :global(ol) {
+  .article-body :global(em) { font-style: italic; }
+  .article-body :global(a) {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .article-body :global(a:hover) { color: var(--gold-light); }
+
+  .article-body :global(ul),
+  .article-body :global(ol) {
     padding-left: 1.5rem;
     margin-bottom: 1.25rem;
     color: var(--text-secondary);
-    line-height: 1.8;
+    line-height: 1.85;
   }
-  .article-body :global(li) { margin-bottom: 0.5rem; list-style: disc; }
-  .article-body :global(ol li) { list-style: decimal; }
+  .article-body :global(ul li) { list-style: disc; margin-bottom: 0.5rem; }
+  .article-body :global(ol li) { list-style: decimal; margin-bottom: 0.5rem; }
+
+  /* Blockquote → pull quote */
+  .article-body :global(blockquote) {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    line-height: 1.5;
+    color: var(--gold-light);
+    border-left: 3px solid var(--gold);
+    padding: 1rem 1.75rem;
+    margin-block: 2rem;
+    background: var(--gold-trans);
+    border-radius: 0 3px 3px 0;
+  }
+  .article-body :global(blockquote p) {
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+    margin-bottom: 0;
+  }
+
+  /* Table — for stat-like data */
+  .article-body :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-block: 2rem;
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .article-body :global(thead) { background: var(--bg-card); }
+  .article-body :global(th) {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0.875rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+    white-space: nowrap;
+  }
+  .article-body :global(td) {
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  .article-body :global(tbody tr:last-child td) { border-bottom: none; }
+  .article-body :global(tbody tr:hover td) { background: rgba(196,154,60,.03); }
+  .article-body :global(td:first-child) { color: var(--text-primary); font-weight: 500; }
+
+  /* Horizontal rule — visual section break */
   .article-body :global(hr) {
     border: none;
     border-top: 1px solid var(--border-light);
-    margin: 3rem 0;
+    margin-block: 3rem;
   }
-  .article-body :global(a) { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
 
-  .article-aside { position: sticky; top: calc(68px + 2rem); }
-  .aside-card {
-    background: var(--bg-card);
+  /* Inline code */
+  .article-body :global(code) {
+    font-family: var(--mono);
+    font-size: 0.875em;
+    background: var(--bg-elevated);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
-  }
-  .aside-card--service { border-color: var(--border); }
-  .aside-service__title {
-    font-family: var(--serif);
-    font-size: var(--text-xl);
-    font-weight: 400;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-  }
-  .aside-service__price {
-    font-family: var(--mono);
-    font-size: var(--text-base);
+    padding: 1px 5px;
+    border-radius: 2px;
     color: var(--gold);
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-  }
-  .aside-service__format {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    font-family: var(--mono);
   }
 
-  .aside-library { display: flex; flex-direction: column; gap: 0.75rem; }
-  .aside-lib-link {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    text-decoration: none;
-    line-height: 1.4;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .aside-lib-link:hover { color: var(--gold); }
-  .aside-lib-cat {
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
+  /* ── Sticky sidebar ────────────────────────────────────────────────────── */
+  .article-sidebar { position:sticky;top:calc(68px + 2rem);display:flex;flex-direction:column;gap:1.5rem }
 
-  .back-link {
-    font-family: var(--mono);
+  .sidebar-cta { background:var(--bg-card);border:1px solid var(--border-light);border-top:2px solid var(--gold-dim);border-radius:3px;padding:1.75rem;display:flex;flex-direction:column;gap:1rem }
+  .sidebar-cta__label { font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold) }
+  .sidebar-cta__heading { font-family:var(--serif);font-size:1.15rem;font-weight:400;line-height:1.3;color:var(--text-primary) }
+  .sidebar-cta__body { font-size:13px;line-height:1.75;color:var(--text-secondary) }
+  .sidebar-cta .btn { width:100%;justify-content:center }
+
+  .sidebar-meta { background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;overflow:hidden }
+  .sidebar-meta__item { display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:baseline;padding:.875rem 1.25rem;border-bottom:1px solid var(--border-light);font-size:13px }
+  .sidebar-meta__item:last-child { border-bottom:none }
+  .sidebar-meta__key { font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-subtle) }
+  .sidebar-meta__val { color:var(--text-secondary);text-align:right }
+
+  .sidebar-service { display:flex;align-items:flex-start;gap:1rem;padding:1.25rem;background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;text-decoration:none;transition:border-color .2s }
+  .sidebar-service:hover { border-color:rgba(196,154,60,.3) }
+  .sidebar-service__icon { width:2.25rem;height:2.25rem;border-radius:2px;background:var(--gold-trans);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1rem;flex-shrink:0 }
+  .sidebar-service__label { font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px }
+  .sidebar-service__name { font-size:14px;color:var(--text-primary);font-weight:500;line-height:1.3 }
+
+  @media (max-width:960px) { .article-layout { grid-template-columns:1fr } .article-sidebar { display:none } }
+
+  /* ── Mobile CTA ────────────────────────────────────────────────────────── */
+  .mobile-cta-strip { display:none;background:var(--bg-card);border-top:1px solid var(--border-light);padding:1.25rem var(--gutter);position:sticky;bottom:0;z-index:50;gap:1rem;justify-content:center;flex-wrap:wrap }
+  @media (max-width:960px) { .mobile-cta-strip { display:flex } }
+
+  /* ── Related cases ─────────────────────────────────────────────────────── */
+  .related { background:var(--bg-surface);border-top:1px solid var(--border-light);padding-block:var(--section) }
+  .related__heading { font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;line-height:1.25;color:var(--text-primary);margin-bottom:2.5rem }
+  .related__grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem }
+  .related-card { background:var(--bg-card-alt);border:1px solid var(--border-light);border-radius:3px;display:flex;flex-direction:column;gap:.875rem;padding:1.75rem;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s }
+  .related-card:hover { border-color:rgba(196,154,60,.25);transform:translateY(-2px) }
+  .related-card__topic { font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-trans);border:1px solid var(--border);padding:3px 8px;border-radius:2px;width:fit-content }
+  .related-card__scenario { font-family:var(--serif);font-style:italic;font-size:.9rem;line-height:1.45;color:var(--text-secondary);border-left:2px solid var(--gold-dim);padding-left:.875rem }
+  .related-card__title { font-family:var(--serif);font-size:1.1rem;font-weight:400;line-height:1.3;color:var(--text-primary);transition:color .2s }
+  .related-card:hover .related-card__title { color:var(--gold-light) }
+  .related-card__read { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:6px;margin-top:auto;transition:gap .2s }
+  .related-card:hover .related-card__read { gap:12px }
+  .related-card__read::after { content:'→' }
+  @media (max-width:760px) { .related__grid { grid-template-columns:1fr } }
+
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band__inner { position:relative;z-index:1 }
+  .cta-band__label { margin-bottom:1.5rem;justify-content:center }
+  .cta-band__label::before { display:none }
+  .cta-band__heading { font-family:var(--serif);font-size:clamp(1.9rem,3.5vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem }
+  .cta-band__heading em { font-style:italic;color:var(--gold) }
+  .cta-band__sub { font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem }
+  .cta-band__actions { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap }
+</style>
+
+<!--
+  Section nav button styles — in a global block because the buttons
+  are created dynamically by JS and Astro's scoped CSS won't reach them.
+-->
+<style is:global>
+  .section-nav-btn {
+    font-family: var(--mono, 'DM Mono', monospace);
     font-size: 11px;
-    font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--gold);
+    background: var(--bg-card, #141c2c);
+    color: var(--text-subtle, #7d8799);
+    border: none;
+    border-right: 1px solid var(--border-light, rgba(255,255,255,.06));
+    padding: 0.75rem 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    min-height: 44px;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
   }
-
-  @media (max-width: 900px) {
-    .article-layout { grid-template-columns: 1fr; gap: 3rem; }
-    .article-aside { position: static; }
+  .section-nav-btn:last-child { border-right: none; }
+  .section-nav-btn:hover {
+    background: var(--bg-elevated, #111828);
+    color: var(--text-primary, #ede8dc);
+  }
+  .section-nav-btn.is-active {
+    background: var(--gold-trans, rgba(196,154,60,.06));
+    color: var(--gold, #c49a3c);
+  }
+  @media (max-width: 760px) {
+    .section-nav-btn {
+      flex: 1;
+      justify-content: center;
+      font-size: 10px;
+      padding: 0.65rem 0.75rem;
+      border-right: none;
+      border-bottom: 1px solid var(--border-light, rgba(255,255,255,.06));
+    }
+    .section-nav-btn:last-child { border-bottom: none; }
   }
 </style>

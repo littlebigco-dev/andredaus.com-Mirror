@@ -75,15 +75,59 @@ const services = defineCollection({
 const useCases = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/use-cases' }),
   schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    og_title: z.string(),
+ 
+    // ── Core ──────────────────────────────────────────────────────────────
+    title:   z.string(),          // Full case title
+    status:  z.enum(['published', 'draft']),
+    date:    z.coerce.date(),
+ 
+    // ── Content model ──────────────────────────────────────────────────────
+ 
+    /** The broad organisational concern this case examines.
+     *  Shown as a category label on cards and in the hero.
+     *  e.g. "Cybersecurity", "Leadership Alignment", "Digital Transformation" */
+    topic: z.string(),
+ 
+    /** The specific situation / scenario this case is built around.
+     *  1–2 sentences. Concrete, not abstract.
+     *  Shown as the italic deck on cards and in the archive.
+     *  e.g. "A mid-size financial firm invests €2M in security tooling
+     *        and suffers a breach six months later." */
+    scenario: z.string(),
+ 
+    /** Short summary for SEO / meta description */
+    summary: z.string().optional(),
+ 
+    // ── Domain / applicability ─────────────────────────────────────────────
+    /** Primary filter category (matches archive filter buttons) */
+    category: z.string(),
+ 
+    /** Additional domain tags beyond the primary category */
+    domain: z.array(z.string()).default([]),
+ 
+    /** Who this applies to — shown in sidebar and card */
+    applies_to: z.string().optional(),   // e.g. "All industries"
+ 
+    /** Organisation size context */
+    org_size: z.string().optional(),     // e.g. "Mid-market upward"
+ 
+    // ── Services ──────────────────────────────────────────────────────────
+    /** Primary service slug — links to /services/[slug] */
+    primary_service: z.string().optional(),    // e.g. "assumption-hunting"
+ 
+    /** Secondary service slug */
+    secondary_service: z.string().optional(), // e.g. "burn-the-box"
+ 
+    // ── Hero stats strip ──────────────────────────────────────────────────
+    /** Key data points shown in the hero stats strip */
+    stats: z.array(z.object({
+      value: z.string(),   // e.g. "85%"
+      label: z.string(),   // e.g. "of breaches involve a human component"
+    })).default([]),
+ 
+    // ── OG / SEO ──────────────────────────────────────────────────────────
+    og_title: z.string().optional(),
     og_image: z.string().url().optional(),
-    summary: z.string().optional(), // AI-generated at build time
-    status: z.enum(['draft', 'published']),
-    category: z.string(), // Strategy | Leadership | Operations | Communication | Decision Making
-    related_service: reference('services'),
-    related_library: z.array(reference('library')).default([]),
   }),
 });
 

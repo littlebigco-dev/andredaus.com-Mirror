@@ -11,239 +11,615 @@ const useCases = allUseCases
   .filter(e => e.id.startsWith(isDE ? 'de/' : 'en/') && e.data.status === 'published')
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
-const categories = ['All', ...Array.from(new Set(useCases.map(e => e.data.category))).sort()];
+const allCats = Array.from(new Set(useCases.map(e => e.data.category))).sort();
 
 function slugify(entry: typeof useCases[number]) {
   return entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
-}
-
-function formatDate(d: Date) {
-  return d.toLocaleDateString(isDE ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 ---
 
 <Base
   title={isDE ? 'Praxisbeispiele — André Daus' : 'Use Cases — André Daus'}
   description={isDE
-    ? 'Wie Strategic Opposition in der Praxis aussieht. Echte Situationen, konkrete Interventionen, messbare Ergebnisse.'
-    : 'What Strategic Opposition looks like in practice. Real situations, concrete interventions, measurable outcomes.'}
+    ? 'Echte Themen. Konkrete Situationen. Wie Strategic Opposition ansetzt, wo andere aufhören zu fragen.'
+    : 'Real topics. Concrete situations. How Strategic Opposition engages where others stop asking questions.'}
   lang={isDE ? 'de' : 'en'}
 >
 
-  <!-- HERO -->
-  <header class="coll-hero">
-    <div class="hero-grid" aria-hidden="true"></div>
+  <!-- ── PAGE HERO ──────────────────────────────────────────────────────── -->
+  <header class="page-hero" aria-labelledby="page-heading">
+    <div class="page-hero__grid" aria-hidden="true"></div>
     <div class="container">
-      <p class="label">{isDE ? 'Praxisbeispiele' : 'Use Cases'}</p>
-      <h1 class="coll-hero__heading">
-        {isDE
-          ? <Fragment>Wie es in der <em>Praxis aussieht.</em></Fragment>
-          : <Fragment>What it looks like <em>in practice.</em></Fragment>}
-      </h1>
-      <p class="coll-hero__sub">
-        {isDE
-          ? 'Echte Situationen, in denen Strategic Opposition die Annahmen aufgedeckt hat, die einen Entscheidungsprozess blockiert haben. Keine Namen. Echte Erkenntnisse.'
-          : 'Real situations where Strategic Opposition surfaced the assumptions blocking a decision process. No names. Real insight.'}
-      </p>
+      <div class="page-hero__inner">
+
+        <div>
+          <p class="label page-hero__label">
+            {isDE ? 'Angewandte Methodik' : 'Applied methodology'}
+          </p>
+          <h1 class="page-hero__heading" id="page-heading">
+            {isDE
+              ? <Fragment>Das Problem ist<br><em>selten das Problem.</em></Fragment>
+              : <Fragment>The problem is<br><em>rarely the problem.</em></Fragment>}
+          </h1>
+          <p class="page-hero__lede">
+            {isDE
+              ? 'Jeder Fall beginnt mit einem Thema, das Organisationen gerade beschäftigt. Er endet damit zu zeigen, welche Annahme darunter liegt — und wie man anders ansetzt.'
+              : 'Each case starts with a topic organisations are wrestling with right now. It ends by showing the assumption underneath it — and what a different starting point looks like.'}
+          </p>
+        </div>
+
+        <!-- How-it-works aside -->
+        <aside class="how-aside" aria-label={isDE ? 'Wie die Use Cases aufgebaut sind' : 'How these cases work'}>
+          <p class="how-aside__heading">
+            {isDE ? 'Wie jeder Fall aufgebaut ist' : 'How each case is built'}
+          </p>
+          <ol class="how-steps">
+            <li class="how-step">
+              <span class="how-step__n" aria-hidden="true">01</span>
+              <div>
+                <p class="how-step__title">{isDE ? 'Das Thema' : 'The topic'}</p>
+                <p class="how-step__desc">
+                  {isDE
+                    ? 'Ein breites Anliegen, das Organisationen heute betrifft.'
+                    : 'A broad concern that organisations are navigating right now.'}
+                </p>
+              </div>
+            </li>
+            <li class="how-step">
+              <span class="how-step__n" aria-hidden="true">02</span>
+              <div>
+                <p class="how-step__title">{isDE ? 'Die Situation' : 'The situation'}</p>
+                <p class="how-step__desc">
+                  {isDE
+                    ? 'Eine konkrete Situation, die das Thema auf den Punkt bringt.'
+                    : 'A concrete situation that makes the topic specific and real.'}
+                </p>
+              </div>
+            </li>
+            <li class="how-step">
+              <span class="how-step__n" aria-hidden="true">03</span>
+              <div>
+                <p class="how-step__title">{isDE ? 'Die Kosten' : 'The cost'}</p>
+                <p class="how-step__desc">
+                  {isDE
+                    ? 'Was es tatsächlich kostet — und warum es sich verschärft.'
+                    : 'What it actually costs — and why it compounds.'}
+                </p>
+              </div>
+            </li>
+            <li class="how-step">
+              <span class="how-step__n" aria-hidden="true">04</span>
+              <div>
+                <p class="how-step__title">{isDE ? 'Die übliche Reaktion' : 'The usual response'}</p>
+                <p class="how-step__desc">
+                  {isDE
+                    ? 'Wie es üblicherweise behandelt wird — und warum das nicht reicht.'
+                    : 'How it\'s typically handled — and why that falls short.'}
+                </p>
+              </div>
+            </li>
+            <li class="how-step">
+              <span class="how-step__n" aria-hidden="true">05</span>
+              <div>
+                <p class="how-step__title">{isDE ? 'Ein anderer Ansatz' : 'A different approach'}</p>
+                <p class="how-step__desc">
+                  {isDE
+                    ? 'Wie Strategic Opposition den Ausgangspunkt verändert.'
+                    : 'How Strategic Opposition changes the starting point.'}
+                </p>
+              </div>
+            </li>
+          </ol>
+        </aside>
+
+      </div>
     </div>
   </header>
 
-  <!-- FILTER + GRID -->
-  <section class="section" aria-label={isDE ? 'Praxisbeispiele-Archiv' : 'Use case archive'}>
+  <!-- ── STICKY CATEGORY FILTER ────────────────────────────────────────── -->
+  <nav
+    class="cat-nav"
+    aria-label={isDE ? 'Nach Thema filtern' : 'Filter by topic'}
+  >
     <div class="container">
-
-      <div class="filter-bar" role="group" aria-label={isDE ? 'Nach Kategorie filtern' : 'Filter by category'}>
-        {categories.map(cat => (
-          <button
-            class="filter-btn"
-            data-category={cat}
-            aria-pressed={cat === 'All' ? 'true' : 'false'}
-          >
-            {cat === 'All' ? (isDE ? 'Alle' : 'All') : cat}
+      <div class="cat-nav__inner" role="list">
+        <button class="cat-btn is-active" data-cat="all" role="listitem" aria-pressed="true">
+          {isDE ? 'Alle' : 'All'}
+        </button>
+        {allCats.map(cat => (
+          <button class="cat-btn" data-cat={cat} role="listitem" aria-pressed="false">
+            {cat}
           </button>
         ))}
       </div>
+    </div>
+  </nav>
+
+  <!-- ── CASES GRID ─────────────────────────────────────────────────────── -->
+  <section class="cases-section" aria-labelledby="cases-heading">
+    <div class="container">
+      <h2 class="sr-only" id="cases-heading">
+        {isDE ? 'Praxisbeispiele' : 'Use Cases'}
+      </h2>
 
       {useCases.length === 0 ? (
-        <p class="empty-state">{isDE ? 'Noch keine Praxisbeispiele veröffentlicht.' : 'No use cases published yet.'}</p>
+        <p class="empty-state">
+          {isDE ? 'Noch keine Praxisbeispiele veröffentlicht.' : 'No use cases published yet.'}
+        </p>
       ) : (
-        <ul class="card-grid" id="usecases-grid">
-          {useCases.map(entry => (
-            <li class="uc-card fade-up" data-category={entry.data.category}>
-              <a href={`${prefix}/use-cases/${slugify(entry)}`} class="uc-card__link">
-                <div class="uc-card__meta">
-                  <span class="uc-card__cat">{entry.data.category}</span>
-                  <time datetime={entry.data.date.toISOString()} class="uc-card__date">
-                    {formatDate(entry.data.date)}
-                  </time>
+        <ul class="cases-grid" id="cases-grid">
+          {useCases.map((entry, i) => (
+            <li
+              class="fade-up"
+              data-cat={entry.data.category}
+              style={i > 0 ? `transition-delay:${Math.min((i % 2) * 0.1, 0.2)}s` : ''}
+            >
+              <a
+                href={`${prefix}/use-cases/${slugify(entry)}`}
+                class="case-card"
+                aria-label={entry.data.title}
+              >
+                <!-- Card image -->
+                <div class="case-card__image">
+                  {entry.data.og_image ? (
+                    <img
+                      src={entry.data.og_image}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      style="width:100%;height:100%;object-fit:cover;transition:transform .4s ease"
+                    />
+                  ) : (
+                    <div class="case-card__placeholder">
+                      <span class="placeholder-icon" aria-hidden="true">◎</span>
+                      <span class="placeholder-label">{entry.data.topic}</span>
+                    </div>
+                  )}
                 </div>
-                <h2 class="uc-card__title">{entry.data.title}</h2>
-                {entry.data.summary && (
-                  <p class="uc-card__summary">{entry.data.summary}</p>
-                )}
-                <span class="uc-card__read">{isDE ? 'Lesen →' : 'Read →'}</span>
+
+                <!-- Card body -->
+                <div class="case-card__body">
+                  <!-- Topic label + domain tags -->
+                  <div class="case-card__tags">
+                    <span class="case-card__topic">{entry.data.topic}</span>
+                    <span class="case-card__cat">{entry.data.category}</span>
+                    {entry.data.applies_to && (
+                      <span class="case-card__domain">{entry.data.applies_to}</span>
+                    )}
+                  </div>
+
+                  <!-- Scenario — the specific situation -->
+                  {entry.data.scenario && (
+                    <p class="case-card__scenario">{entry.data.scenario}</p>
+                  )}
+
+                  <!-- Title -->
+                  <h3 class="case-card__title">{entry.data.title}</h3>
+
+                  <!-- Summary -->
+                  {entry.data.summary && (
+                    <p class="case-card__excerpt">{entry.data.summary}</p>
+                  )}
+
+                  <!-- Footer -->
+                  <div class="case-card__footer">
+                    <span class="case-card__read">
+                      {isDE ? 'Diesen Fall lesen' : 'Read this case'}
+                    </span>
+                    {entry.data.primary_service && (
+                      <span class="case-card__service">
+                        {isDE ? 'Leistung' : 'Service'}: {entry.data.primary_service}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </a>
             </li>
           ))}
         </ul>
       )}
+    </div>
+  </section>
 
+  <!-- ── WHY THESE CASES EXIST BAND ────────────────────────────────────── -->
+  <section class="what-band" aria-labelledby="what-heading">
+    <div class="container">
+      <div class="what-band__inner">
+        <div>
+          <p class="label" style="margin-bottom:1.25rem">
+            {isDE ? 'Warum diese Fälle existieren' : 'Why these cases exist'}
+          </p>
+          <h2 class="what-band__heading" id="what-heading">
+            {isDE
+              ? 'Diese Cases sind keine Kundenstories. Sie sind Denkexperimente mit realen Konsequenzen.'
+              : 'These cases aren\'t client stories. They\'re thought experiments with real consequences.'}
+          </h2>
+          <div class="what-band__body">
+            <p>
+              {isDE
+                ? 'Jeder Fall basiert auf realen Mustern, die ich in Organisationen immer wieder beobachte. Der spezifische Kontext ist konstruiert — um das Prinzip scharf zu machen, nicht um einen einzelnen Klienten zu beschreiben.'
+                : 'Each case is based on real patterns I observe repeatedly across organisations. The specific context is constructed — to sharpen the principle, not to describe a single client.'}
+            </p>
+            <p>
+              {isDE
+                ? 'Die Frage ist nicht: "Haben Sie dieses Problem?" Die Frage ist: "Erkennen Sie die Annahme, die dahintersteckt?"'
+                : 'The question isn\'t "do you have this problem?" The question is: "do you recognise the assumption underneath it?"'}
+            </p>
+          </div>
+          <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow" style="margin-top:2rem">
+            {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+          </a>
+        </div>
+
+        <!-- Methodology note -->
+        <div class="method-note">
+          <p class="method-note__heading">
+            {isDE ? 'Die Methodik dahinter' : 'The methodology behind these'}
+          </p>
+          <p class="method-note__body">
+            {isDE
+              ? 'Strategic Opposition geht immer vom gleichen Ausgangspunkt aus: Das Problem, das eine Organisation beschreibt, ist selten das Problem, das tatsächlich gelöst werden muss. Der erste Schritt ist daher nie die Lösung — sondern die Frage, ob die Problemformulierung überhaupt stimmt.'
+              : 'Strategic Opposition always starts from the same place: the problem an organisation describes is rarely the problem that actually needs solving. So the first step is never the solution — it\'s questioning whether the problem statement is correct.'}
+          </p>
+          <a href={`${prefix}/services`} class="method-note__link">
+            {isDE ? 'Wie ich arbeite →' : 'How I work →'}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────────────── -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="container cta-band__inner">
+      <p class="label cta-band__label">
+        {isDE ? 'Ihr Thema nicht dabei?' : 'Don\'t see your topic?'}
+      </p>
+      <h2 class="cta-band__heading" id="cta-heading">
+        {isDE
+          ? <Fragment>Jedes Problem, an dem ich arbeite,<br>beginnt mit einer <em>anderen Frage.</em></Fragment>
+          : <Fragment>Every problem I work on<br>starts with a <em>different question.</em></Fragment>}
+      </h2>
+      <p class="cta-band__sub">
+        {isDE
+          ? 'Ein 30-minütiger Discovery Call genügt, um sie zu finden. Kommen Sie mit dem Problem, wie Sie es beschreiben würden. Ich werde es herausfordern.'
+          : 'A 30-minute discovery call is enough to find it. Come with the problem as you\'d describe it. I\'ll challenge the description.'}
+      </p>
+      <div class="cta-band__actions">
+        <a href={`${prefix}/contact`} class="btn btn--primary btn-arrow">
+          {isDE ? 'Discovery Call buchen' : 'Book a Discovery Call'}
+        </a>
+        <a href={`${prefix}/services`} class="btn btn--outline">
+          {isDE ? 'Leistungen ansehen' : 'View services'}
+        </a>
+      </div>
     </div>
   </section>
 
 </Base>
 
 <script>
-  const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-  const cards = document.querySelectorAll<HTMLLIElement>('.uc-card');
+  (function () {
+    const btns  = document.querySelectorAll<HTMLButtonElement>('.cat-btn');
+    const items = document.querySelectorAll<HTMLElement>('#cases-grid > li');
 
-  btns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.dataset.category!;
-      btns.forEach(b => b.setAttribute('aria-pressed', 'false'));
-      btn.setAttribute('aria-pressed', 'true');
-      cards.forEach(card => {
-        card.style.display = cat === 'All' || card.dataset.category === cat ? '' : 'none';
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-pressed', 'true');
+        const cat = btn.dataset.cat ?? 'all';
+        items.forEach(li => {
+          li.style.display = cat === 'all' || li.dataset.cat === cat ? '' : 'none';
+        });
       });
     });
-  });
+
+    if (!window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      const io = new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+    } else {
+      document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+    }
+  })();
 </script>
 
 <style>
-  .coll-hero {
+  .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+
+  /* ── Page hero ─────────────────────────────────────────────────────────── */
+  .page-hero {
+    padding-top: 68px;
+    background: linear-gradient(160deg, var(--bg-surface) 0%, var(--bg-base) 55%);
+    border-bottom: 1px solid var(--border-light);
     position: relative;
-    padding: calc(68px + var(--section)) 0 var(--section);
     overflow: hidden;
   }
-  .hero-grid {
+  .page-hero__grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
   }
-  .coll-hero .label { margin-bottom: 1.25rem; }
-  .coll-hero__heading {
+  .page-hero__inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 4rem;
+    align-items: start;
+    padding-block: clamp(4rem, 8vw, 6.5rem) clamp(3rem, 5vw, 4.5rem);
+  }
+  .page-hero__label { margin-bottom: 1.5rem; }
+  .page-hero__heading {
     font-family: var(--serif);
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-size: clamp(2.4rem, 5vw, 4rem);
     font-weight: 400;
     line-height: 1.1;
+    letter-spacing: -0.02em;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
   }
-  .coll-hero__heading em { font-style: italic; color: var(--gold); }
-  .coll-hero__sub {
-    max-width: 52ch;
+  .page-hero__heading em { font-style: italic; color: var(--gold); }
+  .page-hero__lede {
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
     color: var(--text-secondary);
-    font-size: var(--text-lg);
+    line-height: 1.85;
+    max-width: 52ch;
   }
 
-  .filter-bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 3rem;
-  }
-  .filter-btn {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 7px 16px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    background: transparent;
-    color: var(--text-subtle);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-  }
-  .filter-btn:hover,
-  .filter-btn[aria-pressed="true"] {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: var(--gold-trans);
-  }
-
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .uc-card {
+  /* How-it-works aside */
+  .how-aside {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    transition: border-color var(--transition-base);
+    border-top: 2px solid var(--gold-dim);
+    padding: 2rem;
+    border-radius: 3px;
   }
-  .uc-card:hover { border-color: var(--border); }
-
-  .uc-card__link {
-    display: flex;
-    flex-direction: column;
-    gap: 0.875rem;
-    padding: 1.75rem;
-    height: 100%;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .uc-card__meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .uc-card__cat {
+  .how-aside__heading {
     font-family: var(--mono);
     font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--gold);
-    padding: 3px 8px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
+    margin-bottom: 1.25rem;
   }
-  .uc-card__date {
+  .how-steps { display: flex; flex-direction: column; gap: 0.875rem; }
+  .how-step {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.875rem;
+    align-items: start;
+  }
+  .how-step__n {
     font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--gold-dim);
+    padding-top: 0.15rem;
+  }
+  .how-step__title { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.3; margin-bottom: 2px; }
+  .how-step__desc { font-size: 12px; line-height: 1.6; color: var(--text-secondary); }
+
+  @media (max-width: 820px) {
+    .page-hero__inner { grid-template-columns: 1fr; }
+    .how-aside { display: none; }
   }
 
-  .uc-card__title {
-    font-family: var(--serif);
-    font-size: clamp(1.1rem, 2vw, 1.3rem);
-    font-weight: 400;
-    line-height: 1.3;
-    color: var(--text-primary);
-    flex: 1;
+  /* ── Category filter ───────────────────────────────────────────────────── */
+  .cat-nav { background:var(--bg-surface);border-bottom:1px solid var(--border-light);position:sticky;top:68px;z-index:50 }
+  .cat-nav__inner { display:flex;overflow-x:auto;scrollbar-width:none }
+  .cat-nav__inner::-webkit-scrollbar { display:none }
+  .cat-btn { font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:1.1rem 1.4rem;color:var(--text-secondary);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap;min-height:44px }
+  .cat-btn:hover { color:var(--text-primary) }
+  .cat-btn.is-active { color:var(--gold);border-bottom-color:var(--gold) }
+  .cat-btn:focus-visible { outline:3px solid var(--gold);outline-offset:-3px }
+
+  /* ── Cases grid ────────────────────────────────────────────────────────── */
+  .cases-section { padding-block: var(--section); }
+  .cases-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem }
+
+  /* Case card */
+  .case-card {
+    background: var(--bg-card-alt);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .2s, transform .2s;
   }
-  .uc-card__summary {
-    font-size: var(--text-sm);
+  .case-card:hover { border-color: rgba(196,154,60,.3); transform: translateY(-3px); }
+  .case-card:hover img { transform: scale(1.04); }
+
+  .case-card__image {
+    aspect-ratio: 16/8;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-elevated);
+  }
+
+  .case-card__placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 180px;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .placeholder-icon { font-size: 1.75rem; opacity: 0.15; display: block; color: var(--gold); }
+  .placeholder-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+
+  .case-card__body { padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+
+  .case-card__tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .case-card__topic {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .case-card__cat {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-secondary);
-    line-height: 1.6;
+    border: 1px solid var(--border-light);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .case-card__domain {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    border: 1px solid var(--border-light);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+
+  /* Scenario — replaces the old quoted problem */
+  .case-card__scenario {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    padding-left: 1rem;
+    border-left: 2px solid var(--gold-dim);
+  }
+
+  .case-card__title {
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 2vw, 1.55rem);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text-primary);
+    transition: color .2s;
+  }
+  .case-card:hover .case-card__title { color: var(--gold-light); }
+
+  .case-card__excerpt {
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    flex: 1;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  .uc-card__read {
+
+  .case-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    margin-top: auto;
+  }
+  .case-card__read { font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:6px;transition:gap .2s }
+  .case-card:hover .case-card__read { gap: 12px; }
+  .case-card__read::after { content: '→'; }
+  .case-card__service { font-family: var(--mono); font-size: 10px; color: var(--text-subtle); }
+
+  @media (max-width: 760px) { .cases-grid { grid-template-columns: 1fr; } }
+
+  /* ── Why-these-cases band ──────────────────────────────────────────────── */
+  .what-band {
+    background: var(--navy);
+    border-top: 1px solid rgba(29,45,68,.8);
+    border-bottom: 1px solid rgba(29,45,68,.8);
+    padding-block: clamp(3.5rem, 7vw, 5rem);
+  }
+  .what-band__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .what-band__heading {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+  .what-band__body { font-size: 14px; line-height: 1.85; color: var(--text-secondary); }
+  .what-band__body p + p { margin-top: 0.875rem; }
+
+  /* Methodology note card */
+  .method-note {
+    background: rgba(0,0,0,.2);
+    border: 1px solid rgba(255,255,255,.06);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    padding: 2rem;
+  }
+  .method-note__heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .method-note__body {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+  }
+  .method-note__link {
     font-family: var(--mono);
     font-size: 11px;
-    font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
-    margin-top: auto;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: gap .2s;
   }
+  .method-note__link:hover { gap: 10px; }
 
-  .empty-state { color: var(--text-subtle); font-style: italic; padding: 3rem 0; }
+  @media (max-width: 760px) { .what-band__inner { grid-template-columns: 1fr; } }
 
-  @media (max-width: 640px) {
-    .card-grid { grid-template-columns: 1fr; }
-  }
+  /* ── CTA band ──────────────────────────────────────────────────────────── */
+  .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band__inner { position:relative;z-index:1 }
+  .cta-band__label { margin-bottom:1.5rem;justify-content:center }
+  .cta-band__label::before { display:none }
+  .cta-band__heading { font-family:var(--serif);font-size:clamp(2rem,4vw,3.25rem);font-weight:400;line-height:1.15;color:var(--text-primary);max-width:22ch;margin-inline:auto;margin-bottom:1.25rem }
+  .cta-band__heading em { font-style:italic;color:var(--gold) }
+  .cta-band__sub { font-size:15px;color:var(--text-secondary);max-width:46ch;margin-inline:auto;line-height:1.8;margin-bottom:2.5rem }
+  .cta-band__actions { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap }
+
+  .empty-state { color:var(--text-subtle);font-style:italic;padding:3rem 0 }
+  .fade-up { opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease }
+  .fade-up.visible { opacity:1;transform:translateY(0) }
 </style>
