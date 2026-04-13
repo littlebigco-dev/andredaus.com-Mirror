@@ -20,8 +20,8 @@ Slogan: "The problem is rarely the problem."
 - Background: `#090c14` (dark navy)
 - Accent: `#c49a3c` (gold)
 - Text: `#e8e3d8` (off-white)
-- Heading font: Instrument Serif
-- Body font: Work Sans
+- Heading font: Fraunces (variable, all axes: opsz, wght, SOFT, WONK)
+- Body font: Work Sans (variable)
 - Code/accent font: DM Mono
 - CSS methodology: BEM
 - No Tailwind, no CSS frameworks
@@ -196,7 +196,7 @@ src/
       en/
       de/
 public/
-  fonts/            # Self-hosted .woff2 font files (Instrument Serif, Work Sans, DM Mono)
+  fonts/            # Self-hosted .woff2 font files (Fraunces variable, Work Sans via npm, DM Mono via npm)
 ```
 
 ---
@@ -254,20 +254,30 @@ The Library archive is the most complex page on the site. It requires:
 - `output: 'static'` — site is fully static
 - `src/pages/api/contact.ts` has `export const prerender = false` — handled by Cloudflare Pages Functions via the Cloudflare adapter
 
+### Wrangler / compatibility date
+- `wrangler.toml` in project root sets `compatibility_date = "2026-04-12"` for the local dev server
+- The `@cloudflare/vite-plugin` (used by `@astrojs/cloudflare`) reads this file directly; without it the plugin defaults to today's date, which can exceed what the bundled `workerd` binary supports
+- The `compatibilityDate` option in `astro.config.mjs` adapter config is NOT used by the dev server (it ends up in an unrecognised camelCase key); `wrangler.toml` is the authoritative source for local dev
+- When upgrading `wrangler` / `workerd`, bump the date in `wrangler.toml` to match the new binary's maximum supported date
+
 ### PostHog
 - Loaded via inline script in `Base.astro` — only renders when `PUBLIC_POSTHOG_KEY` env var is set
 - EU endpoint: `https://eu.i.posthog.com`
 - Set key in `.env` locally (see `.env.example`); add to Cloudflare Pages env vars for production
 
 ### Fonts
-- Self-hosted in `public/fonts/` as `.woff2` files, declared via `@font-face` in `global.css`
-- Work Sans: weights 300/400/500/600/700 (+ italics); Instrument Serif: 400 regular + italic; DM Mono: 300/400/500 (+ italics)
-- Google Fonts links removed — no external font requests
+- **Fraunces Variable** — self-hosted in `public/fonts/Fraunces-VF.woff2` (Roman) and `Fraunces-Italic-VF.woff2` (Italic); declared via `@font-face` at the top of `global.css`; full variable font with all axes (opsz, wght, SOFT, WONK); source: official Undercasetype GitHub release v1.000
+- **Work Sans Variable** — served via `@fontsource-variable/work-sans` npm package; imported in `src/layouts/Base.astro`; CSS variable uses `'Work Sans Variable'`
+- **DM Mono** — served via `@fontsource/dm-mono` npm package; 300.css and 400.css imported in `src/layouts/Base.astro`; CSS variable uses `'DM Mono'`
+- No Google Fonts CDN — no external font requests
+- Old `public/fonts/` hand-managed woff2 files for Work Sans and DM Mono are superseded by npm packages (files remain on disk but are unused)
 
 ### Design token naming
 - CSS variable names follow the reference HTML convention: `--bg-base`, `--bg-surface`, `--bg-elevated`, `--bg-card`, `--gold`, `--gold-light`, `--gold-dim`, `--gold-glow`, `--gold-trans`, `--text-primary`, `--text-secondary`, `--text-subtle`, `--text-muted`, `--border`, `--border-light`, `--serif`, `--sans`, `--mono`
+- Font token values: `--serif: 'Fraunces Variable', Georgia, serif` | `--sans: 'Work Sans Variable', system-ui, sans-serif` | `--mono: 'DM Mono', 'SF Mono', monospace`
 - Layout shorthand tokens: `--max-w: 1160px`, `--gutter: clamp(1.25rem,4vw,2.5rem)`, `--section: clamp(5rem,10vw,9rem)`
 - Old Phase 1 names (`--color-bg`, `--color-accent`, `--font-heading`, etc.) have been replaced — do not use them
+- Heading font axes: `font-optical-sizing: auto; font-variation-settings: 'WONK' 1` applied to `h1–h6`; weights: `h1` → 300, `h2`/`h3` → 400
 
 ### Component architecture
 - `Header.astro` — thin wrapper: skip link + `<Nav />`

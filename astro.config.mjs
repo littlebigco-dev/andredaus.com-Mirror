@@ -46,7 +46,9 @@ export default defineConfig({
   },
   site: 'https://andredaus.com',
   output: 'static',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    compatibilityDate: '2026-04-12',
+  }),
 
   i18n: {
     defaultLocale: 'en',

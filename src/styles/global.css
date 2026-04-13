@@ -1,137 +1,21 @@
 /* ==========================================================================
-   FONTS — self-hosted via @font-face
+   FONTS — self-hosted variable font
    ========================================================================== */
 
-/* Instrument Serif */
 @font-face {
-  font-family: 'Instrument Serif';
+  font-family: 'Fraunces Variable';
+  src: url('/fonts/Fraunces-VF.woff2') format('woff2-variations');
+  font-weight: 100 900;
   font-style: normal;
-  font-weight: 400;
   font-display: swap;
-  src: url('/fonts/instrument-serif-v5-latin-regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Instrument Serif';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/instrument-serif-v5-latin-italic.woff2') format('woff2');
 }
 
-/* Work Sans — weights used in the design */
 @font-face {
-  font-family: 'Work Sans';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-300.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
+  font-family: 'Fraunces Variable';
+  src: url('/fonts/Fraunces-Italic-VF.woff2') format('woff2-variations');
+  font-weight: 100 900;
   font-style: italic;
-  font-weight: 300;
   font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-300italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-500italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-600italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-700.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Work Sans';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/work-sans-v24-latin-700italic.woff2') format('woff2');
-}
-
-/* DM Mono */
-@font-face {
-  font-family: 'DM Mono';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/dm-mono-v16-latin-300.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'DM Mono';
-  font-style: italic;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/dm-mono-v16-latin-300italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'DM Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/dm-mono-v16-latin-regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'DM Mono';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/dm-mono-v16-latin-italic.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'DM Mono';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/dm-mono-v16-latin-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'DM Mono';
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/dm-mono-v16-latin-500italic.woff2') format('woff2');
 }
 
 /* ==========================================================================
@@ -140,8 +24,8 @@
 
 :root {
   /* Fonts */
-  --serif: 'Instrument Serif', Georgia, serif;
-  --sans:  'Work Sans', system-ui, sans-serif;
+  --serif: 'Fraunces Variable', Georgia, serif;
+  --sans:  'Work Sans Variable', system-ui, sans-serif;
   --mono:  'DM Mono', 'SF Mono', monospace;
 
   /* Backgrounds */
@@ -417,11 +301,13 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   line-height: 1.2;
   color: var(--text-primary);
+  font-optical-sizing: auto;
+  font-variation-settings: 'WONK' 1;
 }
 
-h1 { font-size: clamp(2.5rem, 6vw, var(--text-6xl)); }
-h2 { font-size: clamp(2rem, 4vw, var(--text-5xl)); }
-h3 { font-size: var(--text-3xl); }
+h1 { font-size: clamp(2.5rem, 6vw, var(--text-6xl)); font-weight: 300; }
+h2 { font-size: clamp(2rem, 4vw, var(--text-5xl)); font-weight: 400; }
+h3 { font-size: var(--text-3xl); font-weight: 400; }
 h4 { font-size: var(--text-2xl); }
 h5 { font-size: var(--text-xl); }
 h6 { font-size: var(--text-lg); }
