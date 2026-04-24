@@ -180,8 +180,9 @@ const podcast = defineCollection({
     date:           z.coerce.date(),
     episode_number: z.number(),
     summary:        z.string().optional(),
+    description:    z.string().optional(),
     og_title:       z.string(),
-    og_image:       z.string().url().optional(),
+    og_image:       z.string().optional(),
     episode_id:     z.string().optional(),        // RSS <guid>
     audio_url:      z.string().url(),             // ← RSS <enclosure url> — direct MP3
     artwork_url:    z.string().url().optional(),  // RSS <itunes:image href>

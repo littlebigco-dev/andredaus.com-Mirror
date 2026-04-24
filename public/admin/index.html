@@ -8,5 +8,43 @@
   </head>
   <body>
     <script src="https://cdn.jsdelivr.net/npm/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+      CMS.registerEditorComponent({
+        id: 'internal-link',
+        label: 'Internal Link',
+        fields: [
+          {
+            name: 'collection',
+            label: 'Collection',
+            widget: 'select',
+            options: [
+              { label: 'Insights (EN)',  value: 'insights/en' },
+              { label: 'Insights (DE)',  value: 'insights/de' },
+              { label: 'Library (EN)',   value: 'library/en' },
+              { label: 'Library (DE)',   value: 'library/de' },
+              { label: 'Use Cases (EN)', value: 'use-cases/en' },
+              { label: 'Use Cases (DE)', value: 'use-cases/de' },
+              { label: 'Services (EN)',  value: 'services/en' },
+              { label: 'Services (DE)',  value: 'services/de' },
+              { label: 'Podcast (EN)',   value: 'podcast/en' },
+              { label: 'Podcast (DE)',   value: 'podcast/de' },
+            ],
+          },
+          { name: 'slug',  label: 'Slug',      widget: 'string',
+            hint: 'The slug of the target entry, e.g. the-quote-nobody-checked' },
+          { name: 'label', label: 'Link Text', widget: 'string' },
+        ],
+        pattern: /\[([^\]]+)\]\(\/([a-z-]+\/(?:en|de))\/([a-z0-9-]+)\)/,
+        fromBlock: (match) => ({
+          label:      match[1],
+          collection: match[2],
+          slug:       match[3],
+        }),
+        toBlock: ({ label, collection, slug }) =>
+          `[${label || 'Link'}](/${collection}/${slug})`,
+        toPreview: ({ label, collection, slug }) =>
+          `<a href="/${collection}/${slug}" style="color:#c49a3c">${label || 'Link'}</a>`,
+      });
+    </script>
   </body>
 </html>
