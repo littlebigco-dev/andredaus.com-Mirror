@@ -1,8 +1,9 @@
 ---
 title: "Assumption Blindness: Why Your Strategy Feels Solid But Isn't"
+og_title: Why Your Strategy Feels Solid But Isn't
 date: 2025-10-15
-og_title: "Why Your Strategy Feels Solid But Isn't"
-summary: "Every strategy rests on assumptions. The dangerous ones aren't the assumptions you know about — they're the ones you've stopped seeing."
+summary: Every strategy rests on assumptions. The dangerous ones aren't the
+  assumptions you know about — they're the ones you've stopped seeing.
 category: Strategy
 status: published
 ---

@@ -1,0 +1,454 @@
+backend:
+  name: gitlab
+  repo: littlebigco/andredaus-com   # ← update this
+  branch: main
+  auth_type: pkce
+  app_id: 81152537         # ← update this
+
+media_folder: src/assets/uploads
+public_folder: /assets/uploads
+
+local_backend: true
+
+collections:
+
+  # ────────────────────────────────────────────────────────────────────
+  # INSIGHTS
+  # ────────────────────────────────────────────────────────────────────
+
+  - name: insights_en
+    label: "Insights (EN)"
+    folder: src/content/insights/en
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: "OG Title", name: og_title, widget: string, required: false,
+          hint: "Shorter title for OG image and social sharing. Leave blank to use Title." }
+      - label: Category
+        name: category
+        widget: select
+        options:
+          - { label: Strategy, value: Strategy }
+          - { label: Psychology, value: Psychology }
+          - { label: Technology, value: Technology }
+          - { label: Business, value: Business }
+          - { label: Methodology, value: Methodology }
+          - { label: Strategic Opposition, value: Strategic Opposition }
+        default: Strategy    
+      - { label: "Published Date", name: date, widget: datetime }
+      - { label: Summary, name: summary, widget: text,
+          hint: "Used in cards, meta description, and AI-generated summaries." }
+      - { label: Tags, name: tags, widget: list, default: [] }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Draft, value: draft }
+          - { label: Published, value: published }
+        default: draft
+      - { label: Body, name: body, widget: markdown }
+
+  - name: insights_de
+    label: "Insights (DE)"
+    folder: src/content/insights/de
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Titel, name: title, widget: string }
+      - { label: "OG Titel", name: og_title, widget: string, required: false }
+      - label: Category
+        name: category
+        widget: select
+        options:
+          - { label: Strategy, value: Strategy }
+          - { label: Psychology, value: Psychology }
+          - { label: Technology, value: Technology }
+          - { label: Business, value: Business }
+          - { label: Methodology, value: Methodology }
+        default: Strategy    
+      - { label: Veröffentlichungsdatum, name: date, widget: datetime }
+      - { label: Zusammenfassung, name: summary, widget: text }
+      - { label: Tags, name: tags, widget: list, default: [] }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Entwurf, value: draft }
+          - { label: Veröffentlicht, value: published }
+        default: draft
+      - { label: Inhalt, name: body, widget: markdown }
+
+  # ────────────────────────────────────────────────────────────────────
+  # SERVICES
+  # ────────────────────────────────────────────────────────────────────
+
+  - name: services_en
+    label: "Services (EN)"
+    folder: src/content/services/en
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Title, name: title, widget: string }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Active, value: active }
+          - { label: Retired, value: retired }
+        default: active
+      - { label: Price, name: price, widget: string,
+          hint: 'e.g. "€400" or "from €400"' }
+      - { label: Format, name: format, widget: string,
+          hint: 'e.g. "90 min video call" or "async written report"' }
+      - { label: "CTA Button Label", name: cta_label, widget: string,
+          hint: 'e.g. "Book a call"' }
+      - label: "Featured Use Cases"
+        name: featured_use_cases
+        widget: list
+        required: false
+        hint: "Use cases that illustrate this service."
+        field:
+          label: "Use Case"
+          name: slug
+          widget: relation
+          collection: use_cases_en
+          search_fields: [title]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - { label: Description, name: body, widget: markdown }
+
+  - name: services_de
+    label: "Services (DE)"
+    folder: src/content/services/de
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Titel, name: title, widget: string }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Aktiv, value: active }
+          - { label: Eingestellt, value: retired }
+        default: active
+      - { label: Preis, name: price, widget: string }
+      - { label: Format, name: format, widget: string }
+      - { label: "CTA Button Text", name: cta_label, widget: string }
+      - label: "Ausgewählte Use Cases"
+        name: featured_use_cases
+        widget: list
+        required: false
+        field:
+          label: "Use Case"
+          name: slug
+          widget: relation
+          collection: use_cases_de
+          search_fields: [title]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - { label: Beschreibung, name: body, widget: markdown }
+
+  # ────────────────────────────────────────────────────────────────────
+  # USE CASES
+  # ────────────────────────────────────────────────────────────────────
+
+  - name: use_cases_en
+    label: "Use Cases (EN)"
+    folder: src/content/use-cases/en
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: "OG Title", name: og_title, widget: string, required: false }
+      - { label: "Published Date", name: date, widget: datetime }
+      - { label: Summary, name: summary, widget: text }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Draft, value: draft }
+          - { label: Published, value: published }
+        default: draft
+      - label: "Related Service"
+        name: related_service
+        widget: relation
+        required: false
+        hint: "Which service does this use case illustrate?"
+        collection: services_en
+        search_fields: [title]
+        value_field: "{{slug}}"
+        display_fields: [title]
+      - label: "Related Library Entries"
+        name: related_library
+        widget: list
+        required: false
+        hint: "Concepts or mental models that apply to this use case."
+        field:
+          label: "Library Entry"
+          name: slug
+          widget: relation
+          collection: library_en
+          search_fields: [title]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - { label: Tags, name: tags, widget: list, default: [] }
+      - { label: Body, name: body, widget: markdown }
+
+  - name: use_cases_de
+    label: "Use Cases (DE)"
+    folder: src/content/use-cases/de
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Titel, name: title, widget: string }
+      - { label: "OG Titel", name: og_title, widget: string, required: false }
+      - { label: Veröffentlichungsdatum, name: date, widget: datetime }
+      - { label: Zusammenfassung, name: summary, widget: text }
+      - label: Status
+        name: status
+        widget: select
+        options:
+          - { label: Entwurf, value: draft }
+          - { label: Veröffentlicht, value: published }
+        default: draft
+      - label: "Zugehöriger Service"
+        name: related_service
+        widget: relation
+        required: false
+        collection: services_de
+        search_fields: [title]
+        value_field: "{{slug}}"
+        display_fields: [title]
+      - label: "Verwandte Library-Einträge"
+        name: related_library
+        widget: list
+        required: false
+        field:
+          label: "Library-Eintrag"
+          name: slug
+          widget: relation
+          collection: library_de
+          search_fields: [title]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - { label: Tags, name: tags, widget: list, default: [] }
+      - { label: Inhalt, name: body, widget: markdown }
+
+  # ────────────────────────────────────────────────────────────────────
+  # LIBRARY
+  # No publish date — evergreen. last_updated for SEO only.
+  # Three relation types with distinct descriptions.
+  # ────────────────────────────────────────────────────────────────────
+
+  - name: library_en
+    label: "Library (EN)"
+    folder: src/content/library/en
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: "OG Title", name: og_title, widget: string, required: false }
+      - label: Category
+        name: category
+        widget: select
+        options:
+          - { label: Bias, value: bias }
+          - { label: "Liberating Structure", value: liberating-structure }
+          - { label: "Mental Model", value: mental-model }
+        default: mental-model
+      - { label: Summary, name: summary, widget: text,
+          hint: "Used in cards, meta description, and AI snippets." }
+      - { label: "Last Updated", name: last_updated, widget: datetime, required: false,
+          hint: "Not shown to visitors — used for SEO freshness signals." }
+      - label: "Related Concepts"
+        name: related_concepts
+        widget: list
+        required: false
+        hint: "Cross-category connections — biases, structures, or models that connect to this entry."
+        field:
+          label: Concept
+          name: slug
+          widget: relation
+          collection: library_en
+          search_fields: [title, category]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - label: "Related Entries"
+        name: related_entries
+        widget: list
+        required: false
+        hint: "Same-category entries — similar or contrasting entries within this category."
+        field:
+          label: Entry
+          name: slug
+          widget: relation
+          collection: library_en
+          search_fields: [title, category]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - label: "Related Use Cases"
+        name: related_use_cases
+        widget: list
+        required: false
+        hint: "Real-world applications of this concept."
+        field:
+          label: "Use Case"
+          name: slug
+          widget: relation
+          collection: use_cases_en
+          search_fields: [title]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - { label: Body, name: body, widget: markdown }
+
+  - name: library_de
+    label: "Library (DE)"
+    folder: src/content/library/de
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Titel, name: title, widget: string }
+      - { label: "OG Titel", name: og_title, widget: string, required: false }
+      - label: Kategorie
+        name: category
+        widget: select
+        options:
+          - { label: Bias, value: bias }
+          - { label: "Liberating Structure", value: liberating-structure }
+          - { label: "Mental Model", value: mental-model }
+        default: mental-model
+      - { label: Zusammenfassung, name: summary, widget: text }
+      - { label: "Zuletzt aktualisiert", name: last_updated, widget: datetime, required: false }
+      - label: "Verwandte Konzepte"
+        name: related_concepts
+        widget: list
+        required: false
+        hint: "Kategorieübergreifende Verbindungen."
+        field:
+          label: Konzept
+          name: slug
+          widget: relation
+          collection: library_de
+          search_fields: [title, category]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - label: "Verwandte Einträge"
+        name: related_entries
+        widget: list
+        required: false
+        hint: "Ähnliche oder kontrastierende Einträge der gleichen Kategorie."
+        field:
+          label: Eintrag
+          name: slug
+          widget: relation
+          collection: library_de
+          search_fields: [title, category]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - label: "Verwandte Use Cases"
+        name: related_use_cases
+        widget: list
+        required: false
+        field:
+          label: "Use Case"
+          name: slug
+          widget: relation
+          collection: use_cases_de
+          search_fields: [title]
+          value_field: "{{slug}}"
+          display_fields: [title]
+      - { label: Inhalt, name: body, widget: markdown }
+
+  # ────────────────────────────────────────────────────────────────────
+  # FAQs
+  # No body/markdown — question + answer only.
+  # ────────────────────────────────────────────────────────────────────
+
+  - name: faqs_en
+    label: "FAQs (EN)"
+    folder: src/content/faqs/en
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Question, name: question, widget: string }
+      - { label: Answer, name: answer, widget: text }
+      - { label: Category, name: category, widget: string,
+          hint: 'e.g. "Services", "Methodology", "Process"' }
+      - { label: "Display Order", name: order, widget: number, default: 0,
+          hint: "Lower numbers appear first within the same category." }
+
+  - name: faqs_de
+    label: "FAQs (DE)"
+    folder: src/content/faqs/de
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: Frage, name: question, widget: string }
+      - { label: Antwort, name: answer, widget: text }
+      - { label: Kategorie, name: category, widget: string,
+          hint: 'z.B. "Services", "Methodik", "Ablauf"' }
+      - { label: Anzeigereihenfolge, name: order, widget: number, default: 0 }
+
+  # ────────────────────────────────────────────────────────────────────
+  # PODCAST
+  # Transcript is optional; has_transcript controls display logic.
+  # ────────────────────────────────────────────────────────────────────
+
+
+  - name: podcast_en
+    label: "Podcast Episodes (EN)"
+    folder: src/content/podcast/en
+    create: true
+    slug: "{{show}}-{{episode_number}}-{{slug}}"
+    extension: md
+    fields:
+      - { label: "Episode Title", name: title, widget: string }
+      - { label: "Published Date", name: date, widget: datetime }
+      - { label: "Episode Number", name: episode_number, widget: number }
+      - label: Show
+        name: show
+        widget: select
+        options:
+          - { label: "Iconoclast Insights", value: iconoclast-insights }
+          - { label: "The Human Perimeter", value: the-human-perimeter }
+        default: iconoclast-insights
+      - { label: Summary, name: summary, widget: text,
+          hint: "Used in cards, meta description, and show notes." }
+      - { label: "YouTube URL", name: youtube_url, widget: string, required: false }
+      - { label: "Spotify URL", name: spotify_url, widget: string, required: false }
+      - { label: "Has Transcript", name: has_transcript, widget: boolean, default: false }
+      - { label: Transcript, name: body, widget: markdown, required: false }
+
+  - name: podcast_de
+    label: "Podcast Episodes (DE)"
+    folder: src/content/podcast/de
+    create: true
+    slug: "{{show}}-{{episode_number}}-{{slug}}"
+    extension: md
+    fields:
+      - { label: "Episode Titel", name: title, widget: string }
+      - { label: "Veröffentlichungsdatum", name: date, widget: datetime }
+      - { label: "Episodennummer", name: episode_number, widget: number }
+      - label: Show
+        name: show
+        widget: select
+        options:
+          - { label: "Iconoclast Insights", value: iconoclast-insights }
+          - { label: "The Human Perimeter", value: the-human-perimeter }
+        default: iconoclast-insights
+      - { label: Zusammenfassung, name: summary, widget: text }
+      - { label: "YouTube URL", name: youtube_url, widget: string, required: false }
+      - { label: "Spotify URL", name: spotify_url, widget: string, required: false }
+      - { label: "Transkript vorhanden", name: has_transcript, widget: boolean, default: false }
+      - { label: Transkript, name: body, widget: markdown, required: false }

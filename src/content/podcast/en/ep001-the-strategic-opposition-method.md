@@ -1,16 +1,19 @@
 ---
-title: "There's No App for Thinking"
+artwork_url: https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_episode/19215224/19215224-1774732600847-3597194738825.jpg
+audio_url: https://anchor.fm/s/7320b160/podcast/play/117615088/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-2-28%2F420952822-44100-2-2fe5b9dcccf5d.mp3
+title: There's No App for Thinking
 date: 2026-04-08
 episode_number: 56
-og_title: "There's No App for Thinking"
-episode_id: "11c0f107-937f-44f2-bc13-54547e4a79d6"
-audio_url: "https://anchor.fm/s/7320b160/podcast/play/117615088/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-2-28%2F420952822-44100-2-2fe5b9dcccf5d.mp3"
-artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_episode/19215224/19215224-1774732600847-3597194738825.jpg"
-spotify_url: "https://open.spotify.com/episode/6yphLiEH3kl8tW9f255s3s?si=6_WXIApjQ5-8wZSpVB2s9A"
-youtube_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-duration: "00:11:48"
-category: Solo Episode
+show: iconoclast-insights
+summary: This is the summary
+spotify_url: https://open.spotify.com/episode/6yphLiEH3kl8tW9f255s3s?si=6_WXIApjQ5-8wZSpVB2s9A
+og_title: There's No App for Thinking
 status: published
+youtube_url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+duration: 00:11:48
+has_transcript: false
+category: Solo Episode
+episode_id: 11c0f107-937f-44f2-bc13-54547e4a79d6
 ---
 
 ## Transcript
