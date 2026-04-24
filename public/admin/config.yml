@@ -3,7 +3,7 @@ backend:
   repo: littlebigco/andredaus-com   # ← update this
   branch: main
   auth_type: pkce
-  app_id: 81152537         # ← update this
+  app_id: f5c6055d8474c35cf330b672bd451ecd8a4d405447caa2dac8e551f9e8a5c524         # ← update this
 
 media_folder: src/assets/uploads
 public_folder: /assets/uploads
