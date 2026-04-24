@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The loudest person in the room rarely has the best answer. They have the most to lose from being wrong. Two stories, one pattern: status defense dressed up as expertise.
 og_image: "/podcast-artwork/ep-052.jpg"
+summary: "Discover why the loudest voices defend their status rather than seek truth—two stories reveal how ego masquerades as expertise."
 ---

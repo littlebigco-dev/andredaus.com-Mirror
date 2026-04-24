@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Corporate retreat from diversity quotas reveals the fundamental flaw in how we've approached diversity for decades. Most diversity initiatives have been elaborate theater, not genuine transformation. The biggest obstacle to genuine inclusion? Ego.
 og_image: "/podcast-artwork/ep-011.jpg"
+summary: "Most diversity initiatives are theater masking the real problem: our refusal to examine our own egos and cognitive blind spots."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Does Santa Claus exist? Let's run the numbers. 378 million children. 91 million households. 31 hours. One sleigh traveling at 650 miles per second. Which lies are worth keeping? When does a shared delusion create more value than the truth?
 og_image: "/podcast-artwork/ep-041.jpg"
+summary: "Santa logistics don't add up, but maybe the lie matters more than the math—a contrarian case for keeping the delusion alive."
 ---

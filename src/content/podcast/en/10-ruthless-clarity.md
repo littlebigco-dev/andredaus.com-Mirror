@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   André dissects the uncomfortable space between social harmony and intellectual honesty. His decision-making framework—built on immediate visualization, relentless questioning, and willingness to update in real-time—creates friction in a world that prioritizes comfort over clarity.
 og_image: "/podcast-artwork/ep-010.jpg"
+summary: "André's framework for ruthless decision-making prioritizes intellectual honesty over social comfort, creating productive friction in a world addicted to false harmony."
 ---

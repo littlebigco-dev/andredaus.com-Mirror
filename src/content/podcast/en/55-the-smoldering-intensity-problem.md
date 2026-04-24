@@ -1,8 +1,6 @@
 ---
-title: "The Smoldering Intensity Problem: How Organisations Mistake the Face for
-  the Power"
-og_title: "The Smoldering Intensity Problem: How Organisations Mistake the Face
-  for the Power"
+title: "The Smoldering Intensity Problem: How Organisations Mistake the Face for the Power"
+og_title: "The Smoldering Intensity Problem"
 date: 2026-04-01T13:00:00.000Z
 episode_number: 55
 category: Business Strategy
@@ -15,6 +13,7 @@ youtube_url: https://youtu.be/8jZebr2NPtQ
 spotify_url: https://open.spotify.com/episode/7vmzin1nIaua8xCtqeo7Pr
 og_image: /podcast-artwork/ep-055.jpg
 duration: 00:13:50
+summary: "Organisations keep promoting results-driven performers into leadership roles without actual development, unknowingly scaling their incompetence across the business."
 ---
 If you spend any time on LinkedIn — and I know most of you do, because apparently that’s just what we do now — you will have seen the leadership content. God, you will have seen so much of it.
 

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   What does "era" actually mean? Most people can't define it—yet they use it constantly. "The new era of web development." When did every minor update become an "era"? When did every feature become a "game-changer"?
 og_image: "/podcast-artwork/ep-038.jpg"
+summary: "We've stopped knowing what an era actually is, yet we declare new ones every Tuesday—here's why everything becoming everything means nothing."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Why are we stumbling over individual words instead of grappling with actual ideas? We're not protecting people from harm—we're eliminating the friction necessary for growth. Context matters more than content in determining meaning.
 og_image: "/podcast-artwork/ep-025.jpg"
+summary: "Language policing distracts us from real ideas; discomfort is where growth happens, not where it ends."
 ---

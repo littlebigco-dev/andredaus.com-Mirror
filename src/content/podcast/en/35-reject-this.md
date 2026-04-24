@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   50+ workers aren't your diversity problem—they're your strategic solution. It's about cognitive diversity through scars. People who've had to think in different contexts, different crises, and different roles. "Overqualified" might be the most expensive rejection you'll ever make.
 og_image: "/podcast-artwork/ep-035.jpg"
+summary: "Hiring managers dismiss 50+ workers as overqualified—but refusing experience-forged cognitive diversity is your costliest mistake."
 ---

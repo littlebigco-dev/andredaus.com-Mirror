@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The best ideas don't win—the loudest egos do. Discover the Coffee Kitchen Phenomenon that's killing innovation in your workplace, and the simple technique that flips the script on traditional meetings.
 og_image: "/podcast-artwork/ep-012.jpg"
+summary: "Stop letting the loudest voices dominate your meetings—learn how the Coffee Kitchen Phenomenon is killing innovation and the one trick that changes everything."
 ---

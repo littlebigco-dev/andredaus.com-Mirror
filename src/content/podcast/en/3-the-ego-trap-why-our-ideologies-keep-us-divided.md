@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   I dig into the ideological mess splitting us apart. Are we chasing answers or just stroking our egos? From postmodern tangles to culture wars, this episode skewers the myths we cling to, arguing real diversity lives in your head, not your skin.
 og_image: "/podcast-artwork/ep-003.jpg"
+summary: "Explore how ideology and ego fuel our divisions, and why intellectual diversity matters far more than the myths we've been sold."
 ---

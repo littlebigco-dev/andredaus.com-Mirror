@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Standards don't collapse overnight. They erode gradually—one small compromise at a time—until "acceptable" stops meaning "good" and starts meaning "barely functional." And somehow, we've agreed to call this evolution.
 og_image: "/podcast-artwork/ep-046.jpg"
+summary: "Standards erode one compromise at a time until acceptable means barely functional, and we call it progress."
 ---

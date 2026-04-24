@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Why do we wait for January 1st to change what we already know needs changing? Are you committing to change, or just performing it? Genuine transformation doesn't wait for permission from a date.
 og_image: "/podcast-artwork/ep-042.jpg"
+summary: "Why we use January 1st as an excuse for change we should have started already, and why real transformation doesn't need a calendar date."
 ---

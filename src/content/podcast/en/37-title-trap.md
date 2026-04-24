@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   We've compressed human identity into one line on a business card—and it's destroying how we hire, how we work, and how we see ourselves. The dangerous assumption that job titles equal identity.
 og_image: "/podcast-artwork/ep-037.jpg"
+summary: "Job titles have become the lies we tell ourselves about who we are—and they're warping hiring, work culture, and human identity itself."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Experts are everywhere—ready to tell us what to do. But what is an expert, really? This episode challenges the modern concept of expertise and what happens when experts are rewarded more for confidence than competence.
 og_image: "/podcast-artwork/ep-007.jpg"
+summary: "When experts profit from confidence instead of competence, who actually knows what they're talking about anymore?"
 ---

@@ -16,4 +16,5 @@ description: |
   
   If you're tired of echo chambers and want a fresh perspective, stick around. In Episode 1, we'll dive into a topic most people think they understand: Control.
 og_image: "/podcast-artwork/ep-000.jpg"
+summary: "Discover why André Daus launched Iconoclast Insights, a podcast for norm-challengers who reject mediocrity and demand better thinking."
 ---

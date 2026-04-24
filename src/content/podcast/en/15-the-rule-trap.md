@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Our obsession with better regulations is making things worse. From MiFID banking regulations to urban traffic policies, the uncomfortable truth: people don't follow the spirit of rules, they follow the structure of rewards.
 og_image: "/podcast-artwork/ep-015.jpg"
+summary: "Rules designed to protect us often backfire because people exploit the structure instead of embracing the intent."
 ---

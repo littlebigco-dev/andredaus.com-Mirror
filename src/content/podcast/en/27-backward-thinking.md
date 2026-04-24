@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Why do we keep asking the wrong questions in business? The dangerous habit of backward-looking thinking—from LinkedIn's "younger self" posts to seeking control over unchangeable outcomes. Your past mistakes were actually correct decisions.
 og_image: "/podcast-artwork/ep-027.jpg"
+summary: "Stop obsessing over your past mistakes—they were rational decisions with incomplete information, and backward thinking is killing your business."
 ---

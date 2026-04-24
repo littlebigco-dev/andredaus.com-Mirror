@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Productivity culture has become a modern religion. We optimize, track, and hack every hour—while the research shows it's making us worse. This episode dismantles the productivity myth and asks what we're actually optimizing for.
 og_image: "/podcast-artwork/ep-004.jpg"
+summary: "Productivity culture is a cult dressed in spreadsheets—and the data proves it's destroying what actually matters in your life."
 ---

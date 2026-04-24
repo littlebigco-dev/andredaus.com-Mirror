@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   When virtue signaling replaces actual values. The performative boycott epidemic—from Tesla to Müller-Milch—where moral theater masquerades as meaningful action. Real values reveal themselves when nobody is watching.
 og_image: "/podcast-artwork/ep-023.jpg"
+summary: "Boycotts have become performative theater masking inaction; real values show up when nobody's watching."
 ---

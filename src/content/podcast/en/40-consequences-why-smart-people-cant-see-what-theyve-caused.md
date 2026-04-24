@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Why do capable people take actions that cause obvious damage—and genuinely not see the connection? People don't observe their own behavior—they narrate it. Identity protection makes us incapable of seeing our actions accurately.
 og_image: "/podcast-artwork/ep-040.jpg"
+summary: "Intelligence doesn't prevent blindness to your own damage—identity protection makes capable people narrate instead of observe their behavior."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   In this episode of Iconoclast Insights, André Daus delves into the concept of control. He explores the illusion of control in daily life, leadership, and parenting. André discusses how micromanagement often backfires and presents strategies to achieve true control through self-awareness and trust.
 og_image: "/podcast-artwork/ep-001.jpg"
+summary: "Discover why the illusion of control sabotages leaders and parents, and how real power comes from self-awareness and letting go."
 ---

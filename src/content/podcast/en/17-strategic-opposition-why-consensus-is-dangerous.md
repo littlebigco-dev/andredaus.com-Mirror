@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Most organizations pursue perfect alignment. Everyone nodding in agreement. No friction, no dissent. This isn't success—it's intellectual death. Strategic Opposition isn't mere confrontation—it's the systematic resistance to comfortable lies.
 og_image: "/podcast-artwork/ep-017.jpg"
+summary: "Strategic Opposition explores why organizational consensus breeds mediocrity and how systematic dissent drives better decisions than universal agreement."
 ---

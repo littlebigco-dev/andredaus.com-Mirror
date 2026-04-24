@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The worst professionals in your industry are probably making more money than you. Not despite their incompetence—because of it. Why do buyers keep rewarding people who promise shortcuts over those who solve actual problems?
 og_image: "/podcast-artwork/ep-048.jpg"
+summary: "Incompetent professionals often outearn skilled ones by selling shortcuts instead of solutions. Here's why buyers reward false promises over real problem-solving."
 ---

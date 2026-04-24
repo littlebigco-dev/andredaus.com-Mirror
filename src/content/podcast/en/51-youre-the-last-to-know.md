@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The Mental Health Advice That Only Works If You Don't Need It. The wellness industry has handed you a toolkit built for the wrong person. The moment you genuinely cross into mental stress, those words stop making sense—because your thinking changes first, and nobody tells you that.
 og_image: "/podcast-artwork/ep-051.jpg"
+summary: "Information asymmetry in mental health: why the advice that works best only helps people stable enough to not need it."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Most conversations about AI focus on what it can do. This episode asks what we're doing with it—and what we're avoiding by handing over decisions to systems we barely understand. AI mirrors the quality of your thinking, not your speed.
 og_image: "/podcast-artwork/ep-020.jpg"
+summary: "We're obsessed with what AI can do while ignoring what we're actually doing with it—and why we'd rather let machines decide than think for ourselves."
 ---

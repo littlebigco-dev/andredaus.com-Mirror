@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Your most impressive certificates might be making you worse at your job. We confront the growing disconnect between what organizations reward and what actually works—the difference between complicated problems and complex ones.
 og_image: "/podcast-artwork/ep-014.jpg"
+summary: "Credentials signal competence but often guarantee incompetence; why organizations reward complexity over results in a world demanding adaptive thinking."
 ---

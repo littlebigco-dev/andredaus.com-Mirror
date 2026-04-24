@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Most of what we call "right" in organizations isn't about effectiveness—it's about conformity. It's about not having to think. Why do smart people keep creating reports nobody reads and attending meetings that accomplish nothing?
 og_image: "/podcast-artwork/ep-021.jpg"
+summary: "Forget the rulebook—what actually works matters more than what's officially correct, and most organizations have it backwards."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   There's a reason every YouTuber makes that face. The algorithm rewards theatrical shock, so the faces get more extreme and nobody can stop. The same psychology that works on most people actively repels the most valuable segment of the audience. Manipulation-based attention is a race to the bottom.
 og_image: "/podcast-artwork/ep-053.jpg"
+summary: "Everyone uses the same manipulative tactics because the algorithm rewards them, but it's destroying trust with your most valuable customers."
 ---

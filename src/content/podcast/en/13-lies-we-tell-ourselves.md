@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Every organization operates on two levels of truth: the official version in your mission statement, and the brutal reality whispered in hallways. The gap between these truths isn't just uncomfortable—it's toxic.
 og_image: "/podcast-artwork/ep-013.jpg"
+summary: "Discover why the gap between what organizations claim and what actually happens destroys culture from within."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The most dangerous threat to innovation isn't external competition—it's how we think. This episode exposes the hidden epidemic of black-and-white thinking that silently paralyzes organizations and stifles personal growth.
 og_image: "/podcast-artwork/ep-008.jpg"
+summary: "Explore how binary thinking sabotages innovation and growth, and discover why nuance is your competitive advantage in a complex world."
 ---

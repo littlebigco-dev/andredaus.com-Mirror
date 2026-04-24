@@ -16,6 +16,23 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+// Load .env file if present (no external dependency needed)
+try {
+  const envContent = fs.readFileSync(
+    path.resolve(__dirname, '../.env'),
+    'utf-8'
+  );
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+    process.env[key] ??= val;  // don't overwrite vars already set in the environment
+  }
+} catch { /* no .env file — rely on environment variables */ }
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.resolve(__dirname, '../src/content/podcast/en');
 const API_KEY = process.env.ANTHROPIC_API_KEY;

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Why do brilliant products vanish after acquisition? Why do startups with passionate users suddenly pivot or shut down? The answer is simpler than you think: follow the money. From Arc Browser to Butter.us, the pattern repeats.
 og_image: "/podcast-artwork/ep-032.jpg"
+summary: "Brilliant products die after acquisition because incentives shift—follow the money to understand why startups abandon their users."
 ---

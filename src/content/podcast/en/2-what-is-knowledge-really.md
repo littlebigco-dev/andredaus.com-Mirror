@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   What is knowledge, really? In this episode of Iconoclast Insights, André Daus digs into this slippery question, challenging the urge to trap knowledge in rigid systems. From a project where he dodged a "type-till-retirement" loop, he shows why those pricey management tools often flop. Knowledge isn't just information—it's info multiplied by experience.
 og_image: "/podcast-artwork/ep-002.jpg"
+summary: "Knowledge isn't information; it's information multiplied by experience—and rigid systems designed to capture it usually fail."
 ---

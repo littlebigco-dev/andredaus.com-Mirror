@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Two types of people: those who chase every buzzword without asking why, and those who declare things impossible without actually trying. Both have stopped thinking. "Geht nicht, gibt's nicht"—there's no such thing as "can't be done."
 og_image: "/podcast-artwork/ep-043.jpg"
+summary: "We've outsourced thinking to buzzwords and defeatism alike; here's why the real work starts when everyone says it's impossible."
 ---

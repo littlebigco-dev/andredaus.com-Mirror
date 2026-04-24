@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Work-life balance is a promise you can't keep. Your passions, stresses, and ideas don't follow a timer. This episode calls out the myth and asks what a better alternative actually looks like.
 og_image: "/podcast-artwork/ep-005.jpg"
+summary: "Stop chasing work-life balance—it's a myth designed to make you feel guilty about caring deeply. Here's what actually works."
 ---

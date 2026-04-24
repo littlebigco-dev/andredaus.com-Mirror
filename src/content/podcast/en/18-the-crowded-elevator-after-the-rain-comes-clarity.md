@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The elevator to success is crowded with people who all look the same. While everyone searches for hacks and shortcuts, they're missing the fundamental truth: the path creates the person, not the destination.
 og_image: "/podcast-artwork/ep-018.jpg"
+summary: "After the rain comes clarity—and success isn't crowded when you stop chasing everyone else's path."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   "The bait must appeal to the fish, not the fisherman." This metaphor has become a weapon to shut down differentiation and creative thinking. Lower Saxony just removed written division from elementary schools because it's "too complex." The same dangerous pattern.
 og_image: "/podcast-artwork/ep-044.jpg"
+summary: "Learn why the obsession with eliminating difficulty is destroying education and creative thinking, one misguided policy at a time."
 ---

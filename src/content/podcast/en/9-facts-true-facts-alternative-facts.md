@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Is a fact truly an objective piece of reality, or is it merely an interpretation that has gained dominance through authority and repetition? André explores how facts function as instruments of power in political and social discourse.
 og_image: "/podcast-artwork/ep-009.jpg"
+summary: "André examines whether facts are objective truths or dominant interpretations, revealing how they function as instruments of power in politics and society."
 ---

@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   A place that calls itself modern, that performs progress, that wraps itself in the language of advancement—while underneath, absolutely nothing has changed. That's what lazy thinking looks like in business. Everyone nods at the right words—and nobody asks what success is actually supposed to look like.
 og_image: "/podcast-artwork/ep-049.jpg"
+summary: "Why businesses obsess over the language of progress while dodging the harder question: what actually counts as success."
 ---

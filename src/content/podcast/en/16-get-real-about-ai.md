@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The German phrase "Wasch mich, aber mach mich nicht nass"—wash me, but don't get me wet—perfectly captures the self-defeating mindset plaguing creators and entrepreneurs facing AI disruption. Stop yelling at the storm. Learn to sail.
 og_image: "/podcast-artwork/ep-016.jpg"
+summary: "Stop pretending you want AI innovation while resisting the changes required—learn to actually adapt or get left behind."
 ---

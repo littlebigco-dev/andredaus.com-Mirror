@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Organizations praise critical thinking—then silence it when it challenges comfort zones. This episode exposes the hypocrisy that muzzles innovation and sidelines those who dare to ask hard questions.
 og_image: "/podcast-artwork/ep-006.jpg"
+summary: "Organizations praise critical thinking—then silence it when it challenges comfort zones, exposing the hypocrisy that muzzles innovation and sidelines questioners."
 ---

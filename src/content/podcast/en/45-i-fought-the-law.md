@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Everyone wants change. Nobody wants to lose power. Why do transformations fail even when everyone agrees? The uncomfortable answer: people aren't the problem. The system is doing exactly what it was built to do.
 og_image: "/podcast-artwork/ep-045.jpg"
+summary: "Systems preserve themselves by design—transformation fails not because people resist, but because institutions are engineered to prevent exactly that."
 ---

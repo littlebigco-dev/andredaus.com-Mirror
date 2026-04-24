@@ -13,4 +13,5 @@ youtube_url: https://youtu.be/FTmTV_Ppbj4
 spotify_url: https://open.spotify.com/episode/6yphLiEH3kl8tW9f255s3s
 og_image: /podcast-artwork/ep-056.jpg
 duration: 00:11:48
+summary: "Most apps don't solve problems—they just make organizations look modern while creating new ones for everyone else."
 ---

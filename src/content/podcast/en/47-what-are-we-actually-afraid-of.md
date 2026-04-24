@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Most people don't actually know whether they're taking risks or avoiding them. They just know how to justify whatever they already did. The question isn't whether to take risks or avoid them—it's whether you're honest about which risks you're already taking.
 og_image: "/podcast-artwork/ep-047.jpg"
+summary: "Most people justify the risks they're already taking without admitting it—here's how to actually know what you're afraid of."
 ---

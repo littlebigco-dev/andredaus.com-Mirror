@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Everyone's talking about AI replacing workers at scale. There's just one problem: where's the evidence? This episode dissects the AI replacement narrative that exists everywhere except reality.
 og_image: "/podcast-artwork/ep-036.jpg"
+summary: "AI is supposedly destroying jobs everywhere, but the data tells a different story—we investigate why the replacement narrative doesn't match reality."
 ---

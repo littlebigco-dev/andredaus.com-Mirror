@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Your brain's addiction to simple answers is sabotaging your success. Over 50,000 tech workers lost their jobs. The media blames AI. Case closed? Wrong. This oversimplification is exactly what's killing our ability to navigate the modern world.
 og_image: "/podcast-artwork/ep-019.jpg"
+summary: "Your brain craves simple answers, but that addiction is sabotaging you. Here's why oversimplification kills success in a complex world."
 ---

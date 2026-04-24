@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Unions matter. But not every union, in every industry, using the same blunt instrument, is still serving the people it claims to represent. The KVB strike in Cologne is a perfect case study. This is not an anti-union episode. It is an honesty episode.
 og_image: "/podcast-artwork/ep-054.jpg"
+summary: "Service industry strikes often hurt the vulnerable workers they claim to protect, and the Cologne transit union proves this uncomfortable truth."
 ---

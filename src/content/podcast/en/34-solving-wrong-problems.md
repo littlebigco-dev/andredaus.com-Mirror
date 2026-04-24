@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Most businesses don't fail because they implemented badly—they fail because they solved the wrong problem. A practical three-question framework to determine when you actually need an expert versus when you need someone who asks better questions.
 og_image: "/podcast-artwork/ep-034.jpg"
+summary: "Most startups fail solving the wrong problem, not executing badly. Learn when you need expertise versus someone who questions smarter."
 ---

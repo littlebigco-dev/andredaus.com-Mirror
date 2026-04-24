@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   We complain about too much bureaucracy—and then ask for more rules. Politicians promise to cut red tape by passing new laws. Every new regulation adds weight to a system most people have stopped reading. We do not need more rules. We need to understand the ones we already have.
 og_image: "/podcast-artwork/ep-050.jpg"
+summary: "Stop obsessing over new rules when nobody understands the ones already crushing us under bureaucratic weight."
 ---

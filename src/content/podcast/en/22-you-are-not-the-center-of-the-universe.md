@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The illusion of control is destroying your decision-making. Most leaders believe they're steering their organizations when they're actually just reacting to forces they refuse to acknowledge.
 og_image: "/podcast-artwork/ep-022.jpg"
+summary: "Your sense of control is a dangerous illusion—leaders mistake reactions for strategy, ignore forces they can't command, and sabotage their own decisions."
 ---

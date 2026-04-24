@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   What happens when you're the employee who asks uncomfortable questions? You become "not him again." When Openness Is Just Corporate Theater—a pattern that repeats across countless organizations that claim to be open while quietly punishing anyone who tests that claim.
 og_image: "/podcast-artwork/ep-033.jpg"
+summary: "When you question the system, you become the problem—how organizations punish employees brave enough to test their claims of openness."
 ---

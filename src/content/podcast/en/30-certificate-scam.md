@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Why credentials are killing your hiring. Organizations complain about talent shortages while systematically filtering out the best candidates. Job seekers stack meaningless certificates instead of building real skills. Welcome to the credential industrial complex—where everyone loses except the people selling validation.
 og_image: "/podcast-artwork/ep-030.jpg"
+summary: "Hiring obsessed with certificates filters out top talent while job seekers chase worthless credentials in a broken system that profits everyone but the workers."
 ---

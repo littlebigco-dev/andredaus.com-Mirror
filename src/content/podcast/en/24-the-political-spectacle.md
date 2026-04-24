@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Has democracy been reduced to nothing more than a marketing campaign? From German campaign posters to American slogans, politics has become a spectacle of branding, ego, and short-term theatrics. Switzerland shows there's another way.
 og_image: "/podcast-artwork/ep-024.jpg"
+summary: "Democracy has become a marketing campaign—but Switzerland proves politics doesn't have to be pure spectacle and ego."
 ---

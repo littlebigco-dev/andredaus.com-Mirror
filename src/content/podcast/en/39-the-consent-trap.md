@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Three people spent a year trying to agree on AI ethics and failed. Yet we're told seven billion humans need to reach consensus before proceeding with AI. How does that math work? Ethics discussions are a luxury good.
 og_image: "/podcast-artwork/ep-039.jpg"
+summary: "We spent a year trying to agree on AI ethics and failed. So why do we pretend billions can? Ethics is a luxury good."
 ---

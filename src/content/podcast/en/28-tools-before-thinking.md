@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   What happens when a school decides iPads equal digital transformation? The same thing that happens when billion-dollar corporations choose ERP systems before understanding their problems. Organizations choose their tools first—then spend all their energy implementing them without questioning whether they're solving the right problem.
 og_image: "/podcast-artwork/ep-028.jpg"
+summary: "We obsess over fancy tools before asking what problems we're actually trying to solve, wasting time and money on implementation theater."
 ---

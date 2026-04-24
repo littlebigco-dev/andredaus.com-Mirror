@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Your carefully crafted organizational policies are being systematically circumvented right now—and you probably don't know it. The most dangerous situation isn't when employees openly resist bad policies, but when they create the perfect illusion of compliance.
 og_image: "/podcast-artwork/ep-026.jpg"
+summary: "Organizations unknowingly create the illusion of compliance while employees systematically circumvent policies designed to control them."
 ---

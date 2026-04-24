@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Two service counters. One sells uncomfortable truths—nobody's there. The other sells comfortable lies—the line stretches to the horizon. This isn't just a meme. It's a business model. The uncomfortable truth will always have more impact than the comfortable lie.
 og_image: "/podcast-artwork/ep-031.jpg"
+summary: "People flock to comfortable lies while avoiding hard truths—but real change only comes from facing what actually matters."
 ---

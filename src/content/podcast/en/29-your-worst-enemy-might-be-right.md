@@ -12,4 +12,5 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   What happens when a far-right politician makes a perfectly reasonable argument? We're letting tribal thinking override critical analysis. This episode exposes the genetic fallacy—the cognitive bias that's poisoning democratic debate.
 og_image: "/podcast-artwork/ep-029.jpg"
+summary: "Stop dismissing good arguments just because you hate who said them—that's exactly how tribal thinking kills honest discourse."
 ---
