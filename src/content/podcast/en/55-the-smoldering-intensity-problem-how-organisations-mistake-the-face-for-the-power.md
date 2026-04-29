@@ -12,6 +12,7 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   Most organisations aren’t developing leaders. They’re promoting people who get results, giving them a title, and leaving them to figure out the rest. In this episode, André breaks down why this pattern — identified fifty years ago as the Peter Principle and still running unchecked — is quietly costing organisations more than any failed tech rollout ever could. From off-site retreats that change nothing, to 360 feedback reports that end up in a drawer, to the leadership content on LinkedIn that looks profound and says absolutely nothing: this is what development theatre actually costs you. And what it would mean to take the real problem seriously.
 og_image: "/podcast-artwork/ep-055.jpg"
+summary: "Most organisations promote results-getters into leadership roles unprepared, creating a costly cycle of incompetence that development theatre never fixes."
 ---
 
 <!-- Add transcript here -->

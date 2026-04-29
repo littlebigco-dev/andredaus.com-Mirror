@@ -12,6 +12,7 @@ artwork_url: "https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_epi
 description: |
   The loudest person in the room rarely has the best answer. They have the most to lose from being wrong. In this episode, André Daus breaks down why confident-sounding dismissal wins more rooms than careful analysis — and what that costs the people who came with a genuine question. Two stories, one pattern: status defense dressed up as expertise. If you’ve ever watched the wrong voice carry the day and said nothing, this one is for you.
 og_image: "/podcast-artwork/ep-052.jpg"
+summary: "Confident-sounding dismissal wins rooms while careful analysis loses them—here's why the loudest voice is always defending something, never building anything."
 ---
 
 <!-- Add transcript here -->

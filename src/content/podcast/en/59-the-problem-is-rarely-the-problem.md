@@ -13,6 +13,7 @@ description: |
   Most people are wrong about what their problem is. Not because they're careless - but because defining a problem is genuinely hard, and almost nobody treats it as the serious intellectual exercise it actually is. In this episode, I break down what a problem actually is, why stripping out dependencies makes your problem statement incomplete rather than clean, and how the wrong definition consistently leads to confident effort in the wrong direction. Three real examples. One from a technical debugging session where the obvious label "plugin conflict" would have sent everyone down the wrong path. One from a security setup where the instinctive fix solved nothing and created a maintenance ritual. And one from a consultant who was proud that he never needed to ask questions anymore; which is precisely the problem. If you've ever invested real effort into solving something, only to find the real obstacle was still exactly where you left it — this one's for you. Iconoclast Insights is a solo show by André Daus. New episodes challenge the assumptions that lead organizations and individuals to solve the wrong things with great confidence.
 og_image: "/podcast-artwork/ep-059.jpg"
 youtube_url: "https://youtu.be/gFM6WzbQXPg"
+summary: "Most people invest effort solving the wrong problem because they never properly define what the problem actually is."
 ---
 
 <!-- Add transcript here -->
