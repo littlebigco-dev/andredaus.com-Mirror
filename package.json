@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "podcast:summaries": "node --env-file=.env scripts/podcast-summaries.mjs",
-    "podcast:artwork": "node scripts/podcast-artwork.mjs"
+    "podcast:artwork": "node scripts/podcast-artwork.mjs",
+    "import:podcast": "node --env-file=.env scripts/import-podcast.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.8",

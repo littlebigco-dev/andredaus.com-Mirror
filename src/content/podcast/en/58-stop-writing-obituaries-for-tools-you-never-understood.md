@@ -15,6 +15,5 @@ episode_id: 20e83fe2-e3fb-4b69-9bc8-1f4ae1d5a69b
 artwork_url: https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_episode/19215224/19215224-1776859120346-3c0c9db9b112e.jpg
 youtube_url: https://youtu.be/CSYQ1nWCq0E
 spotify_url: https://open.spotify.com/episode/5Z5abpNZi3dNFZD0dkejTX
-og_image: /podcast-artwork/ep-058.jpg
 duration: 00:13:28
 ---

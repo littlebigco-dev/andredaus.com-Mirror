@@ -1,111 +1,226 @@
 /**
- * AI summary generation script
+ * scripts/generate-summaries.mjs
  *
- * Finds content files with a missing or empty `summary` field and calls the
- * Anthropic Messages API to generate a 1–2 sentence summary, then writes it
- * back into the frontmatter.
+ * Generates OG summaries for content files where `summary` is missing or empty.
+ * Replaces both the old generate-summaries.mjs and podcast-summaries.mjs.
  *
- * Target collections: insights, use-cases, library, podcast
- * (Services and FAQs are excluded — no `summary` field.)
+ * Collections covered:
+ *   podcast    → uses `description` frontmatter field (Spotify show notes)
+ *   insights   → uses markdown body
+ *   use-cases  → uses `scenario` frontmatter + markdown body
+ *   library    → uses `definition` frontmatter + markdown body
+ *
+ * Language: auto-detected from path (/en/ → English, /de/ → German prompt)
  *
  * Usage:
- *   node scripts/generate-summaries.mjs
- *   ANTHROPIC_API_KEY=sk-ant-... node scripts/generate-summaries.mjs
+ *   node scripts/generate-summaries.mjs            (skip existing summaries)
+ *   node scripts/generate-summaries.mjs --force    (regenerate all)
+ *   node scripts/generate-summaries.mjs --dry-run  (preview without writing)
+ *   node scripts/generate-summaries.mjs --collection=podcast  (one collection only)
  *
- * If ANTHROPIC_API_KEY is not set, the script exits cleanly (no-op).
- *
- * Model: claude-haiku-4-5-20251001 (fast + cheap for batch generation)
- * Rate limiting: 500 ms delay between API calls to avoid hitting limits.
+ * Requires ANTHROPIC_API_KEY in environment or .env file.
  */
 
-import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const API_KEY = process.env.ANTHROPIC_API_KEY;
+// __dirname must be defined first — used by .env loader below
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-if (!API_KEY) {
-  console.log('[generate-summaries] ANTHROPIC_API_KEY not set — skipping summary generation.');
-  process.exit(0);
-}
+// ── Load .env (no external dependencies) ─────────────────────────────
 
-const CONTENT_ROOT = resolve('src/content');
-const COLLECTIONS = ['insights', 'use-cases', 'library', 'podcast'];
-
-const MODEL = 'claude-haiku-4-5-20251001';
-const ANTHROPIC_API = 'https://api.anthropic.com/v1/messages';
-const RATE_LIMIT_MS = 500;
-
-// ── File helpers ─────────────────────────────────────────────────────────────
-
-async function getMarkdownFiles(dir) {
-  let entries;
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return [];
+try {
+  const envPath = path.resolve(__dirname, '../.env');
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim().replace(/^["']|["']$/g, '');
+    process.env[key] ??= val; // don't overwrite vars already in the environment
   }
-  const files = [];
-  for (const entry of entries) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...await getMarkdownFiles(full));
-    } else if (entry.name.endsWith('.md')) {
-      files.push(full);
-    }
-  }
-  return files;
-}
+} catch { /* no .env file — rely on environment variables */ }
 
-function parseFrontmatter(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n?)([\s\S]*)$/);
-  if (!match) return null;
-  return {
-    raw: match[1],
-    sep: match[2],
-    body: match[3],
-  };
-}
+// ── Config ────────────────────────────────────────────────────────────
 
-function getFmValue(raw, key) {
-  const re = new RegExp(`^${key}:\\s*["']?([^"'\\n]+?)["']?\\s*$`, 'm');
-  const m = raw.match(re);
-  return m ? m[1].trim() : null;
-}
+const API_KEY      = process.env.ANTHROPIC_API_KEY;
+const CONTENT_ROOT = path.resolve(__dirname, '../src/content');
+const DRY_RUN      = process.argv.includes('--dry-run');
+const FORCE        = process.argv.includes('--force');
+const ONLY         = process.argv.find(a => a.startsWith('--collection='))?.split('=')[1];
 
-function setFmValue(raw, key, value) {
-  const escaped = value.replace(/"/g, '\\"');
-  if (new RegExp(`^${key}:`, 'm').test(raw)) {
-    return raw.replace(new RegExp(`^${key}:.*$`, 'm'), `${key}: "${escaped}"`);
-  }
-  // Insert after title field if it exists, otherwise append
-  if (/^title:/m.test(raw)) {
-    return raw.replace(/^(title:.*)$/m, `$1\n${key}: "${escaped}"`);
-  }
-  return `${raw}\n${key}: "${escaped}"`;
-}
+const COLLECTIONS  = ['podcast', 'insights', 'use-cases', 'library'];
 
-// ── Anthropic API ────────────────────────────────────────────────────────────
+// ── Collection strategy ───────────────────────────────────────────────
 
-async function generateSummary(title, body, collection) {
-  const collectionContext = {
-    'insights': 'a business/consulting insights article on Strategic Opposition methodology',
-    'use-cases': 'a consulting use-case article using the PAS (Problem-Agitation-Solution) framework',
-    'library': 'a reference entry in a knowledge library (could be a cognitive bias, mental model, or liberating structure)',
-    'podcast': 'a podcast episode',
-  }[collection] || 'a consulting article';
+const STRATEGY = {
+  podcast: {
+    // Source: `description` frontmatter field (Spotify show notes — rich and specific)
+    getContext(fields, _body) {
+      return fields.description || null;
+    },
+    prompt(title, context, lang) {
+      if (lang === 'de') {
+        return `Schreib eine einzelne OG-Meta-Beschreibung für diese Podcast-Episode. Maximal 155 Zeichen. Keine Anführungszeichen. Nur Klartext. Direkt und pointiert — im konträren Ton der Show.
 
-  const contentSample = body.trim().slice(0, 2000);
+Episodentitel: ${title}
 
-  const prompt = `You are writing a short summary for ${collectionContext}.
+Episodenbeschreibung:
+${context}
+
+Gib nur den Satz aus, nichts anderes.`;
+      }
+      return `Write a single-sentence OG meta description for this podcast episode. Maximum 155 characters. No quotes. Plain text only. Sharp and direct — matching the show's contrarian tone.
+
+Episode title: ${title}
+
+Episode description:
+${context}
+
+Output only the sentence, nothing else.`;
+    },
+  },
+
+  insights: {
+    // Source: markdown body (the article itself — first 2000 chars)
+    getContext(_fields, body) {
+      const trimmed = body.trim();
+      return trimmed.length > 50 ? trimmed.slice(0, 2000) : null;
+    },
+    prompt(title, context, lang) {
+      if (lang === 'de') {
+        return `Schreib eine einzelne OG-Meta-Beschreibung für diesen Consulting-Artikel über Strategic Opposition. Maximal 155 Zeichen. Keine Anführungszeichen. Direkt — keine generischen Phrasen wie "Dieser Artikel erklärt".
+
+Titel: ${title}
+
+Inhalt (Auszug):
+${context}
+
+Gib nur den Satz aus.`;
+      }
+      return `Write a single-sentence OG meta description for this Strategic Opposition consulting insight. Maximum 155 characters. No quotes. Sharp and direct — no generic openers like "This article explores".
 
 Title: ${title}
 
-Content (excerpt):
-${contentSample}
+Content excerpt:
+${context}
 
-Write a single sentence (max 200 characters) that describes what this ${collection === 'library' ? 'concept' : 'content'} is about. Be specific and informative — avoid generic phrases like "This article explores" or "This entry discusses". Start directly with the subject matter.`;
+Output only the sentence.`;
+    },
+  },
 
-  const res = await fetch(ANTHROPIC_API, {
+  'use-cases': {
+    // Source: `scenario` frontmatter (concrete situation) + body
+    getContext(fields, body) {
+      const scenario = fields.scenario || '';
+      const bodyExcerpt = body.trim().slice(0, 1500);
+      const combined = [scenario, bodyExcerpt].filter(Boolean).join('\n\n');
+      return combined.length > 30 ? combined : null;
+    },
+    prompt(title, context, lang) {
+      if (lang === 'de') {
+        return `Schreib eine einzelne OG-Meta-Beschreibung für diesen Consulting Use Case. Maximal 155 Zeichen. Keine Anführungszeichen. Konkret und direkt — kein generischer Einstieg.
+
+Titel: ${title}
+
+Szenario und Inhalt:
+${context}
+
+Gib nur den Satz aus.`;
+      }
+      return `Write a single-sentence OG meta description for this consulting use case. Maximum 155 characters. No quotes. Concrete and direct — no generic openers.
+
+Title: ${title}
+
+Scenario and content:
+${context}
+
+Output only the sentence.`;
+    },
+  },
+
+  library: {
+    // Source: `definition` frontmatter (precise concept definition) + body
+    getContext(fields, body) {
+      const definition = fields.definition || '';
+      const bodyExcerpt = body.trim().slice(0, 1000);
+      const combined = [definition, bodyExcerpt].filter(Boolean).join('\n\n');
+      return combined.length > 20 ? combined : null;
+    },
+    prompt(title, context, lang) {
+      if (lang === 'de') {
+        return `Schreib eine einzelne OG-Meta-Beschreibung für diesen Library-Eintrag (Bias, Methode oder mentales Modell). Maximal 155 Zeichen. Keine Anführungszeichen. Informativ und präzise.
+
+Konzept: ${title}
+
+Definition und Inhalt:
+${context}
+
+Gib nur den Satz aus.`;
+      }
+      return `Write a single-sentence OG meta description for this knowledge library entry (bias, method, or mental model). Maximum 155 characters. No quotes. Informative and precise.
+
+Concept: ${title}
+
+Definition and content:
+${context}
+
+Output only the sentence.`;
+    },
+  },
+};
+
+// ── Frontmatter helpers ───────────────────────────────────────────────
+
+function parseFrontmatter(content) {
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+  if (!match) return null;
+  return { yaml: match[1], body: match[2] };
+}
+
+function parseFrontmatterFields(yaml) {
+  const fields = {};
+  const lines = yaml.split('\n');
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const keyMatch = line.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*(.*)/);
+    if (!keyMatch) { i++; continue; }
+    const key = keyMatch[1];
+    const rest = keyMatch[2].trim();
+    if (rest === '|') {
+      const indented = [];
+      i++;
+      while (i < lines.length && (lines[i].startsWith('  ') || lines[i] === '')) {
+        indented.push(lines[i].replace(/^  /, ''));
+        i++;
+      }
+      fields[key] = indented.join('\n').trim();
+    } else {
+      fields[key] = rest.replace(/^["']|["']$/g, '').trim();
+      i++;
+    }
+  }
+  return fields;
+}
+
+function setFrontmatterField(yaml, key, value) {
+  const escaped = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  const newLine = `${key}: "${escaped}"`;
+  const blockRe = new RegExp(`^${key}:\\s*\\|\\n([\\s\\S]*?)(?=\\n[a-zA-Z_]|$)`, 'm');
+  if (blockRe.test(yaml)) return yaml.replace(blockRe, newLine);
+  const lineRe = new RegExp(`^${key}:.*$`, 'm');
+  if (lineRe.test(yaml)) return yaml.replace(lineRe, newLine);
+  return `${yaml}\n${newLine}`;
+}
+
+// ── Anthropic API ─────────────────────────────────────────────────────
+
+async function callAPI(prompt) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -113,94 +228,134 @@ Write a single sentence (max 200 characters) that describes what this ${collecti
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 120,
       messages: [{ role: 'user', content: prompt }],
     }),
     signal: AbortSignal.timeout(30_000),
   });
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API error ${res.status}: ${text.slice(0, 200)}`);
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`API ${response.status}: ${err.slice(0, 200)}`);
   }
 
-  const data = await res.json();
-  const summary = data.content?.[0]?.text?.trim();
-  if (!summary) throw new Error('Empty response from API');
-  return summary;
+  const data = await response.json();
+  const text = data.content?.[0]?.text?.trim();
+  if (!text) throw new Error('Empty API response');
+  return text.replace(/^["']|["']$/g, '');
 }
 
-// ── Per-file processing ──────────────────────────────────────────────────────
+// ── File discovery ────────────────────────────────────────────────────
 
-async function processFile(filePath, collection) {
-  const content = await readFile(filePath, 'utf8');
-  const parsed = parseFrontmatter(content);
-  if (!parsed) return false;
-
-  const { raw, sep, body } = parsed;
-
-  const existingSummary = getFmValue(raw, 'summary');
-  if (existingSummary && existingSummary.length > 10) return false; // already has summary
-
-  const title = getFmValue(raw, 'title');
-  if (!title) {
-    console.warn(`[generate-summaries] No title in ${filePath} — skipping`);
-    return false;
+function walkDir(dir) {
+  if (!fs.existsSync(dir)) return [];
+  const results = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) results.push(...walkDir(full));
+    else if (entry.name.endsWith('.md')) results.push(full);
   }
-
-  const status = getFmValue(raw, 'status');
-  // Skip drafts that have no body content — nothing to summarise
-  if ((!body || body.trim().length < 50) && status === 'draft') {
-    console.log(`[generate-summaries] Skipping draft with no body: ${filePath}`);
-    return false;
-  }
-
-  console.log(`[generate-summaries] Generating summary for: ${title}`);
-
-  let summary;
-  try {
-    summary = await generateSummary(title, body, collection);
-  } catch (err) {
-    console.error(`[generate-summaries] Failed for ${filePath}: ${err.message}`);
-    return false;
-  }
-
-  const updatedRaw = setFmValue(raw, 'summary', summary);
-  const updatedContent = `---\n${updatedRaw}\n---${sep}${body}`;
-  await writeFile(filePath, updatedContent, 'utf8');
-
-  console.log(`[generate-summaries] ✓ ${filePath}`);
-  console.log(`[generate-summaries]   "${summary}"`);
-  return true;
+  return results;
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────────
+function detectLang(filePath) {
+  return filePath.includes(`${path.sep}de${path.sep}`) ? 'de' : 'en';
+}
+
+// ── Main ─────────────────────────────────────────────────────────────
 
 async function main() {
+  if (!API_KEY) {
+    console.log('[summaries] ANTHROPIC_API_KEY not set — skipping.');
+    return;
+  }
+
+  const collections = ONLY
+    ? COLLECTIONS.filter(c => c === ONLY)
+    : COLLECTIONS;
+
+  if (ONLY && collections.length === 0) {
+    console.error(`[summaries] Unknown collection: ${ONLY}. Options: ${COLLECTIONS.join(', ')}`);
+    process.exit(1);
+  }
+
+  if (DRY_RUN) console.log('[summaries] DRY RUN — no files will be written\n');
+
   let generated = 0;
   let skipped = 0;
+  let errors = 0;
 
-  for (const collection of COLLECTIONS) {
-    const collectionDir = join(CONTENT_ROOT, collection);
-    const files = await getMarkdownFiles(collectionDir);
+  for (const collection of collections) {
+    const dir = path.join(CONTENT_ROOT, collection);
+    const files = walkDir(dir);
 
-    for (const file of files) {
-      const updated = await processFile(file, collection);
-      if (updated) {
-        generated++;
-        // Rate limit between API calls
-        await new Promise(r => setTimeout(r, RATE_LIMIT_MS));
-      } else {
+    if (files.length === 0) {
+      console.log(`[summaries] ${collection}: no files found — skipping`);
+      continue;
+    }
+
+    console.log(`\n[summaries] ${collection} (${files.length} files)`);
+    const strategy = STRATEGY[collection];
+
+    for (const filePath of files) {
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const parsed = parseFrontmatter(content);
+      if (!parsed) { skipped++; continue; }
+
+      const fields = parseFrontmatterFields(parsed.yaml);
+
+      // Skip if summary already exists and we're not forcing
+      if (fields.summary && fields.summary.length > 10 && !FORCE) {
         skipped++;
+        continue;
+      }
+
+      // Skip drafts with no body content
+      if (fields.status === 'draft' && parsed.body.trim().length < 50) {
+        skipped++;
+        continue;
+      }
+
+      const title = fields.title;
+      if (!title) { skipped++; continue; }
+
+      const context = strategy.getContext(fields, parsed.body);
+      if (!context) {
+        console.warn(`  ⚠  no context: ${path.basename(filePath)}`);
+        skipped++;
+        continue;
+      }
+
+      const lang = detectLang(filePath);
+      const label = path.relative(CONTENT_ROOT, filePath);
+      process.stdout.write(`  → ${label} … `);
+
+      if (DRY_RUN) {
+        console.log('(would generate)');
+        generated++;
+        continue;
+      }
+
+      try {
+        const prompt = strategy.prompt(title, context, lang);
+        const summary = await callAPI(prompt);
+        const updatedYaml = setFrontmatterField(parsed.yaml, 'summary', summary);
+        fs.writeFileSync(filePath, `---\n${updatedYaml}\n---\n${parsed.body}`, 'utf-8');
+        console.log(`✓ "${summary.slice(0, 70)}…"`);
+        generated++;
+        await new Promise(r => setTimeout(r, 350));
+      } catch (err) {
+        console.error(`✗ ${err.message}`);
+        errors++;
       }
     }
   }
 
-  console.log(`[generate-summaries] Done. Generated ${generated} summaries, skipped ${skipped} files.`);
+  console.log(`\n[summaries] Done. Generated: ${generated} | Skipped: ${skipped} | Errors: ${errors}`);
 }
 
 main().catch(err => {
-  console.error('[generate-summaries] Fatal error:', err);
+  console.error('[summaries] Fatal error:', err);
   process.exit(1);
 });

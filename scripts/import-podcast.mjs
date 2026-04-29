@@ -2,39 +2,28 @@
  * Podcast RSS import script
  *
  * Fetches the podcast RSS feed and writes/updates Markdown files in
- * src/content/podcast/en/ for each episode. Existing files are not
- * overwritten if they already have a manual transcript body — only
- * frontmatter fields sourced from RSS are updated.
+ * src/content/podcast/en/ for each episode.
+ *
+ * File naming: {episode_number}-{slugified-title}.md
+ * e.g. 3-the-ego-trap-why-our-ideologies-keep-us-divided.md
+ *
+ * Existing files are never overwritten — only created if missing.
+ * The summary field is left empty for generate-summaries.mjs to fill.
  *
  * Usage:
- *   node scripts/import-podcast.mjs
- *   PODCAST_RSS_URL=https://feeds.example.com/podcast node scripts/import-podcast.mjs
+ *   node --env-file=.env scripts/import-podcast.mjs
  *
  * If PODCAST_RSS_URL is not set, the script exits cleanly (no-op).
- *
- * Field mapping:
- *   RSS <title>              → frontmatter title
- *   RSS <pubDate>            → frontmatter date (ISO 8601)
- *   RSS <itunes:episode>     → frontmatter episode_number
- *   RSS <description>        → frontmatter summary (stripped of HTML)
- *   RSS <itunes:summary>     → frontmatter summary (fallback)
- *   RSS <link>               → used to derive Spotify/YouTube URLs if matched
- *   RSS <enclosure url>      → audio URL (stored as comment, not a schema field)
- *   Custom <spotify:url>     → frontmatter spotify_url (if present in feed)
- *   Custom <itunes:type>     → frontmatter category
- *
- * Slug is derived from episode_number: e{episode_number} (e.g. e012).
- * This ensures stable filenames even if the episode title changes.
  */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const RSS_URL = process.env.PODCAST_RSS_URL;
 
 if (!RSS_URL) {
-  console.log('[import-podcast] PODCAST_RSS_URL not set — skipping podcast import.');
+  console.log('[import-podcast] PODCAST_RSS_URL not set — skipping.');
   process.exit(0);
 }
 
@@ -43,7 +32,6 @@ const PODCAST_DIR = resolve('src/content/podcast/en');
 // ── XML helpers ──────────────────────────────────────────────────────────────
 
 function xmlTag(xml, tag) {
-  // Handles both <tag>value</tag> and namespaced <ns:tag>value</ns:tag>
   const re = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i');
   const m = xml.match(re);
   return m ? m[1].trim() : null;
@@ -59,10 +47,13 @@ function xmlItems(xml) {
   const items = [];
   const re = /<item>([\s\S]*?)<\/item>/gi;
   let m;
-  while ((m = re.exec(xml)) !== null) {
-    items.push(m[1]);
-  }
+  while ((m = re.exec(xml)) !== null) items.push(m[1]);
   return items;
+}
+
+function cdata(str) {
+  if (!str) return '';
+  return str.replace(/^<!\[CDATA\[|\]\]>$/g, '').trim();
 }
 
 function stripHtml(html) {
@@ -78,63 +69,71 @@ function stripHtml(html) {
     .trim();
 }
 
-function cdata(str) {
-  // Strip CDATA wrappers
-  return str ? str.replace(/^<!\[CDATA\[|\]\]>$/g, '').trim() : str;
-}
-
 function parseDate(rssDate) {
   try {
     const d = new Date(rssDate);
-    if (isNaN(d)) return null;
-    return d.toISOString().slice(0, 10); // YYYY-MM-DD
+    if (isNaN(d)) return new Date().toISOString();
+    return d.toISOString();
   } catch {
-    return null;
+    return new Date().toISOString();
   }
 }
 
-function toSlug(episodeNumber) {
-  const n = String(episodeNumber).padStart(3, '0');
-  return `e${n}`;
+function slugify(str) {
+  return str
+    .toLowerCase()
+    .replace(/[–—]/g, '-')         // em/en dashes → hyphen
+    .replace(/[^\w\s-]/g, '')      // remove special chars
+    .replace(/[\s_]+/g, '-')       // spaces → hyphens
+    .replace(/-+/g, '-')           // collapse multiple hyphens
+    .replace(/^-|-$/g, '');        // trim leading/trailing hyphens
 }
 
-function guessCategory(item) {
-  const type = xmlTag(item, 'itunes:episodeType') || xmlTag(item, 'itunes:type');
-  if (!type) return 'Solo Episode';
-  const t = type.toLowerCase();
-  if (t.includes('interview') || t.includes('guest')) return 'Interview';
-  if (t.includes('case') || t.includes('story')) return 'Case Study';
-  return 'Solo Episode';
+function padEpisode(n) {
+  return String(n).padStart(3, '0');
 }
 
-// ── Frontmatter helpers ──────────────────────────────────────────────────────
-
-function parseFrontmatter(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(\r?\n?)([\s\S]*)$/);
-  if (!match) return { fm: {}, body: content };
-  const fm = {};
-  for (const line of match[1].split('\n')) {
-    const kv = line.match(/^(\w+):\s*(.*)$/);
-    if (kv) fm[kv[1]] = kv[2].replace(/^["']|["']$/g, '').trim();
-  }
-  return { fm, body: match[3] };
+function formatDuration(raw) {
+  if (!raw) return null;
+  // Already in HH:MM:SS or MM:SS format
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(raw)) return raw;
+  // Seconds only — convert to HH:MM:SS
+  const secs = parseInt(raw, 10);
+  if (isNaN(secs)) return null;
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return [h, m, s].map(n => String(n).padStart(2, '0')).join(':');
 }
 
-function fmValue(value) {
+// ── YAML helpers ─────────────────────────────────────────────────────────────
+
+function yamlString(value) {
   if (value === null || value === undefined) return '""';
-  const s = String(value);
-  // Quote strings that contain special YAML characters
-  if (/[:#\[\]{}&*!,|>?]/.test(s) || s.includes('\n') || s.startsWith(' ') || s.endsWith(' ')) {
-    return `"${s.replace(/"/g, '\\"')}"`;
-  }
-  return s;
+  // Numbers stay unquoted
+  if (typeof value === 'number') return String(value);
+  const str = String(value);
+  if (str === '') return '""';
+  // Use double quotes, escape internal double quotes
+  return `"${str.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
 function buildFrontmatter(fields) {
-  const lines = Object.entries(fields)
-    .filter(([, v]) => v !== null && v !== undefined && v !== '')
-    .map(([k, v]) => `${k}: ${fmValue(v)}`);
-  return `---\n${lines.join('\n')}\n---\n`;
+  const lines = ['---'];
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === null || value === undefined || value === '') continue;
+    if (key === 'description') {
+      // Block scalar for multiline description
+      lines.push(`description: |`);
+      for (const line of String(value).split('\n')) {
+        lines.push(`  ${line}`);
+      }
+    } else {
+      lines.push(`${key}: ${yamlString(value)}`);
+    }
+  }
+  lines.push('---');
+  return lines.join('\n') + '\n';
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -154,7 +153,7 @@ async function main() {
 
   const items = xmlItems(xml);
   if (items.length === 0) {
-    console.log('[import-podcast] No episodes found in RSS feed.');
+    console.log('[import-podcast] No episodes found in feed.');
     process.exit(0);
   }
 
@@ -164,7 +163,7 @@ async function main() {
     await mkdir(PODCAST_DIR, { recursive: true });
   }
 
-  let written = 0;
+  let created = 0;
   let skipped = 0;
 
   for (const item of items) {
@@ -179,83 +178,68 @@ async function main() {
       continue;
     }
 
-    const slug = toSlug(episodeNumber);
-    const filePath = join(PODCAST_DIR, `${slug}.md`);
+    // File naming: {episode_number}-{slugified-title}.md
+    const filename = `${episodeNumber}-${slugify(title)}.md`;
+    const filePath = join(PODCAST_DIR, filename);
 
-    const rawDate = xmlTag(item, 'pubDate');
-    const date = parseDate(rawDate) || new Date().toISOString().slice(0, 10);
-
-    // Summary: prefer itunes:summary, fall back to description, strip HTML
-    const rawSummary = cdata(xmlTag(item, 'itunes:summary')) || cdata(xmlTag(item, 'description')) || '';
-    const summary = stripHtml(rawSummary).slice(0, 500);
-
-    // og_title: truncate title if too long
-    const ogTitle = title.length > 70 ? title.slice(0, 67) + '…' : title;
-
-    // Spotify URL: check for spotify:url custom tag or infer from link
-    let spotifyUrl = xmlTag(item, 'spotify:url') || '';
-    if (!spotifyUrl) {
-      const link = cdata(xmlTag(item, 'link'));
-      if (link && link.includes('spotify')) spotifyUrl = link;
-    }
-
-    const category = guessCategory(item);
-
-    // Check if file already exists
+    // Skip if already exists — never overwrite manual edits
     if (existsSync(filePath)) {
-      const existing = await readFile(filePath, 'utf8');
-      const { fm, body } = parseFrontmatter(existing);
-
-      // Only update RSS-sourced fields; preserve manual edits (transcript body)
-      const updated = {
-        title: title,
-        date: fm.date || date,
-        episode_number: episodeNumber,
-        summary: fm.summary || summary,
-        og_title: fm.og_title || ogTitle,
-        spotify_url: fm.spotify_url || spotifyUrl || '',
-        youtube_url: fm.youtube_url || '',
-        category: fm.category || category,
-        status: fm.status || 'draft',
-      };
-
-      // Remove empty optional fields
-      if (!updated.youtube_url) delete updated.youtube_url;
-      if (!updated.spotify_url) delete updated.spotify_url;
-
-      const newContent = buildFrontmatter(updated) + (body || '\n');
-      const oldContent = existing;
-
-      if (newContent === oldContent) {
-        skipped++;
-        continue;
-      }
-
-      await writeFile(filePath, newContent, 'utf8');
-      console.log(`[import-podcast] Updated: ${slug}.md`);
-    } else {
-      // New file — create with empty transcript body
-      const fields = {
-        title,
-        date,
-        episode_number: episodeNumber,
-        summary,
-        og_title: ogTitle,
-        category,
-        status: 'draft',
-      };
-
-      if (spotifyUrl) fields.spotify_url = spotifyUrl;
-
-      const content = buildFrontmatter(fields) + '\n<!-- Paste transcript here -->\n';
-      await writeFile(filePath, content, 'utf8');
-      console.log(`[import-podcast] Created: ${slug}.md`);
+      console.log(`[import-podcast] Exists, skipping: ${filename}`);
+      skipped++;
+      continue;
     }
 
-    written++;
+    // Parse all fields
+    const date = parseDate(xmlTag(item, 'pubDate'));
+
+    const rawDescription = cdata(xmlTag(item, 'description')) || cdata(xmlTag(item, 'itunes:summary')) || '';
+    const description = stripHtml(rawDescription);
+
+    const duration = formatDuration(xmlTag(item, 'itunes:duration'));
+
+    const audioUrl = xmlAttr(item, 'enclosure', 'url') || '';
+
+    // GUID as episode_id
+    const episodeId = cdata(xmlTag(item, 'guid')) || '';
+
+    // Episode artwork — itunes:image href attr
+    const artworkUrl = xmlAttr(item, 'itunes:image', 'href') || '';
+
+    // OG image path — /podcast-artwork/ep-{padded}.jpg
+    const ogImage = `/podcast-artwork/ep-${padEpisode(episodeNumber)}.jpg`;
+
+    // Category from itunes:category
+    const rawCategory = xmlAttr(item, 'itunes:category', 'text') || 'Solo Episode';
+
+    const fields = {
+      title,
+      og_title: title,           // override manually when shorter title needed
+      date,
+      episode_number: episodeNumber,
+      category: rawCategory,
+      status: 'draft',
+      duration,
+      audio_url: audioUrl,
+      episode_id: episodeId,
+      artwork_url: artworkUrl,
+      description,
+      og_image: ogImage,
+      summary: '',               // filled by generate-summaries.mjs
+    };
+
+    // Remove null/empty optional fields
+    if (!fields.duration) delete fields.duration;
+    if (!fields.audio_url) delete fields.audio_url;
+    if (!fields.episode_id) delete fields.episode_id;
+    if (!fields.artwork_url) delete fields.artwork_url;
+
+    const content = buildFrontmatter(fields) + '\n<!-- Add transcript here -->\n';
+    await writeFile(filePath, content, 'utf8');
+    console.log(`[import-podcast] Created: ${filename}`);
+    created++;
   }
 
-  console.log(`[import-podcast] Done. ${written} written, ${skipped} unchanged/skipped.`);
+  console.log(`[import-podcast] Done. ${created} created, ${skipped} skipped.`);
 }
 
 main().catch(err => {
