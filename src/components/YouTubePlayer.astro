@@ -12,40 +12,25 @@
  *   sizes     — <img sizes> attribute
  */
 
-import { Image } from 'astro:assets';
-
 interface Props {
-  videoId:   string;
-  title:     string;
-  aspect?:   string;
-  autoplay?: boolean;
-  widths?:   number[];
-  sizes?:    string;
+  videoId:    string;
+  title:      string;
+  thumbnail?: string;
+  aspect?:    string;
+  autoplay?:  boolean;
 }
 
 const {
   videoId,
   title,
+  thumbnail,
   aspect   = '16/9',
   autoplay = true,
-  widths   = [640, 960, 1280],
-  sizes    = '(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 720px',
 } = Astro.props;
 
 // Convert "16/9" → "56.25%" for the ::before padding-top height trick
 const [w, h] = aspect.split('/').map(n => parseFloat(n.trim()));
 const padPct  = `${((h / w) * 100).toFixed(4)}%`;
-
-// ── Local thumbnail lookup ─────────────────────────────────────────────────
-const allThumbnails = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/media/thumbnails/*.{jpg,jpeg,webp,png}',
-  { eager: true }
-);
-
-const thumbnailEntry = Object.entries(allThumbnails).find(([path]) =>
-  path.split('/').pop()?.replace(/\.[^.]+$/, '') === videoId
-);
-const localThumbnail = thumbnailEntry?.[1]?.default ?? null;
 
 const uid = `yt-${videoId}-${Math.random().toString(36).slice(2, 7)}`;
 ---
@@ -62,15 +47,14 @@ const uid = `yt-${videoId}-${Math.random().toString(36).slice(2, 7)}`;
   <!-- ::before pseudo-element creates height via padding-top trick -->
 
   <div class="yt-player__placeholder">
-    {localThumbnail ? (
-      <Image
-        src={localThumbnail}
-        alt={`Thumbnail: ${title}`}
-        widths={widths}
-        sizes={sizes}
+    {thumbnail ? (
+      <img
+        src={thumbnail}
+        alt=""
         class="yt-player__thumbnail"
         loading="eager"
         decoding="async"
+        aria-hidden="true"
       />
     ) : (
       <div class="yt-player__thumbnail yt-player__thumbnail--fallback" aria-hidden="true">

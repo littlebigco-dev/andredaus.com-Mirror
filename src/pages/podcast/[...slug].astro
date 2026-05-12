@@ -273,6 +273,7 @@ const episodeJsonLd = JSON.stringify({
         <YouTubePlayer
           videoId={ytVideoId}
           title={entry.data.title}
+          thumbnail={entry.data.og_image?.includes('youtube') ? entry.data.og_image : undefined}
         />
         {entry.data.audio_url && (
           <div style="margin-top:1rem">
