@@ -1,6 +1,7 @@
 image: node:22-slim
 
 stages:
+  - sync
   - build
 
 cache:
@@ -11,8 +12,43 @@ cache:
     - node_modules/
   policy: pull-push
 
+# ── Daily content sync ────────────────────────────────────────────────────────
+# Runs on scheduled pipelines only.
+# Pulls new podcast episodes from the RSS feed, downloads their artwork,
+# and pushes any changes to main — which triggers the build job below.
+content-sync:
+  stage: sync
+  only:
+    - schedules
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git ca-certificates
+    - git config --global user.email "ci@andredaus.com"
+    - git config --global user.name "André Daus CI"
+    - git remote set-url origin "https://oauth2:${GITLAB_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+  script:
+    - npm ci
+    - node scripts/import-podcast.mjs
+    - node scripts/podcast-artwork.mjs
+    - |
+      CHANGED=$(git status --porcelain src/content/podcast/ public/podcast-artwork/)
+      if [ -n "$CHANGED" ]; then
+        git add src/content/podcast/ public/podcast-artwork/
+        git commit -m "chore: sync podcast content $(date +%Y-%m-%d)"
+        git push origin HEAD:main
+        echo "New podcast content pushed to main — deploy will follow."
+      else
+        echo "No new podcast content. Nothing to push."
+      fi
+
+# ── Build + deploy ────────────────────────────────────────────────────────────
+# Runs on every push to main (including the commit from content-sync above).
+# Skips on scheduled pipelines — the sync job handles those.
 build:
   stage: build
+  only:
+    - main
+  except:
+    - schedules
   script:
     - npm ci
     - npm run build
@@ -20,5 +56,3 @@ build:
     paths:
       - dist/
     expire_in: 1 hour
-  only:
-    - main
