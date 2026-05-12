@@ -46,12 +46,13 @@ function extractYtId(url?: string): string | null {
 }
 const ytVideoId = extractYtId(entry.data.youtube_url);
 
-// Artwork: use og_image field (public folder path like /podcast-artwork/ep-001.jpg)
-function getArtwork(ep: { data: { og_image?: string } }): string | null {
-  return ep.data.og_image ?? null;
+// Square artwork: always /podcast-artwork/ep-NNN.jpg
+// og_image may be a 16:9 YouTube thumbnail — only use it for OG meta
+function getSquareArtwork(ep: { data: { episode_number: number } }): string {
+  return `/podcast-artwork/ep-${String(ep.data.episode_number).padStart(3, '0')}.jpg`;
 }
 
-const artwork = getArtwork(entry);
+const artwork = getSquareArtwork(entry);
 const artworkId = entry.data.episode_id
   ?? entry.data.spotify_url?.match(/spotify\.com\/(?:embed\/)?[a-z]+\/([a-zA-Z0-9]+)/)?.[1]
   ?? entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '');
@@ -421,7 +422,7 @@ const episodeJsonLd = JSON.stringify({
         </h2>
         <ul class="related__grid">
           {related.map(rel => {
-            const relArt = getArtwork(rel);
+            const relArt = getSquareArtwork(rel);
             return (
               <li>
                 <a href={`${prefix}/podcast/${slugify(rel)}`} class="rel-ep-card">

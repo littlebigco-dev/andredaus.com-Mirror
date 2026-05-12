@@ -36,12 +36,13 @@ function fmtDuration(d?: string): string {
   return d;
 }
 
-// Artwork: use og_image field (public folder path like /podcast-artwork/ep-001.jpg)
-function getArtwork(ep: typeof episodes[number]): string | null {
-  return ep.data.og_image ?? null;
+// Square artwork: always /podcast-artwork/ep-NNN.jpg (Spotify square format)
+// og_image may point to a 16:9 YouTube thumbnail for video episodes — not for square spots
+function getSquareArtwork(ep: { data: { episode_number: number } }): string {
+  return `/podcast-artwork/ep-${String(ep.data.episode_number).padStart(3, '0')}.jpg`;
 }
 
-const showArtwork = featured ? getArtwork(featured) : null;
+const showArtwork = featured ? getSquareArtwork(featured) : null;
 
 const podcastJsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -213,7 +214,7 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
           <!-- Thumbnail -->
           <div class="latest__thumb">
             {(() => {
-              const art = getArtwork(featured);
+              const art = getSquareArtwork(featured);
               return art ? (
                 <img
                   src={art}
@@ -290,7 +291,7 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
       ) : (
         <ol class="ep-grid" id="ep-grid">
           {(featured ? [featured, ...rest] : episodes).map((ep, i) => {
-            const art = getArtwork(ep);
+            const art = getSquareArtwork(ep);
             return (
               <li class="fade-up" data-cat={ep.data.category}>
                 <a
