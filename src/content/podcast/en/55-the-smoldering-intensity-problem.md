@@ -11,7 +11,7 @@ episode_id: c4b5f3ea-cd87-4938-9746-4f346b8d64f6
 artwork_url: https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_episode/19215224/19215224-1774737814924-9edfb3a75da12.jpg
 youtube_url: https://youtu.be/8jZebr2NPtQ
 spotify_url: https://open.spotify.com/episode/7vmzin1nIaua8xCtqeo7Pr
-og_image: /podcast-artwork/ep-055.jpg
+og_image: "/podcast-artwork/youtube/ep-055-youtube.jpg"
 duration: 00:13:50
 summary: "Organisations keep promoting results-driven performers into leadership roles without actual development, unknowingly scaling their incompetence across the business."
 ---

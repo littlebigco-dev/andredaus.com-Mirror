@@ -121,15 +121,7 @@ const allTypes = Array.from(
               class="service-row fade-up"
               data-type={(entry.data.type ?? []).join(' ')}
             >
-              <!-- Image column — placeholder until real images are added -->
-              <div class="service-row__image" aria-hidden="true">
-                <div class="img-ph">
-                  <span class="img-ph__icon">◎</span>
-                  <span class="img-ph__tag">{entry.data.title}</span>
-                </div>
-              </div>
-
-              <!-- Content column -->
+              <!-- Content -->
               <div class="service-row__content">
                 {entry.data.engagement_type && (
                   <span class="service-row__type">{entry.data.engagement_type}</span>
@@ -439,63 +431,18 @@ const allTypes = Array.from(
   }
 
   .service-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     border-bottom: 1px solid var(--border-light);
     transition: background 0.2s;
   }
   .service-row:first-child { border-top: 1px solid var(--border-light); }
   .service-row:hover { background: rgba(196,154,60,0.02); }
 
-  /* Alternate image/content sides */
-  .service-row:nth-child(even) .service-row__image {
-    order: 1;
-    border-right: none;
-    border-left: 1px solid var(--border-light);
-  }
-  .service-row:nth-child(even) .service-row__content { order: 0; }
-
-  /* Image column */
-  .service-row__image {
-    position: relative;
-    min-height: 320px;
-    overflow: hidden;
-    border-right: 1px solid var(--border-light);
-  }
-
-  .img-ph {
-    width: 100%;
-    height: 100%;
-    min-height: 320px;
-    background: var(--bg-elevated);
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 2.5rem;
-    text-align: center;
-  }
-  .img-ph__icon {
-    font-size: 2rem;
-    opacity: 0.15;
-    color: var(--gold);
-  }
-  .img-ph__tag {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
-  }
-
-  /* Content column */
   .service-row__content {
     padding: 3rem;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    max-width: 72ch;
   }
 
   .service-row__type {
@@ -570,18 +517,6 @@ const allTypes = Array.from(
   .service-row__link:hover { gap: 14px; }
 
   @media (max-width: 860px) {
-    .service-row { grid-template-columns: 1fr; }
-    .service-row__image {
-      min-height: 220px;
-      border-right: none;
-      border-bottom: 1px solid var(--border-light);
-    }
-    .service-row:nth-child(even) .service-row__image {
-      order: 0;
-      border-left: none;
-      border-bottom: 1px solid var(--border-light);
-    }
-    .service-row:nth-child(even) .service-row__content { order: 1; }
     .service-row__content { padding: 2rem; }
   }
 
