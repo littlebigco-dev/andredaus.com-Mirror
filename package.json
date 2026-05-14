@@ -12,10 +12,15 @@
     "astro": "astro",
     "podcast:summaries": "node --env-file=.env scripts/podcast-summaries.mjs",
     "podcast:artwork": "node scripts/podcast-artwork.mjs",
-    "import:podcast": "node --env-file=.env scripts/import-podcast.mjs"
+    "import:podcast": "node --env-file=.env scripts/import-podcast.mjs",
+    "import:library": "node scripts/import-library.mjs",
+    "import:insights": "node scripts/import-insights.mjs",
+    "process:koala": "node scripts/process-koala-library.mjs",
+    "process:koala:dry": "node scripts/process-koala-library.mjs --dry-run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.8",
+    "@astrojs/sitemap": "^3.7.2",
     "@fontsource-variable/fraunces": "^5.2.9",
     "@fontsource-variable/work-sans": "^5.2.8",
     "@fontsource/dm-mono": "^5.2.7",
@@ -26,6 +31,8 @@
     "wrangler": "^4.81.1"
   },
   "devDependencies": {
-    "pagefind": "^1.5.0"
+    "@astrojs/check": "^0.9.9",
+    "pagefind": "^1.5.0",
+    "typescript": "^5.9.3"
   }
 }

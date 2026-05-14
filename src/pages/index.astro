@@ -103,8 +103,8 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
       <img
         src="/AndreDaus-760x1024.png"
         alt={isDE ? 'André Daus, Strategic Opposition Berater' : 'André Daus, Strategic Opposition consultant'}
-        width="760"
-        height="1024"
+        width="767"
+        height="1034"
         loading="eager"
         decoding="async"
       />
@@ -587,8 +587,11 @@ const homeFaqs = isDE ? deFaqs : enFaqs;
   .hero__ctas { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
   .hero__portrait {
     border-radius: 4px; overflow: hidden;
-    aspect-ratio: 3/4; background: var(--bg-elevated);
+    aspect-ratio: 767/1034; background: var(--bg-elevated);
     border: 1px solid var(--border-light);
+  }
+  .hero__portrait img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
   }
   .hero__scroll {
     position: absolute; bottom: 2rem; left: var(--gutter);

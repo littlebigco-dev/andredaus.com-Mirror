@@ -1,6 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 
 interface ZohoLead {
   Last_Name: string;
@@ -54,9 +55,7 @@ async function createZohoLead(lead: ZohoLead, token: string): Promise<void> {
   }
 }
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  // Cloudflare env is available on locals.runtime.env
-  const env = (locals as { runtime?: { env?: Record<string, string | undefined> } }).runtime?.env ?? {};
+export const POST: APIRoute = async ({ request }) => {
 
   let body: FormData | null = null;
   try {

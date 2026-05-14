@@ -44,6 +44,25 @@ function slugify(e: typeof related[number]) {
 }
 
 const shareUrl = `https://andredaus.com${prefix}/insights/${entry.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')}`;
+
+const articleJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: entry.data.title,
+  datePublished: entry.data.date.toISOString(),
+  url: shareUrl,
+  author: {
+    '@type': 'Person',
+    name: 'André Daus',
+    url: 'https://andredaus.com',
+  },
+  publisher: {
+    '@type': 'Person',
+    name: 'André Daus',
+    url: 'https://andredaus.com',
+  },
+  description: entry.data.summary,
+});
 ---
 
 <Base
@@ -52,6 +71,7 @@ const shareUrl = `https://andredaus.com${prefix}/insights/${entry.id.replace(/^(
   ogImage={entry.data.og_image}
   lang={isDE ? 'de' : 'en'}
 >
+<script type="application/ld+json" set:html={articleJsonLd} />
 
   <!-- ── BREADCRUMB ─────────────────────────────────────────────────────── -->
   <nav class="breadcrumb" aria-label="Breadcrumb">

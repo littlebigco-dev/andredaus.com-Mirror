@@ -35,6 +35,22 @@ function typeLabel(type: string, lang: boolean): string {
   };
   return (map[type] ?? [type, type])[lang ? 1 : 0];
 }
+
+const baseUrl = 'https://andredaus.com';
+const libraryJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Strategic Opposition Reference Library',
+  description: 'Cognitive biases, liberating structures, and thinking methods — the intellectual foundation of Strategic Opposition.',
+  url: `${baseUrl}${prefix}/library`,
+  numberOfItems: entries.length,
+  itemListElement: entries.map((e, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: e.data.title,
+    url: `${baseUrl}${prefix}/library/${e.id.replace(/^(en|de)\//, '').replace(/\.md$/, '')}`,
+  })),
+});
 ---
 
 <Base
@@ -44,6 +60,7 @@ function typeLabel(type: string, lang: boolean): string {
     : 'Cognitive biases, liberating structures, and thinking methods — the intellectual foundation of Strategic Opposition.'}
   lang={isDE ? 'de' : 'en'}
 >
+<script type="application/ld+json" set:html={libraryJsonLd} />
 
   <!-- ── PAGE HERO ──────────────────────────────────────────────────────── -->
   <header class="page-hero" aria-labelledby="page-heading">

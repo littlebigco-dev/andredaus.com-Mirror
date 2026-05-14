@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
+import sitemap from '@astrojs/sitemap';
 
 import remarkDirective from 'remark-directive';
 import { visit }       from 'unist-util-visit';
@@ -44,10 +45,16 @@ export default defineConfig({
       remarkNoteBox,
     ],
   },
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/api/'),
+    }),
+  ],
   site: 'https://andredaus.com',
   output: 'static',
   adapter: cloudflare({
     compatibilityDate: '2026-04-12',
+    platformProxy: { enabled: true },
   }),
 
   i18n: {

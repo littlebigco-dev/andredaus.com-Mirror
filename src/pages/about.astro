@@ -4,6 +4,23 @@ import Base from '../layouts/Base.astro';
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
+
+const personJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'André Daus',
+  jobTitle: 'Strategic Opposition Consultant',
+  url: 'https://andredaus.com',
+  sameAs: [
+    'https://linkedin.com/in/andredaus',
+    'https://open.spotify.com/show/iconoclast-insights',
+  ],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Cologne',
+    addressCountry: 'DE',
+  },
+});
 ---
 
 <Base
@@ -13,6 +30,7 @@ const prefix = isDE ? '/de' : '';
     : "I'm André Daus. I make it professionally uncomfortable to keep avoiding the questions that matter. Strategic Opposition coach and consultant based in Germany."}
   lang={isDE ? 'de' : 'en'}
 >
+<script type="application/ld+json" set:html={personJsonLd} />
 
 <!-- ── ABOUT HERO ──────────────────────────────────────── -->
 <header class="about-hero" aria-labelledby="about-name">

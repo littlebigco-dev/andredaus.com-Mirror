@@ -1,0 +1,941 @@
+---
+interface Props {
+  isDE: boolean;
+}
+
+const { isDE } = Astro.props;
+
+// Build-time configuration check — the booking widget only activates when both
+// workspace and service IDs are present at build time. When unset we render a
+// static placeholder with a mailto fallback (no client-side fetch attempted).
+const workspace = import.meta.env.PUBLIC_ZOHO_BOOKING_WORKSPACE ?? '';
+const service = import.meta.env.PUBLIC_ZOHO_BOOKING_SERVICE ?? '';
+const isConfigured = Boolean(workspace) && Boolean(service);
+
+// All visible strings — bilingual via the isDE prop. Kept inline for legibility.
+const t = isDE
+  ? {
+      header: 'Entdeckungsgespräch — André Daus',
+      duration: '30 Min · Video oder Telefon',
+      pickDate: 'Datum wählen',
+      prevWeek: 'Vorherige Woche',
+      nextWeek: 'Nächste Woche',
+      loading: 'Lade verfügbare Zeiten…',
+      noSlots: 'Keine verfügbaren Zeiten an diesem Tag.',
+      tryAnother: 'Versuchen Sie ein anderes Datum oder',
+      emailInstead: 'fragen Sie per E-Mail an',
+      pickTime: 'Verfügbare Zeiten',
+      yourDetails: 'Ihre Angaben',
+      nameLabel: 'Name',
+      emailLabel: 'E-Mail',
+      messageLabel: 'Nachricht (optional)',
+      messageHint: 'Was sollte ich vorab wissen?',
+      submit: 'Termin bestätigen',
+      submitting: 'Wird gebucht…',
+      cancel: 'Zurück',
+      successTitle: 'Termin bestätigt',
+      successBody: 'Sie erhalten in Kürze eine Bestätigung per E-Mail mit dem Videolink.',
+      successAt: 'Bestätigt für',
+      errorTitle: 'Buchung fehlgeschlagen',
+      errorBody: 'Etwas ist schief gelaufen. Bitte versuchen Sie es erneut oder schreiben Sie mir direkt.',
+      retry: 'Erneut versuchen',
+      mailFallback: 'E-Mail an hello@andredaus.com',
+      placeholderHeading: 'Buchungswidget wird hier geladen',
+      placeholderNote: 'Setzen Sie PUBLIC_ZOHO_BOOKING_WORKSPACE und PUBLIC_ZOHO_BOOKING_SERVICE in den Umgebungsvariablen.',
+      placeholderCta: 'Stattdessen per E-Mail anfragen',
+      requiredHint: 'Pflichtfeld',
+      offlineNotice: 'Buchungsdienst vorübergehend nicht verfügbar.',
+    }
+  : {
+      header: 'Discovery Call — André Daus',
+      duration: '30 min · Video or phone',
+      pickDate: 'Pick a date',
+      prevWeek: 'Previous week',
+      nextWeek: 'Next week',
+      loading: 'Loading available times…',
+      noSlots: 'No times available on this day.',
+      tryAnother: 'Try another date or',
+      emailInstead: 'request by email',
+      pickTime: 'Available times',
+      yourDetails: 'Your details',
+      nameLabel: 'Name',
+      emailLabel: 'Email',
+      messageLabel: 'Message (optional)',
+      messageHint: 'Anything I should know beforehand?',
+      submit: 'Confirm booking',
+      submitting: 'Booking…',
+      cancel: 'Back',
+      successTitle: 'Booking confirmed',
+      successBody: 'You will receive a confirmation email shortly with the video link.',
+      successAt: 'Confirmed for',
+      errorTitle: 'Booking failed',
+      errorBody: 'Something went wrong. Please try again or email me directly.',
+      retry: 'Try again',
+      mailFallback: 'Email hello@andredaus.com',
+      placeholderHeading: 'Booking widget loads here',
+      placeholderNote: 'Set PUBLIC_ZOHO_BOOKING_WORKSPACE and PUBLIC_ZOHO_BOOKING_SERVICE in environment variables to activate.',
+      placeholderCta: 'Request by email instead',
+      requiredHint: 'Required',
+      offlineNotice: 'Booking service temporarily unavailable.',
+    };
+
+const lang = isDE ? 'de-DE' : 'en-GB';
+const subjectLine = encodeURIComponent(isDE ? 'Anfrage Entdeckungsgespräch' : 'Discovery Call Request');
+const mailto = `mailto:hello@andredaus.com?subject=${subjectLine}`;
+---
+
+<div
+  class="zoho-booking"
+  data-zoho-booking
+  data-configured={isConfigured ? 'true' : 'false'}
+  data-lang={lang}
+  aria-label={isDE ? 'Buchungskalender' : 'Booking calendar'}
+>
+  <div class="zoho-booking__header">
+    <span class="zoho-booking__title">{t.header}</span>
+    <span class="zoho-booking__duration">{t.duration}</span>
+  </div>
+
+  {!isConfigured && (
+    <div class="zoho-booking__placeholder" role="status">
+      <div class="zoho-booking__placeholder-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="4" width="18" height="18" rx="2"/>
+          <path d="M16 2v4M8 2v4M3 10h18"/>
+        </svg>
+      </div>
+      <p class="zoho-booking__placeholder-heading">{t.placeholderHeading}</p>
+      <p class="zoho-booking__placeholder-note">{t.placeholderNote}</p>
+      <a href={mailto} class="btn btn--outline">{t.placeholderCta}</a>
+    </div>
+  )}
+
+  {isConfigured && (
+    <div class="zoho-booking__widget" data-zoho-widget>
+      <!-- Date navigator (week view) -->
+      <div class="zoho-booking__nav" role="group" aria-label={t.pickDate}>
+        <button type="button" class="zoho-booking__nav-btn" data-prev-week aria-label={t.prevWeek}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"/>
+          </svg>
+        </button>
+        <div class="zoho-booking__week" data-week-strip role="tablist" aria-label={t.pickDate}></div>
+        <button type="button" class="zoho-booking__nav-btn" data-next-week aria-label={t.nextWeek}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Slot grid -->
+      <div class="zoho-booking__slots-wrap">
+        <p class="zoho-booking__slots-heading" data-slots-heading>{t.pickTime}</p>
+        <div class="zoho-booking__slots" data-slots aria-live="polite" aria-busy="false"></div>
+        <p class="zoho-booking__status" data-status hidden></p>
+      </div>
+
+      <!-- Booking form (revealed when a slot is picked) -->
+      <form class="zoho-booking__form" data-form hidden novalidate aria-labelledby="zoho-form-heading">
+        <p class="zoho-booking__form-heading" id="zoho-form-heading">{t.yourDetails}</p>
+        <p class="zoho-booking__form-selected" data-selected-summary></p>
+
+        <div class="zoho-booking__field">
+          <label for="zoho-name">
+            {t.nameLabel} <span class="zoho-booking__required" aria-hidden="true">*</span>
+            <span class="sr-only">({t.requiredHint})</span>
+          </label>
+          <input id="zoho-name" type="text" name="name" required autocomplete="name" />
+        </div>
+
+        <div class="zoho-booking__field">
+          <label for="zoho-email">
+            {t.emailLabel} <span class="zoho-booking__required" aria-hidden="true">*</span>
+            <span class="sr-only">({t.requiredHint})</span>
+          </label>
+          <input id="zoho-email" type="email" name="email" required autocomplete="email" inputmode="email" />
+        </div>
+
+        <div class="zoho-booking__field">
+          <label for="zoho-message">{t.messageLabel}</label>
+          <textarea id="zoho-message" name="message" rows="3" placeholder={t.messageHint}></textarea>
+        </div>
+
+        <!-- Honeypot — keep visually hidden but reachable to bots -->
+        <div class="zoho-booking__trap" aria-hidden="true">
+          <label for="zoho-trap">Leave this field empty</label>
+          <input id="zoho-trap" type="text" name="_trap" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="zoho-booking__actions">
+          <button type="button" class="btn btn--outline" data-cancel>{t.cancel}</button>
+          <button type="submit" class="btn btn--primary" data-submit>{t.submit}</button>
+        </div>
+
+        <p class="zoho-booking__form-error" data-form-error hidden></p>
+      </form>
+
+      <!-- Success panel -->
+      <div class="zoho-booking__success" data-success hidden role="status">
+        <div class="zoho-booking__success-icon" aria-hidden="true">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="m8 12 3 3 5-6"/>
+          </svg>
+        </div>
+        <p class="zoho-booking__success-title">{t.successTitle}</p>
+        <p class="zoho-booking__success-when" data-success-when></p>
+        <p class="zoho-booking__success-body">{t.successBody}</p>
+      </div>
+
+      <!-- Error panel -->
+      <div class="zoho-booking__error" data-error hidden role="alert">
+        <p class="zoho-booking__error-title">{t.errorTitle}</p>
+        <p class="zoho-booking__error-body" data-error-body>{t.errorBody}</p>
+        <div class="zoho-booking__error-actions">
+          <button type="button" class="btn btn--outline" data-retry>{t.retry}</button>
+          <a href={mailto} class="btn btn--primary">{t.mailFallback}</a>
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+<script is:inline define:vars={{ strings: t, lang }}>
+  (() => {
+    const root = document.querySelector('[data-zoho-booking]');
+    if (!root) return;
+    if (root.getAttribute('data-configured') !== 'true') return;
+
+    const widget = root.querySelector('[data-zoho-widget]');
+    if (!widget) return;
+
+    const weekStrip = widget.querySelector('[data-week-strip]');
+    const slotsEl = widget.querySelector('[data-slots]');
+    const statusEl = widget.querySelector('[data-status]');
+    const form = widget.querySelector('[data-form]');
+    const selectedSummary = widget.querySelector('[data-selected-summary]');
+    const formError = widget.querySelector('[data-form-error]');
+    const successEl = widget.querySelector('[data-success]');
+    const successWhen = widget.querySelector('[data-success-when]');
+    const errorEl = widget.querySelector('[data-error]');
+    const errorBody = widget.querySelector('[data-error-body]');
+    const prevBtn = widget.querySelector('[data-prev-week]');
+    const nextBtn = widget.querySelector('[data-next-week]');
+    const cancelBtn = widget.querySelector('[data-cancel]');
+    const retryBtn = widget.querySelector('[data-retry]');
+    const submitBtn = widget.querySelector('[data-submit]');
+
+    if (!weekStrip || !slotsEl || !form || !successEl || !errorEl || !prevBtn || !nextBtn) return;
+
+    const dateFmtLong = new Intl.DateTimeFormat(lang, {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+    const dateFmtShort = new Intl.DateTimeFormat(lang, { weekday: 'short' });
+    const dateFmtDay = new Intl.DateTimeFormat(lang, { day: 'numeric' });
+    const timeFmt = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' });
+
+    const startOfDay = (d) => {
+      const x = new Date(d);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    };
+    const addDays = (d, n) => {
+      const x = startOfDay(d);
+      x.setDate(x.getDate() + n);
+      return x;
+    };
+    const isoDate = (d) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+    const sameDay = (a, b) => isoDate(a) === isoDate(b);
+
+    const today = startOfDay(new Date());
+    let weekAnchor = today;
+    let selectedDate = today;
+    let selectedSlotIso = '';
+    let inflightSlots = 0;
+
+    const setBusy = (busy) => {
+      widget.classList.toggle('is-busy', busy);
+      slotsEl.setAttribute('aria-busy', busy ? 'true' : 'false');
+    };
+
+    const setStatus = (text) => {
+      if (!statusEl) return;
+      if (!text) {
+        statusEl.hidden = true;
+        statusEl.textContent = '';
+        return;
+      }
+      statusEl.hidden = false;
+      statusEl.textContent = text;
+    };
+
+    const renderWeek = () => {
+      weekStrip.replaceChildren();
+      for (let i = 0; i < 7; i += 1) {
+        const d = addDays(weekAnchor, i);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'zoho-booking__day';
+        btn.setAttribute('role', 'tab');
+        btn.dataset.date = isoDate(d);
+        const isPast = d.getTime() < today.getTime();
+        if (isPast) {
+          btn.disabled = true;
+          btn.classList.add('is-past');
+        }
+        if (sameDay(d, selectedDate)) {
+          btn.classList.add('is-selected');
+          btn.setAttribute('aria-selected', 'true');
+        } else {
+          btn.setAttribute('aria-selected', 'false');
+        }
+        if (sameDay(d, today)) {
+          btn.classList.add('is-today');
+        }
+
+        const dow = document.createElement('span');
+        dow.className = 'zoho-booking__day-dow';
+        dow.textContent = dateFmtShort.format(d);
+
+        const num = document.createElement('span');
+        num.className = 'zoho-booking__day-num';
+        num.textContent = dateFmtDay.format(d);
+
+        btn.appendChild(dow);
+        btn.appendChild(num);
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          selectedDate = d;
+          renderWeek();
+          loadSlots(selectedDate);
+        });
+        weekStrip.appendChild(btn);
+      }
+
+      // Disable prev when the week before this anchor would be entirely past.
+      const prevAnchor = addDays(weekAnchor, -7);
+      const prevWeekLastDay = addDays(prevAnchor, 6);
+      prevBtn.disabled = prevWeekLastDay.getTime() < today.getTime();
+    };
+
+    const renderSlots = (slots) => {
+      slotsEl.replaceChildren();
+      if (!slots.length) {
+        const empty = document.createElement('div');
+        empty.className = 'zoho-booking__empty';
+        const line1 = document.createElement('p');
+        line1.textContent = strings.noSlots;
+        const line2 = document.createElement('p');
+        line2.className = 'zoho-booking__empty-sub';
+        const link = document.createElement('a');
+        link.href = 'mailto:hello@andredaus.com';
+        link.textContent = strings.emailInstead;
+        line2.append(`${strings.tryAnother} `);
+        line2.appendChild(link);
+        line2.append('.');
+        empty.appendChild(line1);
+        empty.appendChild(line2);
+        slotsEl.appendChild(empty);
+        return;
+      }
+
+      for (const iso of slots) {
+        const dt = new Date(iso);
+        if (Number.isNaN(dt.getTime())) continue;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'zoho-booking__slot';
+        btn.dataset.slot = iso;
+        btn.textContent = timeFmt.format(dt);
+        btn.addEventListener('click', () => openForm(iso));
+        slotsEl.appendChild(btn);
+      }
+    };
+
+    const loadSlots = async (d) => {
+      const requestId = ++inflightSlots;
+      setBusy(true);
+      setStatus(strings.loading);
+      slotsEl.replaceChildren();
+      try {
+        const res = await fetch(`/api/zoho-booking-slots?date=${isoDate(d)}`, {
+          headers: { Accept: 'application/json' },
+        });
+        if (requestId !== inflightSlots) return;
+        if (!res.ok) {
+          renderSlots([]);
+          setStatus(strings.offlineNotice);
+          return;
+        }
+        const data = await res.json();
+        if (requestId !== inflightSlots) return;
+        const slots = Array.isArray(data?.slots) ? data.slots.filter((s) => typeof s === 'string') : [];
+        renderSlots(slots);
+        setStatus(data?.error && !slots.length ? strings.offlineNotice : '');
+      } catch {
+        if (requestId !== inflightSlots) return;
+        renderSlots([]);
+        setStatus(strings.offlineNotice);
+      } finally {
+        if (requestId === inflightSlots) setBusy(false);
+      }
+    };
+
+    const openForm = (iso) => {
+      selectedSlotIso = iso;
+      const dt = new Date(iso);
+      if (Number.isNaN(dt.getTime())) return;
+      if (selectedSummary) {
+        selectedSummary.textContent = `${dateFmtLong.format(dt)} · ${timeFmt.format(dt)}`;
+      }
+      form.hidden = false;
+      successEl.hidden = true;
+      errorEl.hidden = true;
+      if (formError) {
+        formError.hidden = true;
+        formError.textContent = '';
+      }
+      // Mark currently-selected slot button visually.
+      slotsEl.querySelectorAll('.zoho-booking__slot').forEach((b) => {
+        b.classList.toggle('is-selected', b.getAttribute('data-slot') === iso);
+      });
+      const nameInput = form.querySelector('input[name="name"]');
+      if (nameInput) nameInput.focus();
+    };
+
+    const closeForm = () => {
+      form.hidden = true;
+      selectedSlotIso = '';
+      slotsEl.querySelectorAll('.zoho-booking__slot').forEach((b) => b.classList.remove('is-selected'));
+    };
+
+    const showError = (msg) => {
+      if (errorBody && msg) errorBody.textContent = msg;
+      errorEl.hidden = false;
+      successEl.hidden = true;
+      form.hidden = true;
+    };
+
+    const showSuccess = (iso) => {
+      const dt = new Date(iso);
+      if (successWhen && !Number.isNaN(dt.getTime())) {
+        successWhen.textContent = `${strings.successAt}: ${dateFmtLong.format(dt)} · ${timeFmt.format(dt)}`;
+      }
+      successEl.hidden = false;
+      errorEl.hidden = true;
+      form.hidden = true;
+    };
+
+    prevBtn.addEventListener('click', () => {
+      const candidate = addDays(weekAnchor, -7);
+      // Don't allow navigating to a fully-past week.
+      const candidateLast = addDays(candidate, 6);
+      if (candidateLast.getTime() < today.getTime()) return;
+      weekAnchor = candidate;
+      // If selection falls outside the new visible range, reset to first valid day.
+      if (selectedDate.getTime() < weekAnchor.getTime() || selectedDate.getTime() >= addDays(weekAnchor, 7).getTime()) {
+        const first = weekAnchor.getTime() < today.getTime() ? today : weekAnchor;
+        selectedDate = first;
+      }
+      renderWeek();
+      loadSlots(selectedDate);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      weekAnchor = addDays(weekAnchor, 7);
+      selectedDate = weekAnchor;
+      renderWeek();
+      loadSlots(selectedDate);
+    });
+
+    if (cancelBtn) cancelBtn.addEventListener('click', closeForm);
+    if (retryBtn) retryBtn.addEventListener('click', () => {
+      errorEl.hidden = true;
+      if (selectedSlotIso) openForm(selectedSlotIso);
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!selectedSlotIso) return;
+
+      const fd = new FormData(form);
+      const name = String(fd.get('name') ?? '').trim();
+      const email = String(fd.get('email') ?? '').trim();
+      const message = String(fd.get('message') ?? '').trim();
+      const trap = String(fd.get('_trap') ?? '');
+
+      if (!name || !email) {
+        if (formError) {
+          formError.hidden = false;
+          formError.textContent = strings.errorBody;
+        }
+        return;
+      }
+
+      const dt = new Date(selectedSlotIso);
+      if (Number.isNaN(dt.getTime())) return;
+      const date = isoDate(dt);
+      const hh = String(dt.getHours()).padStart(2, '0');
+      const mm = String(dt.getMinutes()).padStart(2, '0');
+      const ss = String(dt.getSeconds()).padStart(2, '0');
+      const time = `${hh}:${mm}:${ss}`;
+
+      submitBtn.disabled = true;
+      const originalLabel = submitBtn.textContent;
+      submitBtn.textContent = strings.submitting;
+      widget.classList.add('is-busy');
+
+      try {
+        const res = await fetch('/api/zoho-booking-create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ name, email, date, time, message, _trap: trap }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data?.ok === true) {
+          showSuccess(selectedSlotIso);
+        } else {
+          showError(data?.message || strings.errorBody);
+        }
+      } catch {
+        showError(strings.errorBody);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalLabel;
+        widget.classList.remove('is-busy');
+      }
+    });
+
+    // Initial render
+    renderWeek();
+    loadSlots(selectedDate);
+  })();
+</script>
+
+<style is:global>
+  .zoho-booking {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-top: 2px solid var(--gold-dim);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 2rem;
+  }
+
+  .zoho-booking__header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .zoho-booking__title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .zoho-booking__duration {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-subtle);
+  }
+
+  /* Placeholder (not configured) — mirrors the existing booking-placeholder treatment */
+  .zoho-booking__placeholder {
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2.5rem;
+    text-align: center;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(196, 154, 60, .015) 8px,
+      rgba(196, 154, 60, .015) 16px
+    );
+  }
+
+  .zoho-booking__placeholder-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gold-trans);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+  }
+
+  .zoho-booking__placeholder-heading {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+  }
+
+  .zoho-booking__placeholder-note {
+    font-size: 13px;
+    color: var(--text-subtle);
+    max-width: 36ch;
+    line-height: 1.6;
+  }
+
+  /* Widget — date navigator */
+  .zoho-booking__widget {
+    padding: 1.5rem;
+    transition: opacity .15s ease;
+  }
+  .zoho-booking.is-busy .zoho-booking__widget,
+  .zoho-booking__widget.is-busy {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .zoho-booking__nav {
+    display: grid;
+    grid-template-columns: 36px 1fr 36px;
+    gap: .5rem;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
+  }
+
+  .zoho-booking__nav-btn {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .zoho-booking__nav-btn:hover:not(:disabled) {
+    border-color: rgba(196, 154, 60, .35);
+    color: var(--gold);
+    background: var(--gold-trans);
+  }
+  .zoho-booking__nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .zoho-booking__nav-btn:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  .zoho-booking__week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: .375rem;
+  }
+
+  .zoho-booking__day {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: .625rem .25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: border-color .15s ease, background .15s ease, color .15s ease;
+    font-family: var(--sans);
+    min-height: 56px;
+  }
+  .zoho-booking__day:hover:not(:disabled):not(.is-selected) {
+    border-color: rgba(196, 154, 60, .35);
+    color: var(--text-primary);
+  }
+  .zoho-booking__day:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .zoho-booking__day.is-today { border-color: rgba(196, 154, 60, .35); }
+  .zoho-booking__day.is-selected {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #080a10;
+  }
+  .zoho-booking__day.is-past {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .zoho-booking__day-dow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .zoho-booking__day-num {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  /* Slots */
+  .zoho-booking__slots-wrap {
+    margin-top: 1rem;
+  }
+
+  .zoho-booking__slots-heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .875rem;
+  }
+
+  .zoho-booking__slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: .5rem;
+    min-height: 120px;
+  }
+
+  .zoho-booking__slot {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: .75rem .5rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 13px;
+    transition: border-color .15s ease, background .15s ease, color .15s ease;
+    min-height: 44px;
+  }
+  .zoho-booking__slot:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--gold-trans);
+  }
+  .zoho-booking__slot:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .zoho-booking__slot.is-selected {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: #080a10;
+  }
+
+  .zoho-booking__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 1.5rem 1rem;
+    border: 1px dashed var(--border-light);
+    border-radius: 3px;
+  }
+  .zoho-booking__empty-sub {
+    margin-top: .5rem;
+    color: var(--text-subtle);
+    font-size: 12px;
+  }
+  .zoho-booking__empty-sub a {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .zoho-booking__status {
+    margin-top: .75rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--text-subtle);
+  }
+
+  /* Form */
+  .zoho-booking__form {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-light);
+  }
+
+  .zoho-booking__form-heading {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .5rem;
+  }
+
+  .zoho-booking__form-selected {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+  }
+
+  .zoho-booking__field {
+    display: flex;
+    flex-direction: column;
+    gap: .375rem;
+    margin-bottom: 1rem;
+  }
+  .zoho-booking__field label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .zoho-booking__required { color: var(--gold); margin-left: 2px; }
+
+  .zoho-booking__field input,
+  .zoho-booking__field textarea {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-light);
+    border-radius: 3px;
+    padding: .75rem .875rem;
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+    transition: border-color .15s ease;
+    min-height: 44px;
+    width: 100%;
+  }
+  .zoho-booking__field textarea {
+    resize: vertical;
+    min-height: 88px;
+    font-family: var(--sans);
+  }
+  .zoho-booking__field input:focus,
+  .zoho-booking__field textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+
+  /* Honeypot — visually hidden, kept reachable by bots */
+  .zoho-booking__trap {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .zoho-booking__actions {
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+  }
+
+  .zoho-booking__form-error {
+    margin-top: 1rem;
+    padding: .875rem 1rem;
+    border: 1px solid rgba(196, 80, 60, .3);
+    border-radius: 3px;
+    background: rgba(196, 80, 60, .08);
+    color: #e8a89a;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* Success */
+  .zoho-booking__success:not([hidden]) {
+    margin-top: 1.5rem;
+    padding: 2rem 1.5rem;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .75rem;
+  }
+  .zoho-booking__success-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(122, 182, 72, .12);
+    border: 1px solid rgba(122, 182, 72, .3);
+    color: #7ab648;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .zoho-booking__success-title {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--text-primary);
+  }
+  .zoho-booking__success-when {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    color: var(--gold);
+  }
+  .zoho-booking__success-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 42ch;
+  }
+
+  /* Error */
+  .zoho-booking__error {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+  }
+  .zoho-booking__error-title {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: .5rem;
+  }
+  .zoho-booking__error-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 48ch;
+    margin: 0 auto 1.25rem;
+  }
+  .zoho-booking__error-actions {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 520px) {
+    .zoho-booking__week {
+      grid-template-columns: repeat(7, 1fr);
+      gap: .25rem;
+    }
+    .zoho-booking__day { padding: .5rem .125rem; min-height: 52px; }
+    .zoho-booking__day-num { font-size: 14px; }
+    .zoho-booking__slots {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+  }
+</style>

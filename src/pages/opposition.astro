@@ -4,6 +4,18 @@ import Base from '../layouts/Base.astro';
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
+
+const personJsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'André Daus',
+  jobTitle: 'Strategic Opposition Consultant',
+  url: 'https://andredaus.com',
+  sameAs: [
+    'https://linkedin.com/in/andredaus',
+    'https://open.spotify.com/show/iconoclast-insights',
+  ],
+});
 ---
 
 <Base
@@ -13,6 +25,7 @@ const prefix = isDE ? '/de' : '';
     : 'Strategic Opposition is not contrarianism for its own sake. It is a structured methodology for identifying the assumptions running unchallenged — and challenging them systematically, before the market does it for you.'}
   lang={isDE ? 'de' : 'en'}
 >
+<script type="application/ld+json" set:html={personJsonLd} />
 
   <!-- HERO -->
   <header class="opp-hero" aria-labelledby="opp-hero-heading">

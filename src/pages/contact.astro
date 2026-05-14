@@ -1,8 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import ZohoBooking from '../components/ZohoBooking.astro';
 import { getCollection } from 'astro:content';
 
-const calcomUsername = import.meta.env.PUBLIC_CALCOM_USERNAME ?? '';
 const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
@@ -112,40 +112,18 @@ const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
                 : 'Pick a time that works. No form, no questionnaire beforehand.'
               }
             </p>
+            <p class="booking-privacy">
+              <small>
+                {isDE ? (
+                  <Fragment>Ihre Buchungsdaten werden von Zoho (EU-Rechenzentrum) verarbeitet. <a href="/de/policy/privacy">Datenschutz</a>.</Fragment>
+                ) : (
+                  <Fragment>Your booking data is processed by Zoho (EU data centre). <a href="/policy/privacy">Privacy policy</a>.</Fragment>
+                )}
+              </small>
+            </p>
           </div>
 
-          <!-- Cal.com booking block -->
-          <div class="booking-block" aria-label={isDE ? 'Buchungskalender' : 'Booking calendar'}>
-            <div class="booking-block__header">
-              <span class="booking-block__title">{isDE ? 'Entdeckungsgespräch — André Daus' : 'Discovery Call — André Daus'}</span>
-              <span class="booking-block__duration">{isDE ? '30 Min · Video oder Telefon' : '30 min · Video or phone'}</span>
-            </div>
-            <!-- Cal.com inline embed — set CALCOM_USERNAME to your Cal.com username to activate -->
-            {import.meta.env.PUBLIC_CALCOM_USERNAME ? (
-              <div id="cal-booking" style="min-height:600px;"></div>
-            ) : (
-              <div class="booking-placeholder" aria-label={isDE ? 'Kalender-Platzhalter' : 'Calendar placeholder'}>
-                <div class="booking-placeholder__icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <rect x="3" y="4" width="18" height="18" rx="2"/>
-                    <path d="M16 2v4M8 2v4M3 10h18"/>
-                  </svg>
-                </div>
-                <p class="booking-placeholder__heading">
-                  {isDE ? 'Cal.com-Widget wird hier geladen' : 'Cal.com widget loads here'}
-                </p>
-                <p class="booking-placeholder__note">
-                  {isDE
-                    ? 'Setzen Sie PUBLIC_CALCOM_USERNAME in den Umgebungsvariablen.'
-                    : 'Set PUBLIC_CALCOM_USERNAME in environment variables to activate.'
-                  }
-                </p>
-                <a href="mailto:hello@andredaus.com?subject=Discovery%20Call%20Request" class="btn btn--outline">
-                  {isDE ? 'Stattdessen per E-Mail anfragen' : 'Request by email instead'}
-                </a>
-              </div>
-            )}
-          </div>
+          <ZohoBooking isDE={isDE} />
 
           <!-- What happens in 30 minutes -->
           <div class="expect fade-up" aria-labelledby="expect-heading">
@@ -333,54 +311,6 @@ const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
 
 </Base>
 
-{calcomUsername && (
-  <script define:vars={{ calcomUsername }}>
-    (function (C, A, L) {
-      let p = function (a, ar) { a.q.push(ar); };
-      let d = C.document;
-      C.Cal = C.Cal || function () {
-        let cal = C.Cal;
-        let ar = arguments;
-        if (!cal.loaded) {
-          cal.ns = {};
-          cal.q = cal.q || [];
-          d.head.appendChild(d.createElement('script')).src = A;
-          cal.loaded = true;
-        }
-        if (ar[0] === L) {
-          const api = function () { p(api, arguments); };
-          const namespace = ar[1];
-          api.q = api.q || [];
-          if (typeof namespace === 'string') {
-            cal.ns[namespace] = cal.ns[namespace] || api;
-            p(cal.ns[namespace], ar);
-            p(cal, ['initNamespace', namespace]);
-          } else {
-            p(cal, ar);
-          }
-          return;
-        }
-        p(cal, ar);
-      };
-    })(window, 'https://app.cal.com/embed/embed.js', 'init');
-
-    Cal('init', 'discovery-call', { origin: 'https://cal.com' });
-    Cal.ns['discovery-call']('inline', {
-      elementOrSelector: '#cal-booking',
-      calLink: `${calcomUsername}/discovery-call`,
-      layout: 'month_view',
-    });
-    Cal.ns['discovery-call']('ui', {
-      styles: { branding: { brandColor: '#c49a3c' } },
-      hideEventTypeDetails: true,
-      layout: 'month_view',
-      theme: 'dark',
-      useSlotsViewOnSmallScreen: 'true',
-      cssVarsPerTheme: {light:{'cal-brand':'#cd0202'},dark:{'cal-brand':'#c49a3c', 'cal-bg': '#090c14','cal-bg-muted': '#0f1520'}}
-    });
-  </script>
-)}
-
 <style>
   /* ── HERO ─────────────────────────────────────────────── */
   .contact-hero {
@@ -524,81 +454,20 @@ const contactFaqs = isDE ? deContactFaqs : enContactFaqs;
   }
   .booking-body p + p { margin-top: .875rem; }
 
-  /* Booking block (Cal.com placeholder) */
-  .booking-block {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-top: 2px solid var(--gold-dim);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 2rem;
-  }
-
-  .booking-block__header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .booking-block__title {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-
-  .booking-block__duration {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-subtle);
-  }
-
-  .booking-placeholder {
-    height: 480px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 2.5rem;
-    text-align: center;
-    background: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(196,154,60,.015) 8px,
-      rgba(196,154,60,.015) 16px
-    );
-  }
-
-  .booking-placeholder__icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--gold-trans);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--gold);
-  }
-
-  .booking-placeholder__heading {
-    font-family: var(--serif);
-    font-style: italic;
-    font-size: 1.2rem;
-    color: var(--text-secondary);
-  }
-
-  .booking-placeholder__note {
-    font-size: 13px;
-    color: var(--text-subtle);
-    max-width: 30ch;
+  /* Privacy notice above the booking widget */
+  .booking-privacy {
+    margin-top: 1rem;
+    font-size: 12px;
     line-height: 1.6;
+    color: var(--text-subtle);
   }
+  .booking-privacy small { font-size: inherit; }
+  .booking-privacy a {
+    color: var(--gold);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .booking-privacy a:hover { color: var(--gold-light); }
 
   /* Expect steps */
   .expect { margin-top: 3rem; }
