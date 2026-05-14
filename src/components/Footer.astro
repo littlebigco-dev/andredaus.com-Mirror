@@ -12,8 +12,8 @@ const year = new Date().getFullYear();
       <!-- Brand + social -->
       <div class="footer__brand">
         <p class="footer__brand-name">André Daus</p>
-        <p class="footer__brand-sub">Strategic Opposition</p>
-        <p class="footer__tagline">Your thinking creates your limits.</p>
+        <p class="footer__brand-sub">AI Investment Due Diligence</p>
+        <p class="footer__tagline">Find the wrong assumption before the market does.</p>
         <nav class="footer__social" aria-label="Social media links">
           <a
             href="https://twitter.com/andredaus"
@@ -45,11 +45,11 @@ const year = new Date().getFullYear();
         <div>
           <h3 class="footer__nav-heading">{isDE ? 'Leistungen' : 'Services'}</h3>
           <ul class="footer__nav-list">
-            <li><a href={`${prefix}/services/pressure-test`}         class="footer__nav-link">The Pressure Test</a></li>
-            <li><a href={`${prefix}/services/ai-reality-check`}    class="footer__nav-link">The AI Reality Check</a></li>
-            <li><a href={`${prefix}/services/red-team-day`}        class="footer__nav-link">The Red Team Day</a></li>
-            <li><a href={`${prefix}/services/permanent-challenger`} class="footer__nav-link">The Permanent Challenger</a></li>
-            <li><a href={`${prefix}/services/the-mandate`}         class="footer__nav-link">The Mandate</a></li>
+            <li><a href={`${prefix}/services/ai-reality-check`}    class="footer__nav-link">{isDE ? 'KI-Investitionsprüfung' : 'AI Investment Assessment'}</a></li>
+            <li><a href={`${prefix}/services/pressure-test`}         class="footer__nav-link">{isDE ? 'Zweitmeinung' : 'Second Opinion'}</a></li>
+            <li><a href={`${prefix}/services/red-team-day`}        class="footer__nav-link">{isDE ? 'KI-Strategie-Workshop' : 'AI Strategy Workshop'}</a></li>
+            <li><a href={`${prefix}/services/permanent-challenger`} class="footer__nav-link">{isDE ? 'KI-Beratungsretainer' : 'AI Advisory Retainer'}</a></li>
+            <li><a href={`${prefix}/services/the-mandate`}         class="footer__nav-link">{isDE ? 'KI Due Diligence Mandat' : 'AI Due Diligence Mandate'}</a></li>
           </ul>
         </div>
         <div>
