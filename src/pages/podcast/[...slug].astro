@@ -552,6 +552,10 @@ const episodeJsonLd = JSON.stringify({
     white-space: nowrap;
     max-width: 40ch;
   }
+  @media (max-width: 640px) {
+    .breadcrumb__inner li:last-child { flex: 1; min-width: 0; }
+    .breadcrumb__current { display: block; max-width: 100%; }
+  }
 
   /* ── Episode hero ──────────────────────────────────────────────────────── */
   .ep-hero {

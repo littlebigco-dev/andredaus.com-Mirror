@@ -403,6 +403,10 @@ const {
   .breadcrumb__link:hover { color:var(--gold) }
   .breadcrumb__sep { color:var(--text-subtle);user-select:none;padding-inline:.125rem }
   .breadcrumb__current { color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:36ch }
+  @media (max-width: 640px) {
+    .breadcrumb__inner li:last-child { flex: 1; min-width: 0; }
+    .breadcrumb__current { display: block; max-width: 100%; }
+  }
 
   /* ── Case hero ─────────────────────────────────────────────────────────── */
   .case-hero {

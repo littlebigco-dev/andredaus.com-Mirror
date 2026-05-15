@@ -448,7 +448,11 @@ const shareUrl = `https://andredaus.com${prefix}/library/${entrySlug(entry.id)}`
   .breadcrumb__link { color:var(--text-secondary);transition:color .2s;text-decoration:none;min-height:24px;display:inline-flex;align-items:center }
   .breadcrumb__link:hover { color:var(--gold) }
   .breadcrumb__sep { color:var(--text-subtle);user-select:none;padding-inline:.125rem }
-  .breadcrumb__current { color:var(--text-primary) }
+  .breadcrumb__current { color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40ch }
+  @media (max-width: 640px) {
+    .breadcrumb__inner li:last-child { flex: 1; min-width: 0; }
+    .breadcrumb__current { display: block; max-width: 100%; }
+  }
 
   /* ── Entry hero ────────────────────────────────────────────────────────── */
   .entry-hero {
