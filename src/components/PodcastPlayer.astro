@@ -282,7 +282,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
   .pp-bar {
     flex: 1;
     height: 3px;
-    background: rgba(196,154,60,0.2);
+    background: rgba(212,104,56,0.2);
     border-radius: 2px;
     cursor: pointer;
     position: relative;
@@ -292,7 +292,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
   .pp-bar__fill {
     height: 100%;
     width: 0%;
-    background: #c49a3c;
+    background: #d46838;
     border-radius: 2px;
     pointer-events: none;
     transition: width 0.2s linear;
@@ -301,25 +301,25 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
   /* Speed cycle button */
   .pp-speed-cycle {
     background: transparent;
-    border: 1px solid rgba(196,154,60,0.3);
+    border: 1px solid rgba(212,104,56,0.3);
     border-radius: 2px;
     padding: 0.15rem 0.45rem;
     cursor: pointer;
     font-family: 'DM Mono', monospace;
     font-size: 0.68rem;
-    color: #c49a3c;
+    color: #d46838;
     white-space: nowrap;
     flex-shrink: 0;
     transition: border-color 0.2s, background 0.2s;
   }
 
   .pp-speed-cycle:hover {
-    border-color: #c49a3c;
-    background: rgba(196,154,60,0.1);
+    border-color: #d46838;
+    background: rgba(212,104,56,0.1);
   }
 
   .pp-speed-cycle:focus-visible {
-    outline: 2px solid #c49a3c;
+    outline: 2px solid #d46838;
     outline-offset: 2px;
   }
 
@@ -329,7 +329,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     align-items: center;
     gap: 0.35rem;
     background: transparent;
-    border: 1px solid rgba(196,154,60,0.25);
+    border: 1px solid rgba(212,104,56,0.25);
     border-radius: 2px;
     padding: 0.15rem 0.5rem;
     cursor: pointer;
@@ -344,13 +344,13 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
   }
 
   .pp-share:hover {
-    border-color: #c49a3c;
-    color: #c49a3c;
-    background: rgba(196,154,60,0.08);
+    border-color: #d46838;
+    color: #d46838;
+    background: rgba(212,104,56,0.08);
   }
 
   .pp-share:focus-visible {
-    outline: 2px solid #c49a3c;
+    outline: 2px solid #d46838;
     outline-offset: 2px;
   }
 
@@ -360,7 +360,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     align-items: center;
     gap: 0.3rem;
     padding: 0.15rem 0.5rem;
-    border: 1px solid rgba(196,154,60,0.18);
+    border: 1px solid rgba(212,104,56,0.18);
     border-radius: 2px;
     font-family: 'DM Mono', monospace;
     font-size: 0.62rem;
@@ -375,8 +375,8 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
 
   .pp-ext--spotify { color: #1db954; border-color: rgba(29,185,84,0.25); }
   .pp-ext--spotify:hover { background: rgba(29,185,84,0.08); border-color: #1db954; }
-  .pp-ext--youtube { color: #c49a3c; border-color: rgba(196,154,60,0.2); }
-  .pp-ext--youtube:hover { background: rgba(196,154,60,0.08); border-color: #c49a3c; }
+  .pp-ext--youtube { color: #d46838; border-color: rgba(212,104,56,0.2); }
+  .pp-ext--youtube:hover { background: rgba(212,104,56,0.08); border-color: #d46838; }
 
   /* ══ FULL PLAYER ═════════════════════════════════════════════════════════ */
 
@@ -388,7 +388,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
        outside the box — we use inline controls instead to avoid this. */
     overflow: hidden;
     background: #141c2c;  /* visibly distinct from artwork fallback */
-    border: 1px solid rgba(196,154,60,0.18);
+    border: 1px solid rgba(212,104,56,0.18);
     border-radius: 3px;
     font-family: 'Work Sans', sans-serif;
   }
@@ -443,7 +443,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     display: block;
     width: 3px;
     height: var(--h, 20px);
-    background: #c49a3c;
+    background: #d46838;
     opacity: 0.4;
     border-radius: 1px;
     animation: pp-pulse 2.4s ease-in-out infinite alternate;
@@ -489,9 +489,9 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     gap: 0.4rem;
     padding: 0.18rem 0.5rem;
     background: rgba(9,12,20,0.65);
-    border: 1px solid rgba(196,154,60,0.2);
+    border: 1px solid rgba(212,104,56,0.2);
     border-radius: 2px;
-    color: #c49a3c;
+    color: #d46838;
     font-family: 'DM Mono', monospace;
     font-size: 0.65rem;
     letter-spacing: 0.07em;
@@ -522,7 +522,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     z-index: 2;
     width: 72px;
     height: 72px;
-    background: #c49a3c;
+    background: #d46838;
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -530,18 +530,18 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     align-items: center;
     justify-content: center;
     color: #090c14;
-    box-shadow: 0 4px 24px rgba(196,154,60,0.4);
+    box-shadow: 0 4px 24px rgba(212,104,56,0.4);
     transition: background 0.2s, box-shadow 0.2s;
   }
 
   .pp-player__playbtn:hover {
     background: #d4aa4a;
-    box-shadow: 0 6px 32px rgba(196,154,60,0.55);
+    box-shadow: 0 6px 32px rgba(212,104,56,0.55);
     transform: translate(-50%, -50%) scale(1.08);
   }
 
   .pp-player__playbtn:focus-visible {
-    outline: 2px solid #c49a3c;
+    outline: 2px solid #d46838;
     outline-offset: 5px;
   }
 
@@ -549,7 +549,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 1px solid rgba(196,154,60,0.5);
+    border: 1px solid rgba(212,104,56,0.5);
     transform: scale(1);
     opacity: 0.5;
     transition: transform 0.55s ease, opacity 0.55s ease;
@@ -573,7 +573,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     right: 0;
     height: 6rem;
     background: rgba(9,12,20,0.95);
-    border-top: 1px solid rgba(196,154,60,0.12);
+    border-top: 1px solid rgba(212,104,56,0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
@@ -602,7 +602,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     width: 100%;
     height: 80px;
     background: #090c14;
-    border: 1px solid rgba(196,154,60,0.18);
+    border: 1px solid rgba(212,104,56,0.18);
     border-radius: 3px;
     overflow: hidden;
     font-family: 'Work Sans', sans-serif;
@@ -624,8 +624,8 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(196,154,60,0.4);
-    border-right: 1px solid rgba(196,154,60,0.1);
+    color: rgba(212,104,56,0.4);
+    border-right: 1px solid rgba(212,104,56,0.1);
   }
 
   .pp-compact__body {
@@ -642,7 +642,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
     flex-shrink: 0;
     width: 34px;
     height: 34px;
-    background: #c49a3c;
+    background: #d46838;
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -654,7 +654,7 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
   }
 
   .pp-compact .pp-playbtn:hover { background: #d4aa4a; transform: scale(1.08); }
-  .pp-compact .pp-playbtn:focus-visible { outline: 2px solid #c49a3c; outline-offset: 3px; }
+  .pp-compact .pp-playbtn:focus-visible { outline: 2px solid #d46838; outline-offset: 3px; }
 
   /* Optical centre for compact play triangle */
   .pp-compact .pp-icon--play { transform: translateX(1px); }
@@ -804,9 +804,9 @@ const SPEEDS = [1, 1.25, 1.5, 1.75, 2, 0.75]; // cycle order
         try {
           await navigator.clipboard.writeText(shareUrl);
           const origText = shareBtn.innerHTML;
-          shareBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c49a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Copied</span>`;
-          shareBtn.style.color = '#c49a3c';
-          shareBtn.style.borderColor = '#c49a3c';
+          shareBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d46838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Copied</span>`;
+          shareBtn.style.color = '#d46838';
+          shareBtn.style.borderColor = '#d46838';
           setTimeout(() => {
             shareBtn.innerHTML = origText;
             shareBtn.style.color = '';

@@ -340,8 +340,8 @@ function formatDate(d: Date) {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+      linear-gradient(rgba(212,104,56,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,104,56,.03) 1px, transparent 1px);
     background-size: 80px 80px;
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
@@ -386,7 +386,7 @@ function formatDate(d: Date) {
   .cat-nav__inner::-webkit-scrollbar { display: none; }
   .cat-btn {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 1.1rem 1.4rem;
@@ -442,7 +442,7 @@ function formatDate(d: Date) {
   .img-ph__icon { font-size: 2rem; opacity: 0.15; display: block; color: var(--gold); }
   .img-ph__label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
@@ -450,7 +450,7 @@ function formatDate(d: Date) {
 
   .featured__badge {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
@@ -469,7 +469,7 @@ function formatDate(d: Date) {
   }
   .cat-tag {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
@@ -503,7 +503,7 @@ function formatDate(d: Date) {
   }
   .featured__read {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
@@ -516,7 +516,7 @@ function formatDate(d: Date) {
   .featured__read::after { content: '→'; }
   .featured__readtime {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-subtle);
   }
 
@@ -556,7 +556,7 @@ function formatDate(d: Date) {
     transition: border-color 0.2s, transform 0.2s;
     overflow: hidden;
   }
-  .article-card:hover { border-color: rgba(196,154,60,.3); transform: translateY(-3px); }
+  .article-card:hover { border-color: rgba(212,104,56,.3); transform: translateY(-3px); }
 
   .article-card__image {
     aspect-ratio: 16/9;
@@ -577,7 +577,7 @@ function formatDate(d: Date) {
   .article-card__cats { display: flex; gap: 0.375rem; flex-wrap: wrap; }
   .article-card__cat {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gold);
@@ -615,7 +615,7 @@ function formatDate(d: Date) {
   }
   .article-card__read {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
@@ -626,7 +626,7 @@ function formatDate(d: Date) {
   }
   .article-card:hover .article-card__read { gap: 12px; }
   .article-card__read::after { content: '→'; }
-  .article-card__meta { font-family: var(--mono); font-size: 10px; color: var(--text-subtle); }
+  .article-card__meta { font-family: var(--mono); font-size: 12px; color: var(--text-subtle); }
 
   @media (max-width: 900px) { .articles-grid { grid-template-columns: repeat(2,1fr); } }
   @media (max-width: 560px) { .articles-grid { grid-template-columns: 1fr; } }
@@ -634,8 +634,8 @@ function formatDate(d: Date) {
   /* ── Newsletter ────────────────────────────────────────────────────────── */
   .newsletter {
     background: var(--navy);
-    border-top: 1px solid rgba(29,45,68,.8);
-    border-bottom: 1px solid rgba(29,45,68,.8);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     padding-block: 4rem;
   }
   .newsletter__inner {
@@ -674,7 +674,7 @@ function formatDate(d: Date) {
   .newsletter__input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .newsletter__note {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     color: var(--text-subtle);
     line-height: 1.6;
@@ -699,7 +699,7 @@ function formatDate(d: Date) {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,.06), transparent 70%);
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(212,104,56,.06), transparent 70%);
     pointer-events: none;
   }
   .cta-band__inner { position: relative; z-index: 1; }

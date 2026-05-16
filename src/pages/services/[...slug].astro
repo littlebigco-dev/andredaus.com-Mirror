@@ -392,12 +392,12 @@ const stats = [
     gap: 0.75rem;
     padding-block: 0.875rem;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
   .breadcrumb__link {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     transition: color 0.2s;
   }
   .breadcrumb__link:hover { color: var(--gold); }
@@ -412,8 +412,8 @@ const stats = [
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,0.03) 1px, transparent 1px);
+      linear-gradient(rgba(212,104,56,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,104,56,0.03) 1px, transparent 1px);
     background-size: 80px 80px;
     mask-image: radial-gradient(ellipse 80% 80% at 30% 50%, black, transparent);
     pointer-events: none;
@@ -430,7 +430,7 @@ const stats = [
 
   .service-hero__type {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--gold-dim);
@@ -485,7 +485,7 @@ const stats = [
     height: 100%;
     min-height: 340px;
     background: var(--bg-elevated);
-    border: 1px dashed rgba(196,154,60,0.2);
+    border: 1px dashed rgba(212,104,56,0.2);
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -502,7 +502,7 @@ const stats = [
   }
   .img-placeholder__label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gold-dim);
@@ -529,10 +529,10 @@ const stats = [
   }
   .service-hero__stat-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
   .service-hero__stat-value {
     font-size: 14px;
@@ -593,7 +593,7 @@ const stats = [
     margin-bottom: 0.5rem;
     margin-top: 1.75rem;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--gold-dim);
@@ -612,7 +612,7 @@ const stats = [
   .pull-quote {
     border-left: 2px solid var(--gold);
     padding: 1.5rem 2rem;
-    background: rgba(196,154,60,0.06);
+    background: rgba(212,104,56,0.06);
     border-radius: 0 3px 3px 0;
   }
   .pull-quote p {
@@ -628,7 +628,7 @@ const stats = [
 
   .content-section__label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--gold-dim);
@@ -669,7 +669,7 @@ const stats = [
     border-radius: 3px;
     transition: border-color 0.2s;
   }
-  .outcome:hover { border-color: rgba(196,154,60,0.25); }
+  .outcome:hover { border-color: rgba(212,104,56,0.25); }
   .outcome__check { color: var(--gold); font-size: 0.9rem; margin-top: 0.2rem; }
   .outcome__text { font-size: 14px; line-height: 1.7; color: var(--text-secondary); }
   .outcome__text strong {
@@ -707,7 +707,7 @@ const stats = [
     border-top-color: rgba(255,100,100,0.3);
     background: rgba(255,80,80,0.03);
   }
-  .for-card--not strong { color: var(--text-muted); }
+  .for-card--not strong { color: var(--text-secondary); }
   @media (max-width: 600px) {
     .for-grid { grid-template-columns: 1fr; }
   }
@@ -722,7 +722,7 @@ const stats = [
   }
   .sidebar-card__heading {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--gold-dim);
@@ -746,10 +746,10 @@ const stats = [
   }
   .sidebar-card__label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: var(--text-secondary);
   }
   .sidebar-card__value {
     font-size: 14px;
@@ -757,7 +757,7 @@ const stats = [
   }
 
   .sidebar-cta {
-    background: rgba(196,154,60,0.06);
+    background: rgba(212,104,56,0.06);
     border: 1px solid var(--border);
     padding: 1.75rem;
     border-radius: 3px;
@@ -811,7 +811,7 @@ const stats = [
   }
   .related-card__type {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold-dim);
@@ -831,7 +831,7 @@ const stats = [
   }
   .related-card__link {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
@@ -860,7 +860,7 @@ const stats = [
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(196,154,60,0.06), transparent 70%);
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(212,104,56,0.06), transparent 70%);
     pointer-events: none;
   }
   .cta-band__inner { position: relative; z-index: 1; }

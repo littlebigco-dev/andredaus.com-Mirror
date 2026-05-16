@@ -492,10 +492,10 @@ const libraryJsonLd = JSON.stringify({
 
   /* ── Token extensions for type colors ──────────────────────────────────── */
   :root {
-    --accent-bias:      #c49a3c;
+    --accent-bias:      #921a0a;
     --accent-structure: #6ba3c8;
     --accent-method:    #7ab648;
-    --tint-bias:        rgba(196,154,60,.08);
+    --tint-bias:        rgba(212,104,56,.08);
     --tint-structure:   rgba(74,144,186,.08);
     --tint-method:      rgba(106,168,100,.08);
   }
@@ -512,8 +512,8 @@ const libraryJsonLd = JSON.stringify({
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+      linear-gradient(rgba(212,104,56,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,104,56,.03) 1px, transparent 1px);
     background-size: 80px 80px;
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
@@ -626,7 +626,7 @@ const libraryJsonLd = JSON.stringify({
   @media (max-width:900px) { .library-inner { grid-template-columns:1fr } .index-panel { display:none } }
 
   /* ── What-band ─────────────────────────────────────────────────────────── */
-  .what-band { background:var(--navy);border-top:1px solid rgba(29,45,68,.8);border-bottom:1px solid rgba(29,45,68,.8);padding-block:4rem }
+  .what-band { background:var(--navy);border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);padding-block:4rem }
   .what-band__inner { display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start }
   .what-band__heading { font-family:var(--serif);font-size:clamp(1.4rem,2.5vw,1.9rem);font-weight:400;line-height:1.25;color:var(--text-primary);margin-bottom:1rem }
   .what-band__body { font-size:14px;line-height:1.85;color:var(--text-secondary) }
@@ -643,7 +643,7 @@ const libraryJsonLd = JSON.stringify({
 
   /* ── CTA band ──────────────────────────────────────────────────────────── */
   .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
-  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(212,104,56,.06),transparent 70%);pointer-events:none }
   .cta-band__inner { position:relative;z-index:1 }
   .cta-band__label { margin-bottom:1.5rem;justify-content:center }
   .cta-band__label::before { display:none }
@@ -662,26 +662,26 @@ const libraryJsonLd = JSON.stringify({
   /* Entry sections & rows */
   .entry-section { margin-bottom:3.5rem;scroll-margin-top:180px }
   .entry-section:last-child { margin-bottom:0 }
-  .entry-section__letter { font-family:var(--serif, 'Fraunces Variable', Georgia, serif);font-style:italic;font-size:3rem;color:var(--gold, #c49a3c);line-height:1;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-light, rgba(255,255,255,.06));display:flex;align-items:baseline;gap:1rem }
+  .entry-section__letter { font-family:var(--serif, 'Fraunces Variable', Georgia, serif);font-style:italic;font-size:3rem;color:var(--gold, #d46838);line-height:1;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border-light, rgba(255,255,255,.06));display:flex;align-items:baseline;gap:1rem }
   .entry-section__letter span { font-family:var(--mono, 'DM Mono', monospace);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-subtle, #7d8799);font-style:normal }
   .entry-list { display:flex;flex-direction:column;gap:.75rem }
   .entry-row { display:grid;grid-template-columns:28px 1fr auto;gap:1.25rem;align-items:start;background:var(--bg-card-alt, #0f1520);border:1px solid var(--border-light, rgba(255,255,255,.06));border-radius:3px;padding:1.25rem 1.5rem;text-decoration:none;color:inherit;transition:border-color .2s,background .2s }
-  .entry-row:hover { border-color:rgba(196,154,60,.25);background:var(--bg-card, #141c2c) }
+  .entry-row:hover { border-color:rgba(212,104,56,.25);background:var(--bg-card, #141c2c) }
   .entry-type-dot { width:8px;height:8px;border-radius:50%;margin-top:.55rem;flex-shrink:0 }
-  .entry-type-dot--bias      { background:var(--accent-bias, #c49a3c) }
+  .entry-type-dot--bias      { background:var(--accent-bias, #921a0a) }
   .entry-type-dot--structure { background:var(--accent-structure, #6ba3c8) }
   .entry-type-dot--method    { background:var(--accent-method, #7ab648) }
   .entry-main {}
   .entry-name { font-family:var(--serif, 'Fraunces Variable', Georgia, serif);font-size:1.1rem;font-weight:400;line-height:1.25;color:var(--text-primary, #ede8dc);margin-bottom:.375rem;transition:color .2s }
-  .entry-row:hover .entry-name { color:var(--gold-light, #d4aa52) }
+  .entry-row:hover .entry-name { color:var(--gold-light, #a82010) }
   .entry-def { font-size:13px;line-height:1.7;color:var(--text-secondary, #96a0b0);max-width:68ch }
   .entry-tags { display:flex;gap:.375rem;flex-wrap:wrap;margin-top:.625rem }
   .entry-tag { font-family:var(--mono, 'DM Mono', monospace);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px }
-  .entry-tag--bias      { background:rgba(196,154,60,.08);color:#c49a3c;border:1px solid rgba(196,154,60,.15) }
+  .entry-tag--bias      { background:rgba(212,104,56,.08);color:#d46838;border:1px solid rgba(212,104,56,.15) }
   .entry-tag--structure { background:rgba(74,144,186,.08);color:#6ba3c8;border:1px solid rgba(74,144,186,.15) }
   .entry-tag--method    { background:rgba(106,168,100,.08);color:#7ab648;border:1px solid rgba(106,168,100,.15) }
   .entry-tag--neutral   { background:var(--bg-elevated, #111828);color:var(--text-subtle, #7d8799);border:1px solid var(--border-light, rgba(255,255,255,.06)) }
-  .entry-arrow { font-family:var(--mono, 'DM Mono', monospace);font-size:12px;color:var(--gold, #c49a3c);display:flex;align-items:center;align-self:center;transition:transform .2s;flex-shrink:0 }
+  .entry-arrow { font-family:var(--mono, 'DM Mono', monospace);font-size:12px;color:var(--gold, #d46838);display:flex;align-items:center;align-self:center;transition:transform .2s;flex-shrink:0 }
   .entry-row:hover .entry-arrow { transform:translateX(4px) }
 
   /* Empty state */
@@ -694,7 +694,7 @@ const libraryJsonLd = JSON.stringify({
   /* Alpha bar buttons */
   .alpha-btn {
     font-family: var(--mono, 'DM Mono', monospace);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     background: none;
@@ -709,7 +709,7 @@ const libraryJsonLd = JSON.stringify({
     border-radius: 2px;
   }
   .alpha-btn.has-entries { color: var(--text-secondary, #96a0b0); }
-  .alpha-btn.has-entries:hover { color: var(--gold, #c49a3c); }
-  .alpha-btn:focus-visible { outline: 3px solid var(--gold, #c49a3c); outline-offset: 1px; }
+  .alpha-btn.has-entries:hover { color: var(--gold, #d46838); }
+  .alpha-btn:focus-visible { outline: 3px solid var(--gold, #d46838); outline-offset: 1px; }
   .alpha-btn[disabled] { opacity: 0.25; cursor: default; pointer-events: none; }
 </style>

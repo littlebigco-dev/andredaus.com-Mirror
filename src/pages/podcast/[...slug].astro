@@ -500,7 +500,7 @@ const episodeJsonLd = JSON.stringify({
     try {
       await navigator.clipboard.writeText(url);
       const orig = btn.innerHTML;
-      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c49a3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d46838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
       setTimeout(() => { btn.innerHTML = orig; }, 1500);
     } catch {}
   });
@@ -532,7 +532,7 @@ const episodeJsonLd = JSON.stringify({
     flex-wrap: wrap;
     padding-block: 0.875rem;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
   }
   .breadcrumb__link {
@@ -568,8 +568,8 @@ const episodeJsonLd = JSON.stringify({
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(196,154,60,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(196,154,60,.03) 1px, transparent 1px);
+      linear-gradient(rgba(212,104,56,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,104,56,.03) 1px, transparent 1px);
     background-size: 80px 80px;
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
     pointer-events: none;
@@ -593,7 +593,7 @@ const episodeJsonLd = JSON.stringify({
   }
   .ep-badge {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
@@ -638,7 +638,7 @@ const episodeJsonLd = JSON.stringify({
     padding-top: 1.25rem;
     border-top: 1px solid var(--border-light);
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
     color: var(--text-subtle);
   }
@@ -655,7 +655,7 @@ const episodeJsonLd = JSON.stringify({
     border-radius: 3px;
     padding: 0.875rem 1.25rem;
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-secondary);
@@ -663,7 +663,7 @@ const episodeJsonLd = JSON.stringify({
     min-height: 44px;
     text-decoration: none;
   }
-  .ep-listen-btn:hover { border-color: rgba(196,154,60,.3); color: var(--text-primary); }
+  .ep-listen-btn:hover { border-color: rgba(212,104,56,.3); color: var(--text-primary); }
   .ep-listen-btn--primary {
     background: var(--gold);
     color: #080a10;
@@ -675,7 +675,7 @@ const episodeJsonLd = JSON.stringify({
 
   .ep-listen-note {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.08em;
     color: var(--text-subtle);
     margin-top: 0.25rem;
@@ -686,7 +686,7 @@ const episodeJsonLd = JSON.stringify({
   .ep-share { display: flex; align-items: center; gap: 0.625rem; margin-top: 0.5rem; }
   .ep-share-label {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-subtle);
@@ -745,7 +745,7 @@ const episodeJsonLd = JSON.stringify({
   }
   .ep-section__badge {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
@@ -836,7 +836,7 @@ const episodeJsonLd = JSON.stringify({
   .ep-meta-row:last-child { border-bottom: none; }
   .ep-meta-key {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-subtle);
@@ -856,7 +856,7 @@ const episodeJsonLd = JSON.stringify({
     text-decoration: none;
     transition: border-color 0.2s;
   }
-  .show-card:hover { border-color: rgba(196,154,60,.25); }
+  .show-card:hover { border-color: rgba(212,104,56,.25); }
   .show-card__art {
     width: 48px;
     height: 48px;
@@ -874,12 +874,12 @@ const episodeJsonLd = JSON.stringify({
     align-items: center;
     justify-content: center;
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     color: var(--text-subtle);
   }
   .show-card__label {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gold);
@@ -935,7 +935,7 @@ const episodeJsonLd = JSON.stringify({
     transition: border-color 0.2s, transform 0.2s;
     align-items: flex-start;
   }
-  .rel-ep-card:hover { border-color: rgba(196,154,60,.25); transform: translateY(-2px); }
+  .rel-ep-card:hover { border-color: rgba(212,104,56,.25); transform: translateY(-2px); }
 
   .rel-ep-card__thumb {
     width: 56px;
@@ -954,12 +954,12 @@ const episodeJsonLd = JSON.stringify({
     align-items: center;
     justify-content: center;
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-subtle);
   }
   .rel-ep-card__ep {
     font-family: var(--mono);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--gold);
@@ -977,14 +977,14 @@ const episodeJsonLd = JSON.stringify({
     overflow: hidden;
   }
   .rel-ep-card:hover .rel-ep-card__title { color: var(--gold-light); }
-  .rel-ep-card__duration { font-family: var(--mono); font-size: 10px; color: var(--text-subtle); margin-top: 4px; }
+  .rel-ep-card__duration { font-family: var(--mono); font-size: 12px; color: var(--text-subtle); margin-top: 4px; }
 
   @media (max-width: 960px) and (min-width: 721px) { .related__grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 720px) { .related__grid { grid-template-columns: 1fr; } }
 
   /* ── CTA band ──────────────────────────────────────────────────────────── */
   .cta-band { background:var(--bg-elevated);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding-block:5rem;text-align:center;position:relative;overflow:hidden }
-  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(196,154,60,.06),transparent 70%);pointer-events:none }
+  .cta-band::before { content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(212,104,56,.06),transparent 70%);pointer-events:none }
   .cta-band__inner { position:relative;z-index:1 }
   .cta-band__label { margin-bottom:1.5rem;justify-content:center }
   .cta-band__label::before { display:none }

@@ -33,17 +33,18 @@ function isActive(href: string) {
     </a>
 
     <!-- Desktop links -->
-    <div class="nav__links" role="list">
+    <ul class="nav__links">
       {navLinks.map(link => (
-        <a
-          href={link.href}
-          class:list={['nav__link', { 'is-active': isActive(link.href) }]}
-          role="listitem"
-        >
-          {link.label}
-        </a>
+        <li>
+          <a
+            href={link.href}
+            class:list={['nav__link', { 'is-active': isActive(link.href) }]}
+          >
+            {link.label}
+          </a>
+        </li>
       ))}
-    </div>
+    </ul>
 
     <!-- Language switcher -->
     <!--
@@ -74,17 +75,23 @@ function isActive(href: string) {
 
 <!-- Mobile drawer -->
 <div id="nav-drawer" class="nav__drawer" aria-label="Mobile navigation">
-  {navLinks.map(link => (
-    <a
-      href={link.href}
-      class:list={['nav__drawer-link', { 'is-active': isActive(link.href) }]}
-    >
-      {link.label}
-    </a>
-  ))}
-  <a href={altLangHref} class="nav__drawer-link nav__drawer-lang">
-    {isDE ? '🌐 English' : '🌐 Deutsch'}
-  </a>
+  <ul class="nav__drawer-list">
+    {navLinks.map(link => (
+      <li>
+        <a
+          href={link.href}
+          class:list={['nav__drawer-link', { 'is-active': isActive(link.href) }]}
+        >
+          {link.label}
+        </a>
+      </li>
+    ))}
+    <li>
+      <a href={altLangHref} class="nav__drawer-link nav__drawer-lang">
+        {isDE ? '🌐 English' : '🌐 Deutsch'}
+      </a>
+    </li>
+  </ul>
   <div class="nav__drawer-cta">
     <a href={`${prefix}/contact`} class="btn btn--primary" style="width:100%;justify-content:center;">
       {isDE ? 'Blinde Flecken finden' : 'Find Your Blind Spots'}
@@ -103,7 +110,7 @@ function isActive(href: string) {
     height: 68px;
     display: flex;
     align-items: center;
-    background: rgba(9, 12, 20, 0.92);
+    background: rgba(13, 9, 8, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-light);
@@ -136,7 +143,7 @@ function isActive(href: string) {
   }
   .nav__brand-sub {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--gold);
@@ -160,6 +167,7 @@ function isActive(href: string) {
     position: relative;
     padding-block: 4px;
     text-decoration: none;
+    display: block;
   }
   .nav__link::after {
     content: '';
@@ -178,7 +186,7 @@ function isActive(href: string) {
 
   .nav__lang {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -193,12 +201,12 @@ function isActive(href: string) {
 
   .nav__cta {
     font-family: var(--mono);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--gold);
-    border: 1px solid rgba(196, 154, 60, 0.35);
+    border: 1px solid rgba(212, 104, 56, 0.35);
     padding: 10px 18px;
     min-height: 44px;
     border-radius: 3px;
@@ -233,6 +241,8 @@ function isActive(href: string) {
   .nav__toggle-icon { pointer-events: none; }
 
   /* Mobile drawer */
+  .nav__drawer-list { display: flex; flex-direction: column; }
+
   .nav__drawer {
     display: none;
     position: fixed;
