@@ -5,7 +5,7 @@ const currentPath = Astro.url.pathname;
 const isDE = currentPath.startsWith('/de');
 const prefix = isDE ? '/de' : '';
 
-const lastUpdated = '1 January 2025';
+const lastUpdated = isDE ? '28. März 2026' : '28 March 2026';
 ---
 
 <Base
@@ -28,12 +28,20 @@ const lastUpdated = '1 January 2025';
         </div>
         <aside class="policy-meta" aria-label={isDE ? 'Dokumentinformationen' : 'Document information'}>
           <div class="policy-meta__row">
-            <span class="policy-meta__key">{isDE ? 'Gültig ab' : 'Effective'}</span>
+            <span class="policy-meta__key">{isDE ? 'Aktualisiert' : 'Last updated'}</span>
             <span class="policy-meta__val">{lastUpdated}</span>
           </div>
           <div class="policy-meta__row">
-            <span class="policy-meta__key">{isDE ? 'Sprache' : 'Language'}</span>
-            <span class="policy-meta__val">{isDE ? 'Deutsch / Englisch' : 'German / English'}</span>
+            <span class="policy-meta__key">{isDE ? 'Verantwortlicher' : 'Controller'}</span>
+            <span class="policy-meta__val">André Daus, Cologne DE</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Gilt für' : 'Applies to'}</span>
+            <span class="policy-meta__val">andredaus.com</span>
+          </div>
+          <div class="policy-meta__row">
+            <span class="policy-meta__key">{isDE ? 'Rahmenwerk' : 'Framework'}</span>
+            <span class="policy-meta__val">DDGEU · DSA · MStV</span>
           </div>
         </aside>
       </div>
@@ -61,15 +69,12 @@ const lastUpdated = '1 January 2025';
         <p class="policy-toc__title">{isDE ? 'Inhalt' : 'Contents'}</p>
         <nav>
           <ul class="policy-toc__list" role="list">
-            <li><a href="#responsible" class="toc__link">{isDE ? 'Verantwortlicher' : 'Responsible Party'}</a></li>
-            <li><a href="#contact" class="toc__link">{isDE ? 'Kontakt' : 'Contact'}</a></li>
-            <li><a href="#tax" class="toc__link">{isDE ? 'Steuerliche Angaben' : 'Tax Information'}</a></li>
-            <li><a href="#profession" class="toc__link">{isDE ? 'Berufsbezeichnung' : 'Professional Title'}</a></li>
-            <li><a href="#editorial" class="toc__link">{isDE ? 'Redaktionell Verantwortlicher' : 'Editorial Responsibility'}</a></li>
-            <li><a href="#disputes" class="toc__link">{isDE ? 'Streitschlichtung' : 'Dispute Resolution'}</a></li>
-            <li><a href="#liability-content" class="toc__link">{isDE ? 'Haftung für Inhalte' : 'Liability for Content'}</a></li>
-            <li><a href="#liability-links" class="toc__link">{isDE ? 'Haftung für Links' : 'Liability for Links'}</a></li>
-            <li><a href="#copyright" class="toc__link">{isDE ? 'Urheberrecht' : 'Copyright'}</a></li>
+            <li><a href="#responsible" class="toc__link">{isDE ? 'Anbieter' : 'Provider'}</a></li>
+            <li><a href="#contact" class="toc__link">{isDE ? 'Kontaktmöglichkeiten' : 'Contact Options'}</a></li>
+            <li><a href="#audiovisual" class="toc__link">{isDE ? 'Audiovisuelle Mediendienste' : 'Audiovisual Media Services'}</a></li>
+            <li><a href="#company" class="toc__link">{isDE ? 'Unternehmensangaben' : 'Company Details'}</a></li>
+            <li><a href="#social" class="toc__link">{isDE ? 'Social-Media-Konten' : 'Social Media Accounts'}</a></li>
+            <li><a href="#tdm" class="toc__link">{isDE ? 'Nutzungsvorbehalt TDM' : 'Text and Data Mining'}</a></li>
           </ul>
         </nav>
       </aside>
@@ -77,136 +82,100 @@ const lastUpdated = '1 January 2025';
       <!-- ARTICLE -->
       <article class="policy-body" lang={isDE ? 'de' : 'en'}>
 
-        <!-- 1. Responsible Party -->
+        <!-- 1. Provider -->
         <section id="responsible" aria-labelledby="h-responsible">
-          <h2 id="h-responsible">{isDE ? 'Verantwortlicher gemäß § 5 TMG' : 'Responsible Party pursuant to § 5 TMG'}</h2>
+          <h2 id="h-responsible">{isDE ? 'Anbieter' : 'Provider'}</h2>
           <address>
             <strong>André Daus</strong><br/>
-            {isDE ? 'Einzelunternehmer' : 'Sole Trader'}<br/>
-            Musterstraße 1<br/>
-            12345 Musterstadt<br/>
+            c/o Block Services<br/>
+            Stuttgarter Str. 106<br/>
+            70736 Fellbach<br/>
             {isDE ? 'Deutschland' : 'Germany'}
           </address>
-          <p>{isDE
-            ? 'Hinweis: Die vollständige Adresse wird nach Aufnahme der Geschäftstätigkeit hier eingetragen.'
-            : 'Note: The full address will be added here upon commencement of trading.'}</p>
         </section>
 
         <hr class="policy-divider"/>
 
-        <!-- 2. Contact -->
+        <!-- 2. Contact Options -->
         <section id="contact" aria-labelledby="h-contact">
-          <h2 id="h-contact">{isDE ? 'Kontakt' : 'Contact'}</h2>
+          <h2 id="h-contact">{isDE ? 'Kontaktmöglichkeiten' : 'Contact Options'}</h2>
           <dl class="policy-dl">
             <div class="policy-dl__row">
-              <dt>{isDE ? 'E-Mail' : 'Email'}</dt>
-              <dd><a href="mailto:hello@andredaus.com">hello@andredaus.com</a></dd>
+              <dt>{isDE ? 'E-Mail-Adresse' : 'E-Mail Address'}</dt>
+              <dd><a href="mailto:contact@andredaus.com">contact@andredaus.com</a></dd>
             </div>
             <div class="policy-dl__row">
-              <dt>{isDE ? 'Website' : 'Website'}</dt>
-              <dd>andredaus.com</dd>
+              <dt>{isDE ? 'Telefon' : 'Phone'}</dt>
+              <dd><a href="tel:+492211653180">+49 221 16 53 18-0</a></dd>
+            </div>
+            <div class="policy-dl__row">
+              <dt>{isDE ? 'Kontaktformular' : 'Contact form'}</dt>
+              <dd><a href="/contact">andredaus.com/contact</a></dd>
             </div>
           </dl>
         </section>
 
         <hr class="policy-divider"/>
 
-        <!-- 3. Tax -->
-        <section id="tax" aria-labelledby="h-tax">
-          <h2 id="h-tax">{isDE ? 'Steuerliche Angaben' : 'Tax Information'}</h2>
+        <!-- 3. Audiovisual Media Services -->
+        <section id="audiovisual" aria-labelledby="h-audiovisual">
+          <h2 id="h-audiovisual">{isDE ? 'Audiovisuelle Mediendienste' : 'Audiovisual Media Services'}</h2>
           <dl class="policy-dl">
             <div class="policy-dl__row">
-              <dt>{isDE ? 'Umsatzsteuer-ID' : 'VAT Identification Number'}</dt>
-              <dd>{isDE ? 'Wird nach Erteilung hier eingetragen.' : 'Will be added here upon issuance.'}</dd>
-            </div>
-            <div class="policy-dl__row">
-              <dt>{isDE ? 'Steuernummer' : 'Tax Number'}</dt>
-              <dd>{isDE ? 'Wird nach Erteilung hier eingetragen.' : 'Will be added here upon issuance.'}</dd>
-            </div>
-          </dl>
-        </section>
-
-        <hr class="policy-divider"/>
-
-        <!-- 4. Professional Title -->
-        <section id="profession" aria-labelledby="h-profession">
-          <h2 id="h-profession">{isDE ? 'Berufsbezeichnung und berufsrechtliche Regelungen' : 'Professional Title and Regulatory Information'}</h2>
-          <dl class="policy-dl">
-            <div class="policy-dl__row">
-              <dt>{isDE ? 'Berufsbezeichnung' : 'Professional title'}</dt>
-              <dd>{isDE ? 'Unternehmensberater / Coach (freiberuflich)' : 'Business Consultant / Coach (freelance)'}</dd>
-            </div>
-            <div class="policy-dl__row">
-              <dt>{isDE ? 'Verliehen in' : 'Awarded in'}</dt>
+              <dt>{isDE ? 'Niederlassungsland' : 'Country of domicile'}</dt>
               <dd>{isDE ? 'Deutschland' : 'Germany'}</dd>
             </div>
+            <div class="policy-dl__row">
+              <dt>{isDE ? 'Zuständige Aufsichtsbehörde' : 'Competent regulatory authority'}</dt>
+              <dd>
+                <a href="https://www.medienanstalt-nrw.de/" target="_blank" rel="noopener noreferrer">
+                  {isDE ? 'Medienanstalt NRW' : 'State Media Authority NRW'}
+                </a>
+              </dd>
+            </div>
           </dl>
-          <p>{isDE
-            ? 'Die Berufsbezeichnung "Unternehmensberater" und "Coach" sind in Deutschland nicht gesetzlich geschützt. Es bestehen keine berufsrechtlichen Regelungen durch eine Kammer oder einen Berufsverband.'
-            : 'The professional titles "Business Consultant" and "Coach" are not legally protected in Germany. There are no professional regulations by a chamber or professional association.'}</p>
         </section>
 
         <hr class="policy-divider"/>
 
-        <!-- 5. Editorial Responsibility -->
-        <section id="editorial" aria-labelledby="h-editorial">
-          <h2 id="h-editorial">{isDE ? 'Redaktionell Verantwortlicher gemäß § 55 Abs. 2 RStV' : 'Editorial Responsibility pursuant to § 55 Para. 2 RStV'}</h2>
-          <address>
-            <strong>André Daus</strong><br/>
-            {isDE ? '(Adresse wie oben)' : '(Address as above)'}
-          </address>
+        <!-- 4. Company Details -->
+        <section id="company" aria-labelledby="h-company">
+          <h2 id="h-company">{isDE ? 'Unternehmensangaben' : 'Company Details'}</h2>
+          <dl class="policy-dl">
+            <div class="policy-dl__row">
+              <dt>{isDE ? 'Umsatzsteuer-Identifikationsnummer' : 'VAT identification number'}</dt>
+              <dd>DE311510201</dd>
+            </div>
+            <div class="policy-dl__row">
+              <dt>{isDE ? 'AGB' : 'Terms'}</dt>
+              <dd><a href={`${prefix}/policy/terms`}>{isDE ? 'andredaus.com/de/policy/terms' : 'andredaus.com/policy/terms'}</a></dd>
+            </div>
+          </dl>
         </section>
 
         <hr class="policy-divider"/>
 
-        <!-- 6. Dispute Resolution -->
-        <section id="disputes" aria-labelledby="h-disputes">
-          <h2 id="h-disputes">{isDE ? 'Streitschlichtung' : 'Dispute Resolution'}</h2>
+        <!-- 5. Social Media Accounts -->
+        <section id="social" aria-labelledby="h-social">
+          <h2 id="h-social">{isDE ? 'Social-Media-Konten und andere Onlineprofile' : 'Social Media Accounts and other Online Profiles'}</h2>
           <p>{isDE
-            ? 'Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: https://ec.europa.eu/consumers/odr/. Unsere E-Mail-Adresse finden Sie oben im Impressum.'
-            : 'The European Commission provides a platform for online dispute resolution (ODR): https://ec.europa.eu/consumers/odr/. Our email address can be found above in the legal notice.'}</p>
-          <p>{isDE
-            ? 'Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.'
-            : 'We are not willing or obliged to participate in dispute resolution proceedings before a consumer arbitration board.'}</p>
+            ? 'Dieses Impressum gilt auch für folgende Social-Media-Konten und Onlineprofile:'
+            : 'This legal notice also applies to the following social media accounts and online profiles:'}</p>
+          <ul class="policy-list">
+            <li><a href="https://linkedin.com/in/andredaus" target="_blank" rel="noopener noreferrer">linkedin.com/in/andredaus</a></li>
+            <li><a href="https://youtube.com/@AndreDaus" target="_blank" rel="noopener noreferrer">youtube.com/@AndreDaus</a></li>
+            <li><a href="https://instagram.com/andredaus" target="_blank" rel="noopener noreferrer">instagram.com/andredaus</a></li>
+          </ul>
         </section>
 
         <hr class="policy-divider"/>
 
-        <!-- 7. Liability for Content -->
-        <section id="liability-content" aria-labelledby="h-liability-content">
-          <h2 id="h-liability-content">{isDE ? 'Haftung für Inhalte' : 'Liability for Content'}</h2>
+        <!-- 6. Text and Data Mining -->
+        <section id="tdm" aria-labelledby="h-tdm">
+          <h2 id="h-tdm">{isDE ? 'Nutzungsvorbehalt für Text und Data Mining' : 'Reservation of use for text and data mining'}</h2>
           <p>{isDE
-            ? 'Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.'
-            : 'As a service provider, we are responsible for our own content on these pages in accordance with § 7 para. 1 TMG and general laws. However, pursuant to §§ 8 to 10 TMG, we are not obliged to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity.'}</p>
-          <p>{isDE
-            ? 'Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.'
-            : 'Obligations to remove or block the use of information under general laws remain unaffected. However, liability in this regard is only possible from the point in time at which a specific infringement of the law becomes known. Upon notification of such violations, we will remove the content immediately.'}</p>
-        </section>
-
-        <hr class="policy-divider"/>
-
-        <!-- 8. Liability for Links -->
-        <section id="liability-links" aria-labelledby="h-liability-links">
-          <h2 id="h-liability-links">{isDE ? 'Haftung für Links' : 'Liability for Links'}</h2>
-          <p>{isDE
-            ? 'Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich.'
-            : 'Our website contains links to external third-party websites, the content of which we have no influence over. Therefore, we cannot assume any liability for these external contents. The respective provider or operator of the linked pages is always responsible for the content of those pages.'}</p>
-          <p>{isDE
-            ? 'Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.'
-            : 'The linked pages were checked for possible legal violations at the time of linking. No illegal content was apparent at the time of linking. However, permanent monitoring of the content of the linked pages is not reasonable without concrete indications of a legal violation. Upon notification of violations, we will remove such links immediately.'}</p>
-        </section>
-
-        <hr class="policy-divider"/>
-
-        <!-- 9. Copyright -->
-        <section id="copyright" aria-labelledby="h-copyright">
-          <h2 id="h-copyright">{isDE ? 'Urheberrecht' : 'Copyright'}</h2>
-          <p>{isDE
-            ? 'Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.'
-            : 'The content and works created by the site operators on these pages are subject to German copyright law. Reproduction, editing, distribution and any kind of exploitation outside the limits of copyright require the written consent of the respective author or creator.'}</p>
-          <p>{isDE
-            ? 'Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.'
-            : 'Downloads and copies of this site are only permitted for private, non-commercial use. Insofar as the content on this site was not created by the operator, the copyrights of third parties are respected. Third-party content is identified as such. Should you nevertheless become aware of a copyright violation, please inform us accordingly. Upon notification of violations, we will remove such content immediately.'}</p>
+            ? 'Nutzungsvorbehalt für Text und Data Mining: Der Inhaber dieser Website gestattet die Nutzung oder das Herunterladen von Inhalten dieser Website durch Dritte für die Entwicklung, das Training oder den Betrieb von künstlicher Intelligenz oder anderen maschinellen Lernsystemen („Text und Data Mining") ausschließlich mit der ausdrücklichen schriftlichen Zustimmung des Inhabers. Ohne eine solche Zustimmung ist es verboten, die Inhalte für Text und Data Mining zu nutzen. Dies gilt auch dann, wenn auf der Website keine Meta-Tags vorhanden sind, die solche Prozesse blockieren, und auch dann, wenn Bots, die die Website zu Text- und Data-Mining-Zwecken auslesen sollen, nicht blockiert werden.'
+            : 'Reservation of use for text and data mining: The owner of this website permits the use or downloading of content from this website by third parties for the development, training, or operation of artificial intelligence or other machine learning systems ("Text and Data Mining") exclusively with the express written consent of the owner. Without such consent, it is prohibited to use the content for Text and Data Mining. This applies even if there are no meta tags on the website that block such processes, and even if bots designed to read the website for Text and Data Mining purposes are not blocked.'}</p>
         </section>
 
       </article>
@@ -339,6 +308,15 @@ const lastUpdated = '1 January 2025';
   .policy-body section { margin-bottom: 3rem; }
   .policy-body section:last-child { margin-bottom: 0; }
   .policy-divider { border: none; border-top: 1px solid var(--border-light); margin-block: 2.5rem; }
+
+  /* Inline list (social links) */
+  .policy-list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: .375rem;
+  }
+  .policy-list li::before { content: '→ '; color: var(--gold); font-family: var(--mono); font-size: 12px; }
+  .policy-list a { color: var(--gold); text-underline-offset: 3px; }
+  .policy-list a:hover { color: var(--gold-light); }
 
   /* Definition list */
   .policy-dl { margin-bottom: 1rem; }
