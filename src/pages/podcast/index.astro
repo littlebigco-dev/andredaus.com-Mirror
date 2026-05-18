@@ -434,19 +434,30 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
       if (counter) counter.textContent = String(n);
     }
 
-    btns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        btns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
-        btn.classList.add('is-active');
-        btn.setAttribute('aria-pressed', 'true');
-        const cat = btn.dataset.cat ?? 'all';
-        items.forEach(li => {
-          li.style.display = cat === 'all' || li.dataset.cat === cat ? '' : 'none';
-        });
-        updateCount();
+    function applyFilter(cat: string, updateUrl = true) {
+      btns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
+      const match = Array.from(btns).find(b => b.dataset.cat === cat) ?? btns[0];
+      match.classList.add('is-active');
+      match.setAttribute('aria-pressed', 'true');
+      const active = match.dataset.cat ?? 'all';
+      items.forEach(li => {
+        li.style.display = active === 'all' || li.dataset.cat === active ? '' : 'none';
       });
+      updateCount();
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        if (active === 'all') { url.searchParams.delete('cat'); } else { url.searchParams.set('cat', active); }
+        history.replaceState(null, '', url.toString());
+      }
+    }
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => applyFilter(btn.dataset.cat ?? 'all'));
     });
 
+    // Activate filter from URL param on load
+    const initCat = new URL(window.location.href).searchParams.get('cat') ?? 'all';
+    applyFilter(initCat, false);
     updateCount();
 
     // Scroll reveal

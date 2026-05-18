@@ -3,7 +3,7 @@ title: "The Problem Is Rarely the Problem"
 og_title: "The Problem Is Rarely the Problem"
 date: "2026-04-29T13:00:00.000Z"
 episode_number: 59
-category: "Solo Episode"
+category: "Business Strategy"
 status: "published"
 duration: "00:13:17"
 audio_url: "https://anchor.fm/s/7320b160/podcast/play/119226466/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-3-29%2F423117072-44100-2-7935967a332e2.mp3"

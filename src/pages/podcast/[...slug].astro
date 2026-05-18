@@ -130,7 +130,12 @@ const episodeJsonLd = JSON.stringify({
             <span class="ep-badge ep-badge--num" role="listitem">
               {isDE ? 'Episode' : 'Episode'} {String(entry.data.episode_number).padStart(3,'0')}
             </span>
-            <span class="ep-badge" role="listitem">{entry.data.category}</span>
+            <a
+              href={`${prefix}/podcast?cat=${encodeURIComponent(entry.data.category)}`}
+              class="ep-badge ep-badge--link"
+              role="listitem"
+              aria-label={isDE ? `Kategorie: ${entry.data.category}` : `Category: ${entry.data.category}`}
+            >{entry.data.category}</a>
             {ytVideoId && (
               <span class="ep-badge ep-badge--video" role="listitem">
                 {isDE ? 'Video verfügbar' : 'Video available'}
@@ -212,12 +217,6 @@ const episodeJsonLd = JSON.stringify({
               Apple Podcasts
             </a>
           </div>
-
-          <p class="ep-listen-note">
-            {isDE
-              ? 'Audio auf allen Plattformen · Video auf YouTube'
-              : 'Audio-only available on all platforms · Video on YouTube'}
-          </p>
 
           <!-- Share buttons -->
           <div class="ep-share">
@@ -355,7 +354,11 @@ const episodeJsonLd = JSON.stringify({
           )}
           <div class="ep-meta-row">
             <span class="ep-meta-key">{isDE ? 'Kategorie' : 'Category'}</span>
-            <span class="ep-meta-val">{entry.data.category}</span>
+            <span class="ep-meta-val">
+              <a href={`${prefix}/podcast?cat=${encodeURIComponent(entry.data.category)}`}>
+                {entry.data.category}
+              </a>
+            </span>
           </div>
           {entry.data.spotify_url && (
             <div class="ep-meta-row">
@@ -673,14 +676,15 @@ const episodeJsonLd = JSON.stringify({
   .ep-listen-btn--primary:hover { background: var(--gold-light); color: #080a10; border-color: var(--gold-light); }
   .ep-listen-btn__icon { width: 18px; height: 18px; flex-shrink: 0; }
 
-  .ep-listen-note {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    color: var(--text-subtle);
-    margin-top: 0.25rem;
-    text-align: center;
-    line-height: 1.5;
+  .ep-badge--link {
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .ep-badge--link:hover {
+    background: var(--gold-dim);
+    color: var(--gold-light);
+    border-color: var(--gold-dim);
   }
 
   .ep-share { display: flex; align-items: center; gap: 0.625rem; margin-top: 0.5rem; }

@@ -46,7 +46,7 @@ function formatDate(d: Date) {
 
         <div class="episode-hero__content">
           <div class="episode-hero__meta">
-            <span class="episode-cat">{entry.data.category}</span>
+            <a href={`/de/podcast?cat=${encodeURIComponent(entry.data.category)}`} class="episode-cat episode-cat--link">{entry.data.category}</a>
             <span class="episode-num">Episode {String(entry.data.episode_number).padStart(3, '0')}</span>
             <time datetime={entry.data.date.toISOString()} class="episode-date">
               {formatDate(entry.data.date)}
@@ -146,7 +146,9 @@ function formatDate(d: Date) {
     padding: 3px 8px;
     border: 1px solid var(--border);
     border-radius: 2px;
+    text-decoration: none;
   }
+  .episode-cat--link:hover { border-color: var(--gold-dim); color: var(--gold-light); }
   .episode-num { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); }
   .episode-date { font-family: var(--mono); font-size: 13px; color: var(--text-secondary); }
   .episode-hero__title {

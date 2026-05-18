@@ -3,7 +3,7 @@ title: "Follow Your Passion Is Why So Many People Feel Lost"
 og_title: "Follow Your Passion Is Why So Many People Feel Lost"
 date: "2026-05-06T13:00:00.000Z"
 episode_number: 60
-category: "Solo Episode"
+category: "Psychology"
 status: "published"
 duration: "00:13:11"
 audio_url: "https://anchor.fm/s/7320b160/podcast/play/119574682/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-4-6%2F423593110-44100-2-c6221b1c7ce85.mp3"
