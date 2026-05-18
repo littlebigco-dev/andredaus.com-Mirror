@@ -106,7 +106,7 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
               Spotify
               <span class="platform-link__sub">{isDE ? 'Audio' : 'Audio'}</span>
             </a>
-            <a href="https://podcasts.apple.com/podcast/iconoclast-insights/id0000000" class="platform-link" target="_blank" rel="noopener noreferrer">
+            <a href="https://podcasts.apple.com/podcast/iconoclast-insights/id1800914487" class="platform-link" target="_blank" rel="noopener noreferrer">
               <svg class="platform-link__icon" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 300 300" aria-hidden="true">
                 <linearGradient id="apple-grad-idx" x1="150" x2="150" y1="0" y2="300" gradientUnits="userSpaceOnUse">
                   <stop offset="0" style="stop-color:#f452ff"/>
@@ -166,6 +166,9 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
           </p>
           <a href="https://open.spotify.com/show/36YRWk7nrI6V8w9lMncynG" class="btn btn--primary" target="_blank" rel="noopener noreferrer">
             {isDE ? 'Auf Spotify folgen' : 'Follow on Spotify'}
+          </a>
+          <a href="https://www.youtube.com/@andredaus?sub_confirmation=1" class="btn btn--outline" target="_blank" rel="noopener noreferrer">
+            {isDE ? 'Auf YouTube abonnieren' : 'Subscribe on YouTube'}
           </a>
           <a href="/podcast/feed.xml" class="show-sub__rss">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -293,7 +296,7 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
           {(featured ? [featured, ...rest] : episodes).map((ep, i) => {
             const art = getSquareArtwork(ep);
             return (
-              <li class="fade-up" data-cat={ep.data.category}>
+              <li class="fade-up" data-cat={ep.data.category} data-index={i}>
                 <a
                   href={`${prefix}/podcast/${slugify(ep)}`}
                   class="ep-row"
@@ -351,6 +354,12 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
           })}
         </ol>
       )}
+
+      <div id="load-more-wrap" style="display:none; text-align:center; padding-top:2rem">
+        <button id="load-more-btn" class="btn btn--outline load-more-btn" type="button">
+          {isDE ? 'Mehr laden' : 'Load more'}
+        </button>
+      </div>
     </div>
   </section>
 
@@ -380,7 +389,7 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
               <span class="platform-card__name">Spotify</span>
               <span class="platform-card__sub">{isDE ? 'Audio' : 'Audio'}</span>
             </a>
-            <a href="https://podcasts.apple.com/podcast/iconoclast-insights/id0000000" class="platform-card" target="_blank" rel="noopener noreferrer">
+            <a href="https://podcasts.apple.com/podcast/iconoclast-insights/id1800914487" class="platform-card" target="_blank" rel="noopener noreferrer">
               <span class="platform-card__name">Apple Podcasts</span>
               <span class="platform-card__sub">{isDE ? 'Audio' : 'Audio'}</span>
             </a>
@@ -423,42 +432,59 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
 
 <script>
   (function () {
-    // Category filter
-    const btns = document.querySelectorAll<HTMLButtonElement>('.cat-btn');
-    const items = document.querySelectorAll<HTMLElement>('#ep-grid > li');
-    const counter = document.getElementById('visible-count');
+    const BATCH = 20;
+    let shown = BATCH;
+    let activeCat = 'all';
 
-    function updateCount() {
-      let n = 0;
-      items.forEach(li => { if (li.style.display !== 'none') n++; });
-      if (counter) counter.textContent = String(n);
+    const btns    = Array.from(document.querySelectorAll<HTMLButtonElement>('.cat-btn'));
+    const items   = Array.from(document.querySelectorAll<HTMLElement>('#ep-grid > li'));
+    const counter = document.getElementById('visible-count');
+    const loadWrap = document.getElementById('load-more-wrap') as HTMLElement | null;
+    const loadBtn  = document.getElementById('load-more-btn') as HTMLButtonElement | null;
+
+    function filtered() {
+      return items.filter(li => activeCat === 'all' || li.dataset.cat === activeCat);
     }
 
-    function applyFilter(cat: string, updateUrl = true) {
-      btns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
-      const match = Array.from(btns).find(b => b.dataset.cat === cat) ?? btns[0];
-      match.classList.add('is-active');
-      match.setAttribute('aria-pressed', 'true');
-      const active = match.dataset.cat ?? 'all';
-      items.forEach(li => {
-        li.style.display = active === 'all' || li.dataset.cat === active ? '' : 'none';
-      });
-      updateCount();
-      if (updateUrl) {
-        const url = new URL(window.location.href);
-        if (active === 'all') { url.searchParams.delete('cat'); } else { url.searchParams.set('cat', active); }
-        history.replaceState(null, '', url.toString());
+    function refresh(resetShown = false) {
+      if (resetShown) shown = BATCH;
+      const visible = filtered();
+      items.forEach(li => { li.style.display = 'none'; });
+      visible.slice(0, shown).forEach(li => { li.style.display = ''; });
+      if (counter) counter.textContent = String(visible.length);
+
+      const remaining = visible.length - shown;
+      if (loadWrap) loadWrap.style.display = remaining > 0 ? '' : 'none';
+      if (loadBtn) {
+        const next = Math.min(BATCH, remaining);
+        loadBtn.textContent = remaining > 0
+          ? (document.documentElement.lang === 'de'
+              ? `${next} weitere laden · noch ${remaining}`
+              : `Load ${next} more · ${remaining} remaining`)
+          : '';
       }
     }
 
-    btns.forEach(btn => {
-      btn.addEventListener('click', () => applyFilter(btn.dataset.cat ?? 'all'));
-    });
+    function setFilter(cat: string, updateUrl = true) {
+      activeCat = cat;
+      btns.forEach(b => { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
+      const match = btns.find(b => b.dataset.cat === cat) ?? btns[0];
+      match.classList.add('is-active');
+      match.setAttribute('aria-pressed', 'true');
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        cat === 'all' ? url.searchParams.delete('cat') : url.searchParams.set('cat', cat);
+        history.replaceState(null, '', url.toString());
+      }
+      refresh(true);
+    }
 
-    // Activate filter from URL param on load
+    btns.forEach(btn => btn.addEventListener('click', () => setFilter(btn.dataset.cat ?? 'all')));
+    loadBtn?.addEventListener('click', () => { shown += BATCH; refresh(false); });
+
+    // Init from URL param
     const initCat = new URL(window.location.href).searchParams.get('cat') ?? 'all';
-    applyFilter(initCat, false);
-    updateCount();
+    setFilter(initCat, false);
 
     // Scroll reveal
     if (!window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
@@ -992,6 +1018,13 @@ const spPath = 'M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5
     .ep-row { grid-template-columns: 44px 1fr; }
     .ep-aside { display: none; }
     .ep-excerpt { display: none; }
+  }
+
+  .load-more-btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    min-width: 260px;
   }
 
   /* ── Subscribe band ────────────────────────────────────────────────────── */

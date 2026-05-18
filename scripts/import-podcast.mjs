@@ -21,6 +21,8 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 const RSS_URL = process.env.PODCAST_RSS_URL;
+const APPLE_PODCASTS_SHOW_ID = 'id1800914487';
+const APPLE_PODCASTS_BASE = `https://podcasts.apple.com/podcast`;
 
 if (!RSS_URL) {
   console.log('[import-podcast] PODCAST_RSS_URL not set — skipping.');
@@ -211,6 +213,9 @@ async function main() {
     // Category from itunes:category
     const rawCategory = xmlAttr(item, 'itunes:category', 'text') || 'Solo Episode';
 
+    // Apple Podcasts episode deep link — slug derived from title, show ID appended
+    const applePodcastsUrl = `${APPLE_PODCASTS_BASE}/${slugify(title)}/${APPLE_PODCASTS_SHOW_ID}`;
+
     const fields = {
       title,
       og_title: title,           // override manually when shorter title needed
@@ -222,6 +227,7 @@ async function main() {
       audio_url: audioUrl,
       episode_id: episodeId,
       artwork_url: artworkUrl,
+      apple_podcasts_url: applePodcastsUrl,
       description,
       og_image: ogImage,
       summary: '',               // filled by generate-summaries.mjs

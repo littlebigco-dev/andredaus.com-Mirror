@@ -186,8 +186,9 @@ const podcast = defineCollection({
     episode_id:     z.string().optional(),        // RSS <guid>
     audio_url:      z.string().url(),             // ← RSS <enclosure url> — direct MP3
     artwork_url:    z.string().url().optional(),  // RSS <itunes:image href>
-    spotify_url:    z.string().url().optional(),  // open.spotify.com/episode/... (external link only)
-    youtube_url:    z.string().url().optional(),  // YouTube watch URL
+    spotify_url:         z.string().url().optional(),  // open.spotify.com/episode/...
+    youtube_url:         z.string().url().optional(),  // YouTube watch URL
+    apple_podcasts_url:  z.string().url().optional(),  // podcasts.apple.com/podcast/{slug}/id1800914487
     duration:       z.string().optional(),        // RSS <itunes:duration> e.g. "00:47:23"
     category:       z.string(),
     status:         z.enum(['draft', 'published']),

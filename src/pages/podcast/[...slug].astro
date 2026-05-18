@@ -36,6 +36,23 @@ function fmtDuration(d?: string): string {
   return d;
 }
 
+// Apple Podcasts constants
+const APPLE_PODCASTS_SHOW_ID = 'id1800914487';
+const APPLE_PODCASTS_SHOW_URL = `https://podcasts.apple.com/podcast/iconoclast-insights/${APPLE_PODCASTS_SHOW_ID}`;
+
+function appleEpisodeUrl(title: string): string {
+  const slug = title
+    .toLowerCase()
+    .replace(/[–—]/g, '-')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return `https://podcasts.apple.com/podcast/${slug}/${APPLE_PODCASTS_SHOW_ID}`;
+}
+
+const appleUrl = entry.data.apple_podcasts_url ?? appleEpisodeUrl(entry.data.title);
+
 // YouTube video ID extraction
 function extractYtId(url?: string): string | null {
   if (!url) return null;
@@ -196,7 +213,7 @@ const episodeJsonLd = JSON.stringify({
               </a>
             )}
             <a
-              href="https://podcasts.apple.com/podcast/iconoclast-insights/id0000000"
+              href={appleUrl}
               class="ep-listen-btn"
               target="_blank"
               rel="noopener noreferrer"
